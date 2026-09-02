@@ -1,0 +1,38 @@
+{
+  "started_at": "2026-09-02T00:51:52-0400",
+  "scene": "/Users/yangjudx/Documents/Robotics/vendor/unitree_mujoco/unitree_robots/g1/scene.xml",
+  "mujoco_version": "3.3.6",
+  "numpy_version": "2.5.2",
+  "checks": {
+    "model_loads": true,
+    "simulation_advances": true,
+    "reset_works": true,
+    "joint_state_can_be_read": true,
+    "safe_joint_command_changes_state": true,
+    "screenshot_captured": true
+  },
+  "model": {
+    "nq": 36,
+    "nv": 35,
+    "nu": 29,
+    "nbody": 31,
+    "njnt": 30,
+    "nsensor": 95
+  },
+  "initial_time": 0.0,
+  "advanced_time": 0.04000000000000002,
+  "joint_read": {
+    "joint": "left_shoulder_pitch_joint",
+    "before_reset_qpos": 0.001497352166534418,
+    "after_reset_qpos": 0.0
+  },
+  "command": {
+    "actuator": "left_shoulder_pitch",
+    "ctrl": 0.2,
+    "joint": "left_shoulder_pitch_joint",
+    "baseline_qpos": 0.0,
+    "commanded_qpos": -0.11684565300949047,
+    "delta_qpos": -0.11684565300949047
+  },
+  "screenshot": "/Users/yangjudx/Documents/Robotics/artifacts/g1_scene_smoke.png"
+}

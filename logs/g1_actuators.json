@@ -1,0 +1,766 @@
+{
+  "repo_commit": "4134cb5dc7ff1ba7f484deda48b5274b58694519",
+  "scene": "vendor/unitree_mujoco/unitree_robots/g1/scene.xml",
+  "model_xml": "vendor/unitree_mujoco/unitree_robots/g1/g1_29dof.xml",
+  "mujoco_version": "3.3.6",
+  "model_counts": {
+    "nq": 36,
+    "nv": 35,
+    "nu": 29,
+    "nbody": 31,
+    "njnt": 30,
+    "ngeom": 179,
+    "nsite": 2,
+    "nsensor": 95
+  },
+  "actuators": [
+    {
+      "index": 0,
+      "actuator_name": "left_hip_pitch",
+      "controlled_joint": "left_hip_pitch_joint",
+      "control_range": [
+        -88.0,
+        88.0
+      ],
+      "joint_range": [
+        -2.5307,
+        2.8798
+      ],
+      "associated_body": "left_hip_pitch_link"
+    },
+    {
+      "index": 1,
+      "actuator_name": "left_hip_roll",
+      "controlled_joint": "left_hip_roll_joint",
+      "control_range": [
+        -88.0,
+        88.0
+      ],
+      "joint_range": [
+        -0.5236,
+        2.9671
+      ],
+      "associated_body": "left_hip_roll_link"
+    },
+    {
+      "index": 2,
+      "actuator_name": "left_hip_yaw",
+      "controlled_joint": "left_hip_yaw_joint",
+      "control_range": [
+        -88.0,
+        88.0
+      ],
+      "joint_range": [
+        -2.7576,
+        2.7576
+      ],
+      "associated_body": "left_hip_yaw_link"
+    },
+    {
+      "index": 3,
+      "actuator_name": "left_knee",
+      "controlled_joint": "left_knee_joint",
+      "control_range": [
+        -139.0,
+        139.0
+      ],
+      "joint_range": [
+        -0.087267,
+        2.8798
+      ],
+      "associated_body": "left_knee_link"
+    },
+    {
+      "index": 4,
+      "actuator_name": "left_ankle_pitch",
+      "controlled_joint": "left_ankle_pitch_joint",
+      "control_range": [
+        -50.0,
+        50.0
+      ],
+      "joint_range": [
+        -0.87267,
+        0.5236
+      ],
+      "associated_body": "left_ankle_pitch_link"
+    },
+    {
+      "index": 5,
+      "actuator_name": "left_ankle_roll",
+      "controlled_joint": "left_ankle_roll_joint",
+      "control_range": [
+        -50.0,
+        50.0
+      ],
+      "joint_range": [
+        -0.2618,
+        0.2618
+      ],
+      "associated_body": "left_ankle_roll_link"
+    },
+    {
+      "index": 6,
+      "actuator_name": "right_hip_pitch",
+      "controlled_joint": "right_hip_pitch_joint",
+      "control_range": [
+        -88.0,
+        88.0
+      ],
+      "joint_range": [
+        -2.5307,
+        2.8798
+      ],
+      "associated_body": "right_hip_pitch_link"
+    },
+    {
+      "index": 7,
+      "actuator_name": "right_hip_roll",
+      "controlled_joint": "right_hip_roll_joint",
+      "control_range": [
+        -88.0,
+        88.0
+      ],
+      "joint_range": [
+        -2.9671,
+        0.5236
+      ],
+      "associated_body": "right_hip_roll_link"
+    },
+    {
+      "index": 8,
+      "actuator_name": "right_hip_yaw",
+      "controlled_joint": "right_hip_yaw_joint",
+      "control_range": [
+        -88.0,
+        88.0
+      ],
+      "joint_range": [
+        -2.7576,
+        2.7576
+      ],
+      "associated_body": "right_hip_yaw_link"
+    },
+    {
+      "index": 9,
+      "actuator_name": "right_knee",
+      "controlled_joint": "right_knee_joint",
+      "control_range": [
+        -139.0,
+        139.0
+      ],
+      "joint_range": [
+        -0.087267,
+        2.8798
+      ],
+      "associated_body": "right_knee_link"
+    },
+    {
+      "index": 10,
+      "actuator_name": "right_ankle_pitch",
+      "controlled_joint": "right_ankle_pitch_joint",
+      "control_range": [
+        -50.0,
+        50.0
+      ],
+      "joint_range": [
+        -0.87267,
+        0.5236
+      ],
+      "associated_body": "right_ankle_pitch_link"
+    },
+    {
+      "index": 11,
+      "actuator_name": "right_ankle_roll",
+      "controlled_joint": "right_ankle_roll_joint",
+      "control_range": [
+        -50.0,
+        50.0
+      ],
+      "joint_range": [
+        -0.2618,
+        0.2618
+      ],
+      "associated_body": "right_ankle_roll_link"
+    },
+    {
+      "index": 12,
+      "actuator_name": "waist_yaw",
+      "controlled_joint": "waist_yaw_joint",
+      "control_range": [
+        -88.0,
+        88.0
+      ],
+      "joint_range": [
+        -2.618,
+        2.618
+      ],
+      "associated_body": "waist_yaw_link"
+    },
+    {
+      "index": 13,
+      "actuator_name": "waist_roll",
+      "controlled_joint": "waist_roll_joint",
+      "control_range": [
+        -50.0,
+        50.0
+      ],
+      "joint_range": [
+        -0.52,
+        0.52
+      ],
+      "associated_body": "waist_roll_link"
+    },
+    {
+      "index": 14,
+      "actuator_name": "waist_pitch",
+      "controlled_joint": "waist_pitch_joint",
+      "control_range": [
+        -50.0,
+        50.0
+      ],
+      "joint_range": [
+        -0.52,
+        0.52
+      ],
+      "associated_body": "torso_link"
+    },
+    {
+      "index": 15,
+      "actuator_name": "left_shoulder_pitch",
+      "controlled_joint": "left_shoulder_pitch_joint",
+      "control_range": [
+        -25.0,
+        25.0
+      ],
+      "joint_range": [
+        -3.0892,
+        2.6704
+      ],
+      "associated_body": "left_shoulder_pitch_link"
+    },
+    {
+      "index": 16,
+      "actuator_name": "left_shoulder_roll",
+      "controlled_joint": "left_shoulder_roll_joint",
+      "control_range": [
+        -25.0,
+        25.0
+      ],
+      "joint_range": [
+        -1.5882,
+        2.2515
+      ],
+      "associated_body": "left_shoulder_roll_link"
+    },
+    {
+      "index": 17,
+      "actuator_name": "left_shoulder_yaw",
+      "controlled_joint": "left_shoulder_yaw_joint",
+      "control_range": [
+        -25.0,
+        25.0
+      ],
+      "joint_range": [
+        -2.618,
+        2.618
+      ],
+      "associated_body": "left_shoulder_yaw_link"
+    },
+    {
+      "index": 18,
+      "actuator_name": "left_elbow",
+      "controlled_joint": "left_elbow_joint",
+      "control_range": [
+        -25.0,
+        25.0
+      ],
+      "joint_range": [
+        -1.0472,
+        2.0944
+      ],
+      "associated_body": "left_elbow_link"
+    },
+    {
+      "index": 19,
+      "actuator_name": "left_wrist_roll",
+      "controlled_joint": "left_wrist_roll_joint",
+      "control_range": [
+        -25.0,
+        25.0
+      ],
+      "joint_range": [
+        -1.97222,
+        1.97222
+      ],
+      "associated_body": "left_wrist_roll_link"
+    },
+    {
+      "index": 20,
+      "actuator_name": "left_wrist_pitch",
+      "controlled_joint": "left_wrist_pitch_joint",
+      "control_range": [
+        -5.0,
+        5.0
+      ],
+      "joint_range": [
+        -1.61443,
+        1.61443
+      ],
+      "associated_body": "left_wrist_pitch_link"
+    },
+    {
+      "index": 21,
+      "actuator_name": "left_wrist_yaw",
+      "controlled_joint": "left_wrist_yaw_joint",
+      "control_range": [
+        -5.0,
+        5.0
+      ],
+      "joint_range": [
+        -1.61443,
+        1.61443
+      ],
+      "associated_body": "left_wrist_yaw_link"
+    },
+    {
+      "index": 22,
+      "actuator_name": "right_shoulder_pitch",
+      "controlled_joint": "right_shoulder_pitch_joint",
+      "control_range": [
+        -25.0,
+        25.0
+      ],
+      "joint_range": [
+        -3.0892,
+        2.6704
+      ],
+      "associated_body": "right_shoulder_pitch_link"
+    },
+    {
+      "index": 23,
+      "actuator_name": "right_shoulder_roll",
+      "controlled_joint": "right_shoulder_roll_joint",
+      "control_range": [
+        -25.0,
+        25.0
+      ],
+      "joint_range": [
+        -2.2515,
+        1.5882
+      ],
+      "associated_body": "right_shoulder_roll_link"
+    },
+    {
+      "index": 24,
+      "actuator_name": "right_shoulder_yaw",
+      "controlled_joint": "right_shoulder_yaw_joint",
+      "control_range": [
+        -25.0,
+        25.0
+      ],
+      "joint_range": [
+        -2.618,
+        2.618
+      ],
+      "associated_body": "right_shoulder_yaw_link"
+    },
+    {
+      "index": 25,
+      "actuator_name": "right_elbow",
+      "controlled_joint": "right_elbow_joint",
+      "control_range": [
+        -25.0,
+        25.0
+      ],
+      "joint_range": [
+        -1.0472,
+        2.0944
+      ],
+      "associated_body": "right_elbow_link"
+    },
+    {
+      "index": 26,
+      "actuator_name": "right_wrist_roll",
+      "controlled_joint": "right_wrist_roll_joint",
+      "control_range": [
+        -25.0,
+        25.0
+      ],
+      "joint_range": [
+        -1.97222,
+        1.97222
+      ],
+      "associated_body": "right_wrist_roll_link"
+    },
+    {
+      "index": 27,
+      "actuator_name": "right_wrist_pitch",
+      "controlled_joint": "right_wrist_pitch_joint",
+      "control_range": [
+        -5.0,
+        5.0
+      ],
+      "joint_range": [
+        -1.61443,
+        1.61443
+      ],
+      "associated_body": "right_wrist_pitch_link"
+    },
+    {
+      "index": 28,
+      "actuator_name": "right_wrist_yaw",
+      "controlled_joint": "right_wrist_yaw_joint",
+      "control_range": [
+        -5.0,
+        5.0
+      ],
+      "joint_range": [
+        -1.61443,
+        1.61443
+      ],
+      "associated_body": "right_wrist_yaw_link"
+    }
+  ],
+  "bodies": {
+    "wrist_end_effector_bodies": [
+      {
+        "body": "left_wrist_roll_link",
+        "joints": [
+          "left_wrist_roll_joint"
+        ],
+        "geoms": [
+          "<unnamed:157>",
+          "<unnamed:158>"
+        ]
+      },
+      {
+        "body": "left_wrist_pitch_link",
+        "joints": [
+          "left_wrist_pitch_joint"
+        ],
+        "geoms": [
+          "<unnamed:159>",
+          "<unnamed:160>"
+        ]
+      },
+      {
+        "body": "left_wrist_yaw_link",
+        "joints": [
+          "left_wrist_yaw_joint"
+        ],
+        "geoms": [
+          "<unnamed:161>",
+          "<unnamed:162>",
+          "<unnamed:163>"
+        ]
+      },
+      {
+        "body": "right_wrist_roll_link",
+        "joints": [
+          "right_wrist_roll_joint"
+        ],
+        "geoms": [
+          "<unnamed:172>",
+          "<unnamed:173>"
+        ]
+      },
+      {
+        "body": "right_wrist_pitch_link",
+        "joints": [
+          "right_wrist_pitch_joint"
+        ],
+        "geoms": [
+          "<unnamed:174>",
+          "<unnamed:175>"
+        ]
+      },
+      {
+        "body": "right_wrist_yaw_link",
+        "joints": [
+          "right_wrist_yaw_joint"
+        ],
+        "geoms": [
+          "<unnamed:176>",
+          "<unnamed:177>",
+          "<unnamed:178>"
+        ]
+      }
+    ],
+    "hand_finger_bodies": []
+  },
+  "sites": [
+    {
+      "index": 0,
+      "site": "imu",
+      "body": "pelvis",
+      "pos": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "index": 1,
+      "site": "secondary_imu",
+      "body": "waist_roll_link",
+      "pos": [
+        -0.03959,
+        -0.00224,
+        0.13792
+      ]
+    }
+  ],
+  "hand_collision_geoms": [
+    {
+      "geom": "<unnamed:157>",
+      "body": "left_wrist_roll_link",
+      "type": 7,
+      "contype": 0,
+      "conaffinity": 0,
+      "size": [
+        0.030003017900639216,
+        0.03811245675682164,
+        0.03104121818315674
+      ]
+    },
+    {
+      "geom": "<unnamed:158>",
+      "body": "left_wrist_roll_link",
+      "type": 7,
+      "contype": 1,
+      "conaffinity": 1,
+      "size": [
+        0.030003017900639216,
+        0.03811245675682164,
+        0.03104121818315674
+      ]
+    },
+    {
+      "geom": "<unnamed:159>",
+      "body": "left_wrist_pitch_link",
+      "type": 7,
+      "contype": 0,
+      "conaffinity": 0,
+      "size": [
+        0.03289195852043946,
+        0.03287431259878393,
+        0.05187041908954562
+      ]
+    },
+    {
+      "geom": "<unnamed:160>",
+      "body": "left_wrist_pitch_link",
+      "type": 7,
+      "contype": 1,
+      "conaffinity": 1,
+      "size": [
+        0.03289195852043946,
+        0.03287431259878393,
+        0.05187041908954562
+      ]
+    },
+    {
+      "geom": "<unnamed:161>",
+      "body": "left_wrist_yaw_link",
+      "type": 7,
+      "contype": 0,
+      "conaffinity": 0,
+      "size": [
+        0.02808902444514875,
+        0.039546509676416715,
+        0.031050178505069644
+      ]
+    },
+    {
+      "geom": "<unnamed:162>",
+      "body": "left_wrist_yaw_link",
+      "type": 7,
+      "contype": 1,
+      "conaffinity": 1,
+      "size": [
+        0.02808902444514875,
+        0.039546509676416715,
+        0.031050178505069644
+      ]
+    },
+    {
+      "geom": "<unnamed:163>",
+      "body": "left_wrist_yaw_link",
+      "type": 7,
+      "contype": 0,
+      "conaffinity": 0,
+      "size": [
+        0.025800636590747644,
+        0.06155804249457021,
+        0.07424769453291462
+      ]
+    },
+    {
+      "geom": "<unnamed:172>",
+      "body": "right_wrist_roll_link",
+      "type": 7,
+      "contype": 0,
+      "conaffinity": 0,
+      "size": [
+        0.030001928869753242,
+        0.03811301321342589,
+        0.031041551065035665
+      ]
+    },
+    {
+      "geom": "<unnamed:173>",
+      "body": "right_wrist_roll_link",
+      "type": 7,
+      "contype": 1,
+      "conaffinity": 1,
+      "size": [
+        0.030001928869753242,
+        0.03811301321342589,
+        0.031041551065035665
+      ]
+    },
+    {
+      "geom": "<unnamed:174>",
+      "body": "right_wrist_pitch_link",
+      "type": 7,
+      "contype": 0,
+      "conaffinity": 0,
+      "size": [
+        0.03272681549353626,
+        0.03270843953096671,
+        0.05187056952181719
+      ]
+    },
+    {
+      "geom": "<unnamed:175>",
+      "body": "right_wrist_pitch_link",
+      "type": 7,
+      "contype": 1,
+      "conaffinity": 1,
+      "size": [
+        0.03272681549353626,
+        0.03270843953096671,
+        0.05187056952181719
+      ]
+    },
+    {
+      "geom": "<unnamed:176>",
+      "body": "right_wrist_yaw_link",
+      "type": 7,
+      "contype": 0,
+      "conaffinity": 0,
+      "size": [
+        0.028089943325169,
+        0.03954302505044013,
+        0.031055563492553968
+      ]
+    },
+    {
+      "geom": "<unnamed:177>",
+      "body": "right_wrist_yaw_link",
+      "type": 7,
+      "contype": 1,
+      "conaffinity": 1,
+      "size": [
+        0.028089943325169,
+        0.03954302505044013,
+        0.031055563492553968
+      ]
+    },
+    {
+      "geom": "<unnamed:178>",
+      "body": "right_wrist_yaw_link",
+      "type": 7,
+      "contype": 0,
+      "conaffinity": 0,
+      "size": [
+        0.02579609804581078,
+        0.06155815653663789,
+        0.07424980305969006
+      ]
+    }
+  ],
+  "variants": [
+    {
+      "file": "vendor/unitree_mujoco/unitree_robots/g1/g1_23dof.xml",
+      "mentions_hand": true,
+      "mentions_gripper": false,
+      "mentions_inspire": false,
+      "mentions_dex3": false,
+      "motor_count_text": 29,
+      "joint_count_text": 34,
+      "compiled": true,
+      "compiled_nu": 29,
+      "compiled_nbody": 31,
+      "compiled_ngeom": 62,
+      "compiled_nsite": 2,
+      "compiled_hand_bodies": [
+        "left_wrist_roll_rubber_hand",
+        "right_wrist_roll_rubber_hand"
+      ]
+    },
+    {
+      "file": "vendor/unitree_mujoco/unitree_robots/g1/g1_29dof.xml",
+      "mentions_hand": true,
+      "mentions_gripper": false,
+      "mentions_inspire": false,
+      "mentions_dex3": false,
+      "motor_count_text": 29,
+      "joint_count_text": 35,
+      "compiled": true,
+      "compiled_nu": 29,
+      "compiled_nbody": 31,
+      "compiled_ngeom": 73,
+      "compiled_nsite": 2,
+      "compiled_hand_bodies": []
+    },
+    {
+      "file": "vendor/unitree_mujoco/unitree_robots/g1/scene.xml",
+      "mentions_hand": false,
+      "mentions_gripper": false,
+      "mentions_inspire": false,
+      "mentions_dex3": false,
+      "motor_count_text": 0,
+      "joint_count_text": 0,
+      "compiled": true,
+      "compiled_nu": 29,
+      "compiled_nbody": 31,
+      "compiled_ngeom": 179,
+      "compiled_nsite": 2,
+      "compiled_hand_bodies": []
+    },
+    {
+      "file": "vendor/unitree_mujoco/unitree_robots/g1/scene_23dof.xml",
+      "mentions_hand": false,
+      "mentions_gripper": false,
+      "mentions_inspire": false,
+      "mentions_dex3": false,
+      "motor_count_text": 0,
+      "joint_count_text": 0,
+      "compiled": true,
+      "compiled_nu": 29,
+      "compiled_nbody": 31,
+      "compiled_ngeom": 63,
+      "compiled_nsite": 2,
+      "compiled_hand_bodies": [
+        "left_wrist_roll_rubber_hand",
+        "right_wrist_roll_rubber_hand"
+      ]
+    },
+    {
+      "file": "vendor/unitree_mujoco/unitree_robots/g1/scene_29dof.xml",
+      "mentions_hand": false,
+      "mentions_gripper": false,
+      "mentions_inspire": false,
+      "mentions_dex3": false,
+      "motor_count_text": 0,
+      "joint_count_text": 0,
+      "compiled": true,
+      "compiled_nu": 29,
+      "compiled_nbody": 31,
+      "compiled_ngeom": 74,
+      "compiled_nsite": 2,
+      "compiled_hand_bodies": []
+    }
+  ]
+}

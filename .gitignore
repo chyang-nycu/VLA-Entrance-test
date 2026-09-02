@@ -1,0 +1,22 @@
+# Python virtual environment (project-local, rebuildable from setup/)
+.venv/
+
+# Python bytecode caches
+__pycache__/
+*.pyc
+
+# Generated videos and large datasets (task-local outputs, not source)
+*.mp4
+*.avi
+*.mov
+*.webm
+datasets/
+*.hdf5
+*.npz
+
+# Temporary MuJoCo outputs
+*.mjb
+tmp_mujoco*/
+
+# macOS
+.DS_Store

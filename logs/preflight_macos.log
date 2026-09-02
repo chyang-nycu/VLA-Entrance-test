@@ -1,0 +1,95 @@
+
+## macOS version
+$ sw_vers
+ProductName:	macOS
+ProductVersion:	12.7.6
+BuildVersion:	21H1320
+exit=0
+
+## Architecture
+$ uname -m
+x86_64
+exit=0
+
+## RAM bytes
+$ sysctl hw.memsize
+hw.memsize: 17179869184
+exit=0
+
+## Workspace disk
+$ df -h /Users/yangjudx/Documents/Robotics
+Filesystem     Size   Used  Avail Capacity iused      ifree %iused  Mounted on
+/dev/disk1s1  466Gi  122Gi  325Gi    28% 1647620 3405110560    0%   /System/Volumes/Data
+exit=0
+
+## Xcode Command Line Tools path
+$ xcode-select -p
+/Library/Developer/CommandLineTools
+exit=0
+
+## Clang
+$ clang --version
+Apple clang version 14.0.0 (clang-1400.0.29.202)
+Target: x86_64-apple-darwin21.6.0
+Thread model: posix
+InstalledDir: /Library/Developer/CommandLineTools/usr/bin
+exit=0
+
+## Homebrew
+$ brew --version
+Homebrew 6.0.21
+exit=0
+
+## CMake
+$ cmake --version
+cmake version 4.4.3
+
+CMake suite maintained and supported by Kitware (kitware.com/cmake).
+exit=0
+
+## Git
+$ git --version
+git version 2.37.1 (Apple Git-137.1)
+exit=0
+
+## Python 3
+$ python3 --version
+Python 3.14.7
+exit=0
+
+## Python 3.12
+$ python3.12 --version
+Python 3.12.14
+exit=0
+
+## Project Python
+$ /Users/yangjudx/Documents/Robotics/.venv/bin/python --version
+Python 3.12.14
+exit=0
+
+## Project packages
+$ /Users/yangjudx/Documents/Robotics/.venv/bin/python -m pip freeze
+absl-py==2.5.0
+etils==1.14.0
+fsspec==2026.7.0
+glfw==2.10.2
+ImageIO==2.37.4
+mujoco==3.3.6
+numpy==2.5.2
+pillow==12.3.0
+PyOpenGL==3.1.10
+typing_extensions==4.16.0
+zipp==4.1.0
+exit=0
+
+## unitree_mujoco commit
+$ git -C /Users/yangjudx/Documents/Robotics/vendor/unitree_mujoco log -1 --format=%H%n%cI%n%s
+4134cb5dc7ff1ba7f484deda48b5274b58694519
+2026-08-25T22:03:03+08:00
+Merge pull request #129 from keeprobot/main
+exit=0
+
+## unitree_mujoco status
+$ git -C /Users/yangjudx/Documents/Robotics/vendor/unitree_mujoco status --short
+ M unitree_robots/go2w/assets/terrain.STL
+exit=0

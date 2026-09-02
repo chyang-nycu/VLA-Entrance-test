@@ -1,0 +1,80 @@
+{
+  "scene": "tasks/g1_pick_place/g1_contact_probe_scene.xml",
+  "cube_body": "probe_cube",
+  "cube_geom": "probe_cube_geom",
+  "cube_initial_pos": [
+    0.3,
+    -0.12,
+    0.84
+  ],
+  "motion": {
+    "method": "fixed-pelvis kinematic joint sweep",
+    "steps": 101,
+    "target_joint_pose": {
+      "right_shoulder_pitch_joint": -0.5,
+      "right_elbow_joint": 0.8
+    },
+    "initial_joint_pose": {}
+  },
+  "right_wrist_body": "right_wrist_yaw_link",
+  "right_wrist_final_pos": [
+    0.22303737030703386,
+    -0.14116959884625843,
+    0.8765292446578062
+  ],
+  "cube_final_pos": [
+    0.3,
+    -0.12,
+    0.84
+  ],
+  "min_wrist_cube_body_distance": 0.08778259508489143,
+  "contact_detected": true,
+  "start_had_contact": false,
+  "contacts": [
+    {
+      "step": 26,
+      "time": 0.0,
+      "cube_geom": "probe_cube_geom",
+      "other_geom": "<unnamed:72>",
+      "other_body": "right_wrist_yaw_link",
+      "dist": -7.467504631023608e-05,
+      "pos": [
+        0.26503718485646977,
+        -0.15499867044003926,
+        0.8749969001040352
+      ]
+    }
+  ],
+  "final_right_arm_qpos": {
+    "right_shoulder_pitch_joint": -0.13,
+    "right_shoulder_roll_joint": 0.0,
+    "right_shoulder_yaw_joint": 0.0,
+    "right_elbow_joint": 0.20800000000000002,
+    "right_wrist_roll_joint": 0.0,
+    "right_wrist_pitch_joint": 0.0,
+    "right_wrist_yaw_joint": 0.0
+  },
+  "site_probe_scene": "tasks/g1_pick_place/g1_site_probe_scene.xml",
+  "free_standing_stability_probe": {
+    "scene": "vendor/unitree_mujoco/unitree_robots/g1/scene.xml",
+    "method": "free-standing dynamics with small constant arm torques",
+    "duration_seconds": 2.0000000000000013,
+    "commands": {
+      "right_shoulder_pitch": 0.2,
+      "right_elbow": 0.2,
+      "left_shoulder_pitch": 0.2
+    },
+    "pelvis_start_pos": [
+      0.0,
+      0.0,
+      0.793
+    ],
+    "pelvis_end_pos": [
+      0.7295867926421992,
+      -0.0010534519845503123,
+      0.21538827796297097
+    ],
+    "pelvis_translation_norm": 0.9305553713743192,
+    "stable_for_mvp_manipulation": false
+  }
+}
