@@ -339,3 +339,122 @@ for this report, would need its own reachability diagnosis per variant).
 Per this file's scope, do not proceed to full pick-and-place transport,
 cameras, dataset collection, language variants, or policy integration
 without new, explicit authorization.
+
+## Phase 4A — grasp setup-variant evaluation (authorized 2026-09-02)
+
+**Scope decision, binding for all future phases unless explicitly revisited:**
+the current pelvis+torso-welded configuration is accepted as the MVP
+baseline. It must be described exactly as "fixed-base, torso-constrained
+upper-body manipulation baseline." Never describe this project's
+capability as full-body or free-standing manipulation. Do not unlock the
+torso during Phase 4A.
+
+Not in scope for Phase 4A: transport, target placement, cameras, dataset
+collection, language variants. The successful Phase 3C controller
+parameters (`arm_kp=400, arm_kv=25`, `gripper_kp=150, gripper_kd=10`,
+position-priority IK with the evidence-based 8mm tolerance, the
+pelvis+torso weld, `implicitfast` integrator) must be preserved unchanged
+as the one shared configuration for the entire sweep — no per-variant
+gains, hand-tuned joint targets, offsets, or hidden exceptions.
+
+Before any variant work: rerun the committed Phase 3C nominal trial once,
+record the commit hash and nominal metrics, and change nothing about the
+working IK/servo/gripper/state-machine parameters before doing so.
+
+Five deterministic cube variants: nominal; +0.03m and -0.03m on one
+table-plane axis; +0.03m and -0.03m on the other table-plane axis. 0.03m is
+the default magnitude unless pre-run reachability analysis proves it
+invalid for a given direction, in which case the chosen magnitude must be
+justified up front and applied symmetrically (same magnitude both
+directions on that axis). Each variant: stable ID, explicit cube pose,
+fixed seed, identical robot reset state, identical controller parameters,
+and PREGRASP/APPROACH/LIFT/HOLD targets generated from the variant's
+observed cube pose (not hardcoded nominal coordinates). Cube pose is
+written only during reset initialization, before `CubeInitGuard` locks —
+no post-step cube state manipulation, no exceptions.
+
+Pre-run feasibility check per variant (recorded, not silently skipped even
+if it fails): table containment / collision-free spawn; PREGRASP IK
+residual; APPROACH IK residual; joint-limit margin; expected TCP/finger-pad
+alignment; accepted-as-reachable or not.
+
+Each variant run >= 3 times. Per-variant and aggregate metrics recorded:
+success count/trials, bilateral-contact rate, max cube height gain,
+continuous hold time, pre-close cube displacement, TCP error, controller
+saturation, failure state/reason. Success criteria unchanged from Phase
+3/3C (bilateral contact; height gain >=0.08m; hold >=2.0s; finite/bounded;
+physical release; no prohibited cube manipulation). Target: >=3/5 variants
+succeed; report both per-variant success and total trial success rate,
+honestly, whatever it is.
+
+No per-variant tuning. If the one shared configuration scores below 3/5,
+at most 2 global, evidence-driven adjustments are allowed, each applied to
+all 5 variants and the entire sweep rerun after each adjustment.
+
+Test-suite hygiene: preserve Phase 3/3B's historical failure evidence and
+reports unedited, but the repository's default verification command must
+not terminate with 3 unexplained failures — either mark the 3 legacy tests
+as explicit expected-failures, or convert them into regression diagnostics
+asserting the legacy controller stays below its documented (failing)
+threshold. Do not lower acceptance thresholds anywhere; do not mark any
+Phase 3C or Phase 4A test as an expected failure; do not delete historical
+tests; do not rewrite historical reports. The final summary must
+distinguish passing current-controller tests, explicit legacy
+expected-failures/diagnostics, and any actual unexpected failure.
+
+Outputs: `tasks/g1_pick_place/run_variant_sweep.py`;
+`tests/test_phase4a_grasp_variants.py`; `logs/phase4a_grasp_variants.json`;
+`reports/phase4a-grasp-variants.md` (must include an exact 5-row variant
+table and aggregate results); artifacts/video evidence where practical;
+updates to `README.md`, this file, and `docs/work_log.md`.
+
+Commit discipline: exclude the `logs/g1_mujoco_smoke.json` timestamp-only
+diff and the pre-existing Go2w submodule artifact; do not track large
+generated video unless already-established repository policy tracks it
+(the existing small `.gif` evidence files are fine, following the Phase 3C
+precedent). Show staged files and diff summary before committing. One
+separate local commit, not pushed. Stop after reporting Phase 4A results —
+do not begin transport automatically.
+
+## Phase 4A outcome (2026-09-02) — 3/5 variants succeed, 0 adjustments needed
+
+**Fixed-base, torso-constrained upper-body manipulation baseline** (binding
+framing, see Scope decision above). Ran the unmodified Phase 3C winning
+configuration (`arm_kp=400, arm_kv=25, gripper_kp=150, gripper_kd=10`,
+unchanged) across 5 deterministic cube variants (nominal; +/-0.03m on each
+table-plane axis), 3 trials each, one shared scene/config for all of them.
+Full detail: `reports/phase4a-grasp-variants.md`. Raw data:
+`logs/phase4a_grasp_variants.json`. Sweep script:
+`tasks/g1_pick_place/run_variant_sweep.py`.
+
+**Result: 3/5 variants succeed (nominal, x-0.03, y+0.03), 2/5 fail
+(x+0.03, y-0.03) — 60% variant rate, 60% trial rate (9/15), target (>=3/5)
+met on the first, unmodified sweep. Zero of the 2 allowed global
+adjustments were used** — none were needed, and none were manufactured to
+"use the budget."
+
+Both failures were caught by the pre-run IK-based feasibility check
+(APPROACH residual exceeding the evidence-based 8mm tolerance: 27.1mm for
+x+0.03, 8.43mm for y-0.03) *before* any trial ran, and independently
+confirmed by the state machine's own dynamic settle gate refusing to
+advance past `SETTLE_APPROACH` in every trial of both variants — the two
+failure signals agree, and no cube was ever displaced or mishandled in the
+rejected variants; the arm simply could not reach those positions to
+within tolerance. This is a *reachability* limitation, distinct from
+Phase 3/3B's tracking-oscillation failure.
+
+Test-suite hygiene: Phase 3's 3 historical nominal-acceptance failures
+(`tests/test_phase3_grasp.py`) were converted to regression diagnostics
+that assert the documented failure numbers persist (not lowered, not
+marked xfail-and-forgotten, not deleted; `reports/phase3-grasping-baseline.md`
+unedited). Full regression this session: 58 passing current-controller
+tests (Phase 2/3-structural/3C/4A) + 3 passing legacy diagnostics + 0
+unexpected failures.
+
+Limitations: the evaluated envelope is asymmetric (-x and +y succeed, +x
+and -y fail) and consistent with, but not fully explained by, the
+previously-identified wrist singularity near the nominal point — a full
+workspace Jacobian-conditioning map was not computed (out of scope for
+this phase). Per this file's scope, transport, target placement, cameras,
+dataset collection, and language variants remain unimplemented and
+unauthorized for this phase.

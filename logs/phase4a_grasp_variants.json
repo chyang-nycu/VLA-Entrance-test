@@ -1,0 +1,1990 @@
+{
+  "scope": "fixed-base, torso-constrained upper-body manipulation baseline",
+  "sweeps": [
+    {
+      "label": "sweep_0_unmodified_phase3c_config",
+      "scene": "tasks/g1_pick_place/g1_grasp_scene_3c.xml",
+      "parameters": {
+        "arm_kp": 400.0,
+        "arm_kv": 25.0,
+        "gripper_kp": 150.0,
+        "gripper_kd": 10.0
+      },
+      "variants": [
+        {
+          "id": "nominal",
+          "offset_m": [
+            0.0,
+            0.0
+          ],
+          "cube_pose": [
+            0.33,
+            -0.15,
+            0.735
+          ],
+          "feasibility": {
+            "reachability": {
+              "PREGRASP": {
+                "target_pos": [
+                  0.33,
+                  -0.15,
+                  0.835
+                ],
+                "solved_joint_target": [
+                  -0.19236012070300154,
+                  -0.02257436103185778,
+                  -0.0341412396922276,
+                  0.31088698389455155,
+                  -0.0008047309083250843,
+                  0.15589978289253612,
+                  -0.011945078936682865
+                ],
+                "residual_m": 0.0027098432634628917,
+                "iterations": 8,
+                "reachable_within_tol": true
+              },
+              "APPROACH": {
+                "target_pos": [
+                  0.33,
+                  -0.15,
+                  0.735
+                ],
+                "solved_joint_target": [
+                  -0.5932508516060097,
+                  -0.05714257344424994,
+                  -0.0858080666575442,
+                  1.2217553324550308,
+                  -0.011614573612138334,
+                  0.1787681672445459,
+                  -0.01900250627289597
+                ],
+                "residual_m": 0.00788455398204008,
+                "iterations": 21,
+                "reachable_within_tol": true
+              },
+              "CLOSED_LIFT": {
+                "target_pos": [
+                  0.33,
+                  -0.15,
+                  0.855
+                ],
+                "solved_joint_target": [
+                  -0.18385371186801422,
+                  -0.023988052760569825,
+                  -0.03329889897259276,
+                  0.3580375513125653,
+                  -0.006956254337519472,
+                  -0.056853128707607385,
+                  -0.0077296014089966196
+                ],
+                "residual_m": 0.003206781633781387,
+                "iterations": 20,
+                "reachable_within_tol": true
+              },
+              "HOLD": {
+                "target_pos": [
+                  0.33,
+                  -0.15,
+                  0.855
+                ],
+                "solved_joint_target": [
+                  -0.18385371186801422,
+                  -0.023988052760569825,
+                  -0.03329889897259276,
+                  0.3580375513125653,
+                  -0.006956254337519472,
+                  -0.056853128707607385,
+                  -0.0077296014089966196
+                ],
+                "residual_m": 0.003206781633781387,
+                "iterations": 0,
+                "reachable_within_tol": true
+              },
+              "all_reachable": true
+            },
+            "table_containment": {
+              "cube_xy": [
+                0.33,
+                -0.15
+              ],
+              "table_center_xy": [
+                0.33,
+                -0.15
+              ],
+              "table_half_extent_m": 0.22,
+              "edge_margin_m": 0.05,
+              "max_allowed_offset_m": 0.13499999999999998,
+              "actual_offset_m": [
+                0.0,
+                0.0
+              ],
+              "contained": true
+            },
+            "joint_limit_margin_frac": [
+              0.4333545989988872,
+              0.4285081056968643,
+              0.48361190476364707,
+              0.27777077525622906,
+              0.4970554568932122,
+              0.4446342773472539,
+              0.49411479399140995
+            ],
+            "joint_limit_ok": true,
+            "tcp_finger_pad_alignment": {
+              "closing_axis_world": [
+                -0.04587900234193142,
+                0.9964815197228013,
+                -0.07014055884469493
+              ],
+              "angle_from_nominal_deg": 0.0,
+              "within_tolerance_15deg": true
+            },
+            "accepted_as_reachable": true
+          },
+          "trials": [
+            {
+              "trial_index": 0,
+              "pass": true,
+              "criteria": {
+                "both_pads_contact_cube": true,
+                "height_gain_ge_0_08m": true,
+                "lifted_ge_2s_continuous": true,
+                "finite_and_bounded": true,
+                "released_after_open": true
+              },
+              "bilateral_contact": true,
+              "height_gain_m": 0.10838913826086727,
+              "max_continuous_lifted_s": 3.5039999999996145,
+              "pre_close_cube_displacement_m": null,
+              "tcp_tracking_error_rms": {
+                "PREGRASP": 0.03249233139791897,
+                "APPROACH": 0.0885832098778352,
+                "CLOSE": 0.004206779821141614,
+                "LIFT": 0.07762870154080143,
+                "HOLD": 0.0036570991602599156,
+                "LOWER": 0.07882843147444948,
+                "OPEN": 0.004222915525715354,
+                "RELEASE_SETTLE": 0.004253890205076767
+              },
+              "tcp_tracking_error_max": {
+                "PREGRASP": 0.30958499940007256,
+                "APPROACH": 0.9061105481381235,
+                "CLOSE": 0.010508230105589211,
+                "LIFT": 0.8655259629144176,
+                "HOLD": 0.007884834030584292,
+                "LOWER": 0.8618316903238642,
+                "OPEN": 0.01041330069457913,
+                "RELEASE_SETTLE": 0.010424650813525727
+              },
+              "arm_force_saturation": {
+                "PREGRASP": [
+                  0.0125,
+                  0.0,
+                  0.0,
+                  0.015,
+                  0.0,
+                  0.035,
+                  0.0
+                ],
+                "APPROACH": [
+                  0.03,
+                  0.0,
+                  0.0,
+                  0.0375,
+                  0.0,
+                  0.005,
+                  0.0
+                ],
+                "CLOSE": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "LIFT": [
+                  0.024,
+                  0.0,
+                  0.0,
+                  0.028,
+                  0.0,
+                  0.046,
+                  0.0
+                ],
+                "HOLD": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "LOWER": [
+                  0.024,
+                  0.0,
+                  0.0,
+                  0.028,
+                  0.0,
+                  0.044,
+                  0.0
+                ],
+                "OPEN": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "RELEASE_SETTLE": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              "failure_state": null,
+              "failure_reason": null
+            },
+            {
+              "trial_index": 1,
+              "pass": true,
+              "criteria": {
+                "both_pads_contact_cube": true,
+                "height_gain_ge_0_08m": true,
+                "lifted_ge_2s_continuous": true,
+                "finite_and_bounded": true,
+                "released_after_open": true
+              },
+              "bilateral_contact": true,
+              "height_gain_m": 0.10838913826086727,
+              "max_continuous_lifted_s": 3.5039999999996145,
+              "pre_close_cube_displacement_m": null,
+              "tcp_tracking_error_rms": {
+                "PREGRASP": 0.03249233139791897,
+                "APPROACH": 0.0885832098778352,
+                "CLOSE": 0.004206779821141614,
+                "LIFT": 0.07762870154080143,
+                "HOLD": 0.0036570991602599156,
+                "LOWER": 0.07882843147444948,
+                "OPEN": 0.004222915525715354,
+                "RELEASE_SETTLE": 0.004253890205076767
+              },
+              "tcp_tracking_error_max": {
+                "PREGRASP": 0.30958499940007256,
+                "APPROACH": 0.9061105481381235,
+                "CLOSE": 0.010508230105589211,
+                "LIFT": 0.8655259629144176,
+                "HOLD": 0.007884834030584292,
+                "LOWER": 0.8618316903238642,
+                "OPEN": 0.01041330069457913,
+                "RELEASE_SETTLE": 0.010424650813525727
+              },
+              "arm_force_saturation": {
+                "PREGRASP": [
+                  0.0125,
+                  0.0,
+                  0.0,
+                  0.015,
+                  0.0,
+                  0.035,
+                  0.0
+                ],
+                "APPROACH": [
+                  0.03,
+                  0.0,
+                  0.0,
+                  0.0375,
+                  0.0,
+                  0.005,
+                  0.0
+                ],
+                "CLOSE": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "LIFT": [
+                  0.024,
+                  0.0,
+                  0.0,
+                  0.028,
+                  0.0,
+                  0.046,
+                  0.0
+                ],
+                "HOLD": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "LOWER": [
+                  0.024,
+                  0.0,
+                  0.0,
+                  0.028,
+                  0.0,
+                  0.044,
+                  0.0
+                ],
+                "OPEN": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "RELEASE_SETTLE": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              "failure_state": null,
+              "failure_reason": null
+            },
+            {
+              "trial_index": 2,
+              "pass": true,
+              "criteria": {
+                "both_pads_contact_cube": true,
+                "height_gain_ge_0_08m": true,
+                "lifted_ge_2s_continuous": true,
+                "finite_and_bounded": true,
+                "released_after_open": true
+              },
+              "bilateral_contact": true,
+              "height_gain_m": 0.10838913826086727,
+              "max_continuous_lifted_s": 3.5039999999996145,
+              "pre_close_cube_displacement_m": null,
+              "tcp_tracking_error_rms": {
+                "PREGRASP": 0.03249233139791897,
+                "APPROACH": 0.0885832098778352,
+                "CLOSE": 0.004206779821141614,
+                "LIFT": 0.07762870154080143,
+                "HOLD": 0.0036570991602599156,
+                "LOWER": 0.07882843147444948,
+                "OPEN": 0.004222915525715354,
+                "RELEASE_SETTLE": 0.004253890205076767
+              },
+              "tcp_tracking_error_max": {
+                "PREGRASP": 0.30958499940007256,
+                "APPROACH": 0.9061105481381235,
+                "CLOSE": 0.010508230105589211,
+                "LIFT": 0.8655259629144176,
+                "HOLD": 0.007884834030584292,
+                "LOWER": 0.8618316903238642,
+                "OPEN": 0.01041330069457913,
+                "RELEASE_SETTLE": 0.010424650813525727
+              },
+              "arm_force_saturation": {
+                "PREGRASP": [
+                  0.0125,
+                  0.0,
+                  0.0,
+                  0.015,
+                  0.0,
+                  0.035,
+                  0.0
+                ],
+                "APPROACH": [
+                  0.03,
+                  0.0,
+                  0.0,
+                  0.0375,
+                  0.0,
+                  0.005,
+                  0.0
+                ],
+                "CLOSE": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "LIFT": [
+                  0.024,
+                  0.0,
+                  0.0,
+                  0.028,
+                  0.0,
+                  0.046,
+                  0.0
+                ],
+                "HOLD": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "LOWER": [
+                  0.024,
+                  0.0,
+                  0.0,
+                  0.028,
+                  0.0,
+                  0.044,
+                  0.0
+                ],
+                "OPEN": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "RELEASE_SETTLE": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              "failure_state": null,
+              "failure_reason": null
+            }
+          ],
+          "n_trials": 3,
+          "n_pass": 3,
+          "bilateral_contact_rate": 1.0,
+          "max_height_gain_m": 0.10838913826086727,
+          "max_continuous_hold_s": 3.5039999999996145,
+          "variant_success": true
+        },
+        {
+          "id": "x_plus_0.03",
+          "offset_m": [
+            0.03,
+            0.0
+          ],
+          "cube_pose": [
+            0.36,
+            -0.15,
+            0.735
+          ],
+          "feasibility": {
+            "reachability": {
+              "PREGRASP": {
+                "target_pos": [
+                  0.36,
+                  -0.15,
+                  0.835
+                ],
+                "solved_joint_target": [
+                  -0.3635094913975685,
+                  -0.046574623849249,
+                  -0.05560364693004498,
+                  0.4842995551154443,
+                  -0.00185671419318176,
+                  0.22080086646366295,
+                  -0.017842377672651708
+                ],
+                "residual_m": 0.004749381000264639,
+                "iterations": 13,
+                "reachable_within_tol": true
+              },
+              "APPROACH": {
+                "target_pos": [
+                  0.36,
+                  -0.15,
+                  0.735
+                ],
+                "solved_joint_target": [
+                  -0.7115329408418397,
+                  -0.054579441183543985,
+                  -0.28266718660056495,
+                  1.3775067504516145,
+                  -0.03484642936401005,
+                  0.11003320150915007,
+                  -0.01814452153987395
+                ],
+                "residual_m": 0.027076143903288566,
+                "iterations": 199,
+                "reachable_within_tol": false
+              },
+              "CLOSED_LIFT": {
+                "target_pos": [
+                  0.36,
+                  -0.15,
+                  0.855
+                ],
+                "solved_joint_target": [
+                  -0.3639797030382735,
+                  0.014018020004918544,
+                  -0.149061377630137,
+                  0.554727217264352,
+                  -0.01834636872971215,
+                  -0.025997353310601226,
+                  0.007763790027543725
+                ],
+                "residual_m": 0.004307225785062497,
+                "iterations": 19,
+                "reachable_within_tol": true
+              },
+              "HOLD": {
+                "target_pos": [
+                  0.36,
+                  -0.15,
+                  0.855
+                ],
+                "solved_joint_target": [
+                  -0.3639797030382735,
+                  0.014018020004918544,
+                  -0.149061377630137,
+                  0.554727217264352,
+                  -0.01834636872971215,
+                  -0.025997353310601226,
+                  0.007763790027543725
+                ],
+                "residual_m": 0.004307225785062497,
+                "iterations": 0,
+                "reachable_within_tol": true
+              },
+              "all_reachable": false
+            },
+            "table_containment": {
+              "cube_xy": [
+                0.36,
+                -0.15
+              ],
+              "table_center_xy": [
+                0.33,
+                -0.15
+              ],
+              "table_half_extent_m": 0.22,
+              "edge_margin_m": 0.05,
+              "max_allowed_offset_m": 0.13499999999999998,
+              "actual_offset_m": [
+                0.02999999999999997,
+                0.0
+              ],
+              "contained": true
+            },
+            "joint_limit_margin_frac": [
+              0.4128180879155081,
+              0.42784057118617186,
+              0.44601467024435354,
+              0.2281936750535986,
+              0.4911656840098949,
+              0.4659219657993378,
+              0.49438051772456104
+            ],
+            "joint_limit_ok": true,
+            "tcp_finger_pad_alignment": {
+              "closing_axis_world": [
+                0.06196624720492792,
+                0.9975359468953972,
+                0.032897094990921125
+              ],
+              "angle_from_nominal_deg": 8.554135177722777,
+              "within_tolerance_15deg": true
+            },
+            "accepted_as_reachable": false
+          },
+          "trials": [
+            {
+              "trial_index": 0,
+              "pass": false,
+              "criteria": {
+                "both_pads_contact_cube": false,
+                "height_gain_ge_0_08m": false,
+                "lifted_ge_2s_continuous": false,
+                "finite_and_bounded": true,
+                "released_after_open": false
+              },
+              "bilateral_contact": false,
+              "height_gain_m": 0.0,
+              "max_continuous_lifted_s": 0.0,
+              "pre_close_cube_displacement_m": null,
+              "tcp_tracking_error_rms": {
+                "PREGRASP": 0.05532130606042305,
+                "APPROACH": 0.0865456731750883
+              },
+              "tcp_tracking_error_max": {
+                "PREGRASP": 0.48297237690855604,
+                "APPROACH": 0.8867608218352745
+              },
+              "arm_force_saturation": {
+                "PREGRASP": [
+                  0.0275,
+                  0.0,
+                  0.0,
+                  0.0225,
+                  0.0,
+                  0.045,
+                  0.0025
+                ],
+                "APPROACH": [
+                  0.0275,
+                  0.0,
+                  0.01,
+                  0.035,
+                  0.0,
+                  0.02,
+                  0.0
+                ]
+              },
+              "failure_state": "SETTLE_APPROACH",
+              "failure_reason": "TCP did not settle within tolerance before CLOSE"
+            },
+            {
+              "trial_index": 1,
+              "pass": false,
+              "criteria": {
+                "both_pads_contact_cube": false,
+                "height_gain_ge_0_08m": false,
+                "lifted_ge_2s_continuous": false,
+                "finite_and_bounded": true,
+                "released_after_open": false
+              },
+              "bilateral_contact": false,
+              "height_gain_m": 0.0,
+              "max_continuous_lifted_s": 0.0,
+              "pre_close_cube_displacement_m": null,
+              "tcp_tracking_error_rms": {
+                "PREGRASP": 0.05532130606042305,
+                "APPROACH": 0.0865456731750883
+              },
+              "tcp_tracking_error_max": {
+                "PREGRASP": 0.48297237690855604,
+                "APPROACH": 0.8867608218352745
+              },
+              "arm_force_saturation": {
+                "PREGRASP": [
+                  0.0275,
+                  0.0,
+                  0.0,
+                  0.0225,
+                  0.0,
+                  0.045,
+                  0.0025
+                ],
+                "APPROACH": [
+                  0.0275,
+                  0.0,
+                  0.01,
+                  0.035,
+                  0.0,
+                  0.02,
+                  0.0
+                ]
+              },
+              "failure_state": "SETTLE_APPROACH",
+              "failure_reason": "TCP did not settle within tolerance before CLOSE"
+            },
+            {
+              "trial_index": 2,
+              "pass": false,
+              "criteria": {
+                "both_pads_contact_cube": false,
+                "height_gain_ge_0_08m": false,
+                "lifted_ge_2s_continuous": false,
+                "finite_and_bounded": true,
+                "released_after_open": false
+              },
+              "bilateral_contact": false,
+              "height_gain_m": 0.0,
+              "max_continuous_lifted_s": 0.0,
+              "pre_close_cube_displacement_m": null,
+              "tcp_tracking_error_rms": {
+                "PREGRASP": 0.05532130606042305,
+                "APPROACH": 0.0865456731750883
+              },
+              "tcp_tracking_error_max": {
+                "PREGRASP": 0.48297237690855604,
+                "APPROACH": 0.8867608218352745
+              },
+              "arm_force_saturation": {
+                "PREGRASP": [
+                  0.0275,
+                  0.0,
+                  0.0,
+                  0.0225,
+                  0.0,
+                  0.045,
+                  0.0025
+                ],
+                "APPROACH": [
+                  0.0275,
+                  0.0,
+                  0.01,
+                  0.035,
+                  0.0,
+                  0.02,
+                  0.0
+                ]
+              },
+              "failure_state": "SETTLE_APPROACH",
+              "failure_reason": "TCP did not settle within tolerance before CLOSE"
+            }
+          ],
+          "n_trials": 3,
+          "n_pass": 0,
+          "bilateral_contact_rate": 0.0,
+          "max_height_gain_m": 0.0,
+          "max_continuous_hold_s": 0.0,
+          "variant_success": false
+        },
+        {
+          "id": "x_minus_0.03",
+          "offset_m": [
+            -0.03,
+            0.0
+          ],
+          "cube_pose": [
+            0.30000000000000004,
+            -0.15,
+            0.735
+          ],
+          "feasibility": {
+            "reachability": {
+              "PREGRASP": {
+                "target_pos": [
+                  0.30000000000000004,
+                  -0.15,
+                  0.835
+                ],
+                "solved_joint_target": [
+                  -0.03363506166501876,
+                  -0.0030388094567836595,
+                  -0.010026347747487944,
+                  0.17331011681695419,
+                  -0.00017413309870473222,
+                  0.0914120176579087,
+                  -0.0039518824869293374
+                ],
+                "residual_m": 0.0010708351096716745,
+                "iterations": 4,
+                "reachable_within_tol": true
+              },
+              "APPROACH": {
+                "target_pos": [
+                  0.30000000000000004,
+                  -0.15,
+                  0.735
+                ],
+                "solved_joint_target": [
+                  -0.31267264810918377,
+                  -0.028446544520008266,
+                  -0.04790638321923716,
+                  0.7751815002921535,
+                  -0.004057297543171261,
+                  0.2879875968678404,
+                  -0.01580365297418448
+                ],
+                "residual_m": 0.005026167577420115,
+                "iterations": 14,
+                "reachable_within_tol": true
+              },
+              "CLOSED_LIFT": {
+                "target_pos": [
+                  0.30000000000000004,
+                  -0.15,
+                  0.855
+                ],
+                "solved_joint_target": [
+                  -0.020188158247253937,
+                  -0.002904489857641484,
+                  -0.007264784039180387,
+                  0.13441407573124123,
+                  -0.0007408276919629142,
+                  0.04686364316680819,
+                  -0.002245292123596954
+                ],
+                "residual_m": 0.00570665766379827,
+                "iterations": 15,
+                "reachable_within_tol": true
+              },
+              "HOLD": {
+                "target_pos": [
+                  0.30000000000000004,
+                  -0.15,
+                  0.855
+                ],
+                "solved_joint_target": [
+                  -0.020188158247253937,
+                  -0.002904489857641484,
+                  -0.007264784039180387,
+                  0.13441407573124123,
+                  -0.0007408276919629142,
+                  0.04686364316680819,
+                  -0.002245292123596954
+                ],
+                "residual_m": 0.00570665766379827,
+                "iterations": 0,
+                "reachable_within_tol": true
+              },
+              "all_reachable": true
+            },
+            "table_containment": {
+              "cube_xy": [
+                0.30000000000000004,
+                -0.15
+              ],
+              "table_center_xy": [
+                0.33,
+                -0.15
+              ],
+              "table_half_extent_m": 0.22,
+              "edge_margin_m": 0.05,
+              "max_allowed_offset_m": 0.13499999999999998,
+              "actual_offset_m": [
+                0.02999999999999997,
+                0.0
+              ],
+              "contained": true
+            },
+            "joint_limit_margin_frac": [
+              0.482069475639075,
+              0.4210345976300253,
+              0.4908505761613375,
+              0.41991930853954884,
+              0.49897138819625314,
+              0.4108082738589346,
+              0.49510550071102977
+            ],
+            "joint_limit_ok": true,
+            "tcp_finger_pad_alignment": {
+              "closing_axis_world": [
+                -0.021277868184165168,
+                0.9989584313998038,
+                -0.04036464617436646
+              ],
+              "angle_from_nominal_deg": 2.217681900092268,
+              "within_tolerance_15deg": true
+            },
+            "accepted_as_reachable": true
+          },
+          "trials": [
+            {
+              "trial_index": 0,
+              "pass": true,
+              "criteria": {
+                "both_pads_contact_cube": true,
+                "height_gain_ge_0_08m": true,
+                "lifted_ge_2s_continuous": true,
+                "finite_and_bounded": true,
+                "released_after_open": true
+              },
+              "bilateral_contact": true,
+              "height_gain_m": 0.10644274894254169,
+              "max_continuous_lifted_s": 3.515999999999613,
+              "pre_close_cube_displacement_m": null,
+              "tcp_tracking_error_rms": {
+                "PREGRASP": 0.015620619495340498,
+                "APPROACH": 0.05903815184179316,
+                "CLOSE": 0.0034652072720033357,
+                "LIFT": 0.057639487664553075,
+                "HOLD": 0.0031194687225955947,
+                "LOWER": 0.05752590553743333,
+                "OPEN": 0.0034622026613245734,
+                "RELEASE_SETTLE": 0.0034817473085942195
+              },
+              "tcp_tracking_error_max": {
+                "PREGRASP": 0.17213368655184055,
+                "APPROACH": 0.5981029701372451,
+                "CLOSE": 0.008178850015874206,
+                "LIFT": 0.6419477431865905,
+                "HOLD": 0.006081002260462204,
+                "LOWER": 0.6355143716030388,
+                "OPEN": 0.008082358431156456,
+                "RELEASE_SETTLE": 0.008089723602358712
+              },
+              "arm_force_saturation": {
+                "PREGRASP": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0075,
+                  0.0,
+                  0.0225,
+                  0.0
+                ],
+                "APPROACH": [
+                  0.02,
+                  0.0,
+                  0.0,
+                  0.0275,
+                  0.0,
+                  0.045,
+                  0.0
+                ],
+                "CLOSE": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "LIFT": [
+                  0.014,
+                  0.0,
+                  0.0,
+                  0.022,
+                  0.0,
+                  0.048,
+                  0.002
+                ],
+                "HOLD": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "LOWER": [
+                  0.018,
+                  0.0,
+                  0.0,
+                  0.022,
+                  0.0,
+                  0.044,
+                  0.002
+                ],
+                "OPEN": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "RELEASE_SETTLE": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              "failure_state": null,
+              "failure_reason": null
+            },
+            {
+              "trial_index": 1,
+              "pass": true,
+              "criteria": {
+                "both_pads_contact_cube": true,
+                "height_gain_ge_0_08m": true,
+                "lifted_ge_2s_continuous": true,
+                "finite_and_bounded": true,
+                "released_after_open": true
+              },
+              "bilateral_contact": true,
+              "height_gain_m": 0.10644274894254169,
+              "max_continuous_lifted_s": 3.515999999999613,
+              "pre_close_cube_displacement_m": null,
+              "tcp_tracking_error_rms": {
+                "PREGRASP": 0.015620619495340498,
+                "APPROACH": 0.05903815184179316,
+                "CLOSE": 0.0034652072720033357,
+                "LIFT": 0.057639487664553075,
+                "HOLD": 0.0031194687225955947,
+                "LOWER": 0.05752590553743333,
+                "OPEN": 0.0034622026613245734,
+                "RELEASE_SETTLE": 0.0034817473085942195
+              },
+              "tcp_tracking_error_max": {
+                "PREGRASP": 0.17213368655184055,
+                "APPROACH": 0.5981029701372451,
+                "CLOSE": 0.008178850015874206,
+                "LIFT": 0.6419477431865905,
+                "HOLD": 0.006081002260462204,
+                "LOWER": 0.6355143716030388,
+                "OPEN": 0.008082358431156456,
+                "RELEASE_SETTLE": 0.008089723602358712
+              },
+              "arm_force_saturation": {
+                "PREGRASP": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0075,
+                  0.0,
+                  0.0225,
+                  0.0
+                ],
+                "APPROACH": [
+                  0.02,
+                  0.0,
+                  0.0,
+                  0.0275,
+                  0.0,
+                  0.045,
+                  0.0
+                ],
+                "CLOSE": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "LIFT": [
+                  0.014,
+                  0.0,
+                  0.0,
+                  0.022,
+                  0.0,
+                  0.048,
+                  0.002
+                ],
+                "HOLD": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "LOWER": [
+                  0.018,
+                  0.0,
+                  0.0,
+                  0.022,
+                  0.0,
+                  0.044,
+                  0.002
+                ],
+                "OPEN": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "RELEASE_SETTLE": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              "failure_state": null,
+              "failure_reason": null
+            },
+            {
+              "trial_index": 2,
+              "pass": true,
+              "criteria": {
+                "both_pads_contact_cube": true,
+                "height_gain_ge_0_08m": true,
+                "lifted_ge_2s_continuous": true,
+                "finite_and_bounded": true,
+                "released_after_open": true
+              },
+              "bilateral_contact": true,
+              "height_gain_m": 0.10644274894254169,
+              "max_continuous_lifted_s": 3.515999999999613,
+              "pre_close_cube_displacement_m": null,
+              "tcp_tracking_error_rms": {
+                "PREGRASP": 0.015620619495340498,
+                "APPROACH": 0.05903815184179316,
+                "CLOSE": 0.0034652072720033357,
+                "LIFT": 0.057639487664553075,
+                "HOLD": 0.0031194687225955947,
+                "LOWER": 0.05752590553743333,
+                "OPEN": 0.0034622026613245734,
+                "RELEASE_SETTLE": 0.0034817473085942195
+              },
+              "tcp_tracking_error_max": {
+                "PREGRASP": 0.17213368655184055,
+                "APPROACH": 0.5981029701372451,
+                "CLOSE": 0.008178850015874206,
+                "LIFT": 0.6419477431865905,
+                "HOLD": 0.006081002260462204,
+                "LOWER": 0.6355143716030388,
+                "OPEN": 0.008082358431156456,
+                "RELEASE_SETTLE": 0.008089723602358712
+              },
+              "arm_force_saturation": {
+                "PREGRASP": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0075,
+                  0.0,
+                  0.0225,
+                  0.0
+                ],
+                "APPROACH": [
+                  0.02,
+                  0.0,
+                  0.0,
+                  0.0275,
+                  0.0,
+                  0.045,
+                  0.0
+                ],
+                "CLOSE": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "LIFT": [
+                  0.014,
+                  0.0,
+                  0.0,
+                  0.022,
+                  0.0,
+                  0.048,
+                  0.002
+                ],
+                "HOLD": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "LOWER": [
+                  0.018,
+                  0.0,
+                  0.0,
+                  0.022,
+                  0.0,
+                  0.044,
+                  0.002
+                ],
+                "OPEN": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "RELEASE_SETTLE": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              "failure_state": null,
+              "failure_reason": null
+            }
+          ],
+          "n_trials": 3,
+          "n_pass": 3,
+          "bilateral_contact_rate": 1.0,
+          "max_height_gain_m": 0.10644274894254169,
+          "max_continuous_hold_s": 3.515999999999613,
+          "variant_success": true
+        },
+        {
+          "id": "y_plus_0.03",
+          "offset_m": [
+            0.0,
+            0.03
+          ],
+          "cube_pose": [
+            0.33,
+            -0.12,
+            0.735
+          ],
+          "feasibility": {
+            "reachability": {
+              "PREGRASP": {
+                "target_pos": [
+                  0.33,
+                  -0.12,
+                  0.835
+                ],
+                "solved_joint_target": [
+                  -0.1954549872996403,
+                  0.023140799769394413,
+                  0.014154416378286697,
+                  0.3103847784538811,
+                  -0.00018728844469472438,
+                  0.15580280778983222,
+                  0.0024551438065020304
+                ],
+                "residual_m": 0.003573433010721368,
+                "iterations": 8,
+                "reachable_within_tol": true
+              },
+              "APPROACH": {
+                "target_pos": [
+                  0.33,
+                  -0.12,
+                  0.735
+                ],
+                "solved_joint_target": [
+                  -0.6126149985246582,
+                  0.00018755771136528334,
+                  -0.05931605108020813,
+                  1.2554673465927062,
+                  -0.014090604171095275,
+                  0.15033372766545716,
+                  -0.01775064151977112
+                ],
+                "residual_m": 0.007664835707639854,
+                "iterations": 22,
+                "reachable_within_tol": true
+              },
+              "CLOSED_LIFT": {
+                "target_pos": [
+                  0.33,
+                  -0.12,
+                  0.855
+                ],
+                "solved_joint_target": [
+                  -0.19563723114627357,
+                  0.03729276487404936,
+                  0.002681561409236295,
+                  0.4044534642125434,
+                  -0.009592638872459095,
+                  -0.10978389736263673,
+                  0.004093381028769655
+                ],
+                "residual_m": 0.005376579631407985,
+                "iterations": 20,
+                "reachable_within_tol": true
+              },
+              "HOLD": {
+                "target_pos": [
+                  0.33,
+                  -0.12,
+                  0.855
+                ],
+                "solved_joint_target": [
+                  -0.19563723114627357,
+                  0.03729276487404936,
+                  0.002681561409236295,
+                  0.4044534642125434,
+                  -0.009592638872459095,
+                  -0.10978389736263673,
+                  0.004093381028769655
+                ],
+                "residual_m": 0.005376579631407985,
+                "iterations": 0,
+                "reachable_within_tol": true
+              },
+              "all_reachable": true
+            },
+            "table_containment": {
+              "cube_xy": [
+                0.33,
+                -0.12
+              ],
+              "table_center_xy": [
+                0.33,
+                -0.15
+              ],
+              "table_half_extent_m": 0.22,
+              "edge_margin_m": 0.05,
+              "max_allowed_offset_m": 0.13499999999999998,
+              "actual_offset_m": [
+                0.0,
+                0.03
+              ],
+              "contained": true
+            },
+            "joint_limit_margin_frac": [
+              0.42999253445991764,
+              0.413577217566121,
+              0.4886714952100443,
+              0.26703993296641637,
+              0.496427730128714,
+              0.4534406175351495,
+              0.4945025050575835
+            ],
+            "joint_limit_ok": true,
+            "tcp_finger_pad_alignment": {
+              "closing_axis_world": [
+                -0.10654072966930508,
+                0.9935338791546318,
+                -0.03923651224919722
+              ],
+              "angle_from_nominal_deg": 3.9051148421019626,
+              "within_tolerance_15deg": true
+            },
+            "accepted_as_reachable": true
+          },
+          "trials": [
+            {
+              "trial_index": 0,
+              "pass": true,
+              "criteria": {
+                "both_pads_contact_cube": true,
+                "height_gain_ge_0_08m": true,
+                "lifted_ge_2s_continuous": true,
+                "finite_and_bounded": true,
+                "released_after_open": true
+              },
+              "bilateral_contact": true,
+              "height_gain_m": 0.1063658535229346,
+              "max_continuous_lifted_s": 3.5019999999996148,
+              "pre_close_cube_displacement_m": null,
+              "tcp_tracking_error_rms": {
+                "PREGRASP": 0.032557882922064976,
+                "APPROACH": 0.09242900488310603,
+                "CLOSE": 0.004201040350584212,
+                "LIFT": 0.07760261453692494,
+                "HOLD": 0.0036431127998489323,
+                "LOWER": 0.07807344089249012,
+                "OPEN": 0.0041989900735753885,
+                "RELEASE_SETTLE": 0.004221792673377307
+              },
+              "tcp_tracking_error_max": {
+                "PREGRASP": 0.30913895609677033,
+                "APPROACH": 0.9401631040999455,
+                "CLOSE": 0.010552314864161305,
+                "LIFT": 0.8526268391833283,
+                "HOLD": 0.007934153538947691,
+                "LOWER": 0.8365496539813829,
+                "OPEN": 0.0104523624663313,
+                "RELEASE_SETTLE": 0.010460658178461313
+              },
+              "arm_force_saturation": {
+                "PREGRASP": [
+                  0.015,
+                  0.0,
+                  0.0,
+                  0.015,
+                  0.0,
+                  0.035,
+                  0.0
+                ],
+                "APPROACH": [
+                  0.0325,
+                  0.0,
+                  0.0025,
+                  0.0375,
+                  0.0,
+                  0.0,
+                  0.0025
+                ],
+                "CLOSE": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "LIFT": [
+                  0.02,
+                  0.0,
+                  0.002,
+                  0.028,
+                  0.0,
+                  0.05,
+                  0.004
+                ],
+                "HOLD": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "LOWER": [
+                  0.024,
+                  0.0,
+                  0.002,
+                  0.028,
+                  0.0,
+                  0.048,
+                  0.004
+                ],
+                "OPEN": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "RELEASE_SETTLE": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              "failure_state": null,
+              "failure_reason": null
+            },
+            {
+              "trial_index": 1,
+              "pass": true,
+              "criteria": {
+                "both_pads_contact_cube": true,
+                "height_gain_ge_0_08m": true,
+                "lifted_ge_2s_continuous": true,
+                "finite_and_bounded": true,
+                "released_after_open": true
+              },
+              "bilateral_contact": true,
+              "height_gain_m": 0.1063658535229346,
+              "max_continuous_lifted_s": 3.5019999999996148,
+              "pre_close_cube_displacement_m": null,
+              "tcp_tracking_error_rms": {
+                "PREGRASP": 0.032557882922064976,
+                "APPROACH": 0.09242900488310603,
+                "CLOSE": 0.004201040350584212,
+                "LIFT": 0.07760261453692494,
+                "HOLD": 0.0036431127998489323,
+                "LOWER": 0.07807344089249012,
+                "OPEN": 0.0041989900735753885,
+                "RELEASE_SETTLE": 0.004221792673377307
+              },
+              "tcp_tracking_error_max": {
+                "PREGRASP": 0.30913895609677033,
+                "APPROACH": 0.9401631040999455,
+                "CLOSE": 0.010552314864161305,
+                "LIFT": 0.8526268391833283,
+                "HOLD": 0.007934153538947691,
+                "LOWER": 0.8365496539813829,
+                "OPEN": 0.0104523624663313,
+                "RELEASE_SETTLE": 0.010460658178461313
+              },
+              "arm_force_saturation": {
+                "PREGRASP": [
+                  0.015,
+                  0.0,
+                  0.0,
+                  0.015,
+                  0.0,
+                  0.035,
+                  0.0
+                ],
+                "APPROACH": [
+                  0.0325,
+                  0.0,
+                  0.0025,
+                  0.0375,
+                  0.0,
+                  0.0,
+                  0.0025
+                ],
+                "CLOSE": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "LIFT": [
+                  0.02,
+                  0.0,
+                  0.002,
+                  0.028,
+                  0.0,
+                  0.05,
+                  0.004
+                ],
+                "HOLD": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "LOWER": [
+                  0.024,
+                  0.0,
+                  0.002,
+                  0.028,
+                  0.0,
+                  0.048,
+                  0.004
+                ],
+                "OPEN": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "RELEASE_SETTLE": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              "failure_state": null,
+              "failure_reason": null
+            },
+            {
+              "trial_index": 2,
+              "pass": true,
+              "criteria": {
+                "both_pads_contact_cube": true,
+                "height_gain_ge_0_08m": true,
+                "lifted_ge_2s_continuous": true,
+                "finite_and_bounded": true,
+                "released_after_open": true
+              },
+              "bilateral_contact": true,
+              "height_gain_m": 0.1063658535229346,
+              "max_continuous_lifted_s": 3.5019999999996148,
+              "pre_close_cube_displacement_m": null,
+              "tcp_tracking_error_rms": {
+                "PREGRASP": 0.032557882922064976,
+                "APPROACH": 0.09242900488310603,
+                "CLOSE": 0.004201040350584212,
+                "LIFT": 0.07760261453692494,
+                "HOLD": 0.0036431127998489323,
+                "LOWER": 0.07807344089249012,
+                "OPEN": 0.0041989900735753885,
+                "RELEASE_SETTLE": 0.004221792673377307
+              },
+              "tcp_tracking_error_max": {
+                "PREGRASP": 0.30913895609677033,
+                "APPROACH": 0.9401631040999455,
+                "CLOSE": 0.010552314864161305,
+                "LIFT": 0.8526268391833283,
+                "HOLD": 0.007934153538947691,
+                "LOWER": 0.8365496539813829,
+                "OPEN": 0.0104523624663313,
+                "RELEASE_SETTLE": 0.010460658178461313
+              },
+              "arm_force_saturation": {
+                "PREGRASP": [
+                  0.015,
+                  0.0,
+                  0.0,
+                  0.015,
+                  0.0,
+                  0.035,
+                  0.0
+                ],
+                "APPROACH": [
+                  0.0325,
+                  0.0,
+                  0.0025,
+                  0.0375,
+                  0.0,
+                  0.0,
+                  0.0025
+                ],
+                "CLOSE": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "LIFT": [
+                  0.02,
+                  0.0,
+                  0.002,
+                  0.028,
+                  0.0,
+                  0.05,
+                  0.004
+                ],
+                "HOLD": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "LOWER": [
+                  0.024,
+                  0.0,
+                  0.002,
+                  0.028,
+                  0.0,
+                  0.048,
+                  0.004
+                ],
+                "OPEN": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "RELEASE_SETTLE": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              "failure_state": null,
+              "failure_reason": null
+            }
+          ],
+          "n_trials": 3,
+          "n_pass": 3,
+          "bilateral_contact_rate": 1.0,
+          "max_height_gain_m": 0.1063658535229346,
+          "max_continuous_hold_s": 3.5019999999996148,
+          "variant_success": true
+        },
+        {
+          "id": "y_minus_0.03",
+          "offset_m": [
+            0.0,
+            -0.03
+          ],
+          "cube_pose": [
+            0.33,
+            -0.18,
+            0.735
+          ],
+          "feasibility": {
+            "reachability": {
+              "PREGRASP": {
+                "target_pos": [
+                  0.33,
+                  -0.18,
+                  0.835
+                ],
+                "solved_joint_target": [
+                  -0.18364389388560526,
+                  -0.06572696332783995,
+                  -0.08037696576365397,
+                  0.3017627668004173,
+                  -0.0013044562218795198,
+                  0.1524784048287765,
+                  -0.02580335671338491
+                ],
+                "residual_m": 0.0060745205209817585,
+                "iterations": 8,
+                "reachable_within_tol": true
+              },
+              "APPROACH": {
+                "target_pos": [
+                  0.33,
+                  -0.18,
+                  0.735
+                ],
+                "solved_joint_target": [
+                  -0.5910728625601374,
+                  -0.11305729417552113,
+                  -0.13214952049287554,
+                  1.274024512696386,
+                  -0.018195988933906858,
+                  0.10660371867419202,
+                  -0.01943670095261121
+                ],
+                "residual_m": 0.008430744743668239,
+                "iterations": 199,
+                "reachable_within_tol": false
+              },
+              "CLOSED_LIFT": {
+                "target_pos": [
+                  0.33,
+                  -0.18,
+                  0.855
+                ],
+                "solved_joint_target": [
+                  -0.19453546287304269,
+                  -0.07972190974621404,
+                  -0.08308208878463817,
+                  0.4373049535859683,
+                  -0.01235568965151379,
+                  -0.16691488980979513,
+                  -0.019002714489854362
+                ],
+                "residual_m": 0.0029223191864126896,
+                "iterations": 20,
+                "reachable_within_tol": true
+              },
+              "HOLD": {
+                "target_pos": [
+                  0.33,
+                  -0.18,
+                  0.855
+                ],
+                "solved_joint_target": [
+                  -0.19453546287304269,
+                  -0.07972190974621404,
+                  -0.08308208878463817,
+                  0.4373049535859683,
+                  -0.01235568965151379,
+                  -0.16691488980979513,
+                  -0.019002714489854362
+                ],
+                "residual_m": 0.0029223191864126896,
+                "iterations": 0,
+                "reachable_within_tol": true
+              },
+              "all_reachable": false
+            },
+            "table_containment": {
+              "cube_xy": [
+                0.33,
+                -0.18
+              ],
+              "table_center_xy": [
+                0.33,
+                -0.15
+              ],
+              "table_half_extent_m": 0.22,
+              "edge_margin_m": 0.05,
+              "max_allowed_offset_m": 0.13499999999999998,
+              "actual_offset_m": [
+                0.0,
+                0.03
+              ],
+              "contained": true
+            },
+            "joint_limit_margin_frac": [
+              0.4337327483575009,
+              0.44307036856408605,
+              0.47476135972252187,
+              0.2611330173489986,
+              0.49538692718512467,
+              0.4669841000618819,
+              0.4939803209328954
+            ],
+            "joint_limit_ok": true,
+            "tcp_finger_pad_alignment": {
+              "closing_axis_world": [
+                0.019776122036395435,
+                0.9951954350542414,
+                -0.09589030735377468
+              ],
+              "angle_from_nominal_deg": 4.042241847500082,
+              "within_tolerance_15deg": true
+            },
+            "accepted_as_reachable": false
+          },
+          "trials": [
+            {
+              "trial_index": 0,
+              "pass": false,
+              "criteria": {
+                "both_pads_contact_cube": false,
+                "height_gain_ge_0_08m": false,
+                "lifted_ge_2s_continuous": false,
+                "finite_and_bounded": true,
+                "released_after_open": false
+              },
+              "bilateral_contact": false,
+              "height_gain_m": 0.0,
+              "max_continuous_lifted_s": 0.0,
+              "pre_close_cube_displacement_m": null,
+              "tcp_tracking_error_rms": {
+                "PREGRASP": 0.03222534150240394,
+                "APPROACH": 0.09465265904381957
+              },
+              "tcp_tracking_error_max": {
+                "PREGRASP": 0.30042427584394965,
+                "APPROACH": 0.967338577457111
+              },
+              "arm_force_saturation": {
+                "PREGRASP": [
+                  0.0125,
+                  0.0025,
+                  0.0025,
+                  0.0125,
+                  0.0,
+                  0.0325,
+                  0.005
+                ],
+                "APPROACH": [
+                  0.0325,
+                  0.0,
+                  0.0,
+                  0.04,
+                  0.0,
+                  0.0075,
+                  0.0
+                ]
+              },
+              "failure_state": "SETTLE_APPROACH",
+              "failure_reason": "TCP did not settle within tolerance before CLOSE"
+            },
+            {
+              "trial_index": 1,
+              "pass": false,
+              "criteria": {
+                "both_pads_contact_cube": false,
+                "height_gain_ge_0_08m": false,
+                "lifted_ge_2s_continuous": false,
+                "finite_and_bounded": true,
+                "released_after_open": false
+              },
+              "bilateral_contact": false,
+              "height_gain_m": 0.0,
+              "max_continuous_lifted_s": 0.0,
+              "pre_close_cube_displacement_m": null,
+              "tcp_tracking_error_rms": {
+                "PREGRASP": 0.03222534150240394,
+                "APPROACH": 0.09465265904381957
+              },
+              "tcp_tracking_error_max": {
+                "PREGRASP": 0.30042427584394965,
+                "APPROACH": 0.967338577457111
+              },
+              "arm_force_saturation": {
+                "PREGRASP": [
+                  0.0125,
+                  0.0025,
+                  0.0025,
+                  0.0125,
+                  0.0,
+                  0.0325,
+                  0.005
+                ],
+                "APPROACH": [
+                  0.0325,
+                  0.0,
+                  0.0,
+                  0.04,
+                  0.0,
+                  0.0075,
+                  0.0
+                ]
+              },
+              "failure_state": "SETTLE_APPROACH",
+              "failure_reason": "TCP did not settle within tolerance before CLOSE"
+            },
+            {
+              "trial_index": 2,
+              "pass": false,
+              "criteria": {
+                "both_pads_contact_cube": false,
+                "height_gain_ge_0_08m": false,
+                "lifted_ge_2s_continuous": false,
+                "finite_and_bounded": true,
+                "released_after_open": false
+              },
+              "bilateral_contact": false,
+              "height_gain_m": 0.0,
+              "max_continuous_lifted_s": 0.0,
+              "pre_close_cube_displacement_m": null,
+              "tcp_tracking_error_rms": {
+                "PREGRASP": 0.03222534150240394,
+                "APPROACH": 0.09465265904381957
+              },
+              "tcp_tracking_error_max": {
+                "PREGRASP": 0.30042427584394965,
+                "APPROACH": 0.967338577457111
+              },
+              "arm_force_saturation": {
+                "PREGRASP": [
+                  0.0125,
+                  0.0025,
+                  0.0025,
+                  0.0125,
+                  0.0,
+                  0.0325,
+                  0.005
+                ],
+                "APPROACH": [
+                  0.0325,
+                  0.0,
+                  0.0,
+                  0.04,
+                  0.0,
+                  0.0075,
+                  0.0
+                ]
+              },
+              "failure_state": "SETTLE_APPROACH",
+              "failure_reason": "TCP did not settle within tolerance before CLOSE"
+            }
+          ],
+          "n_trials": 3,
+          "n_pass": 0,
+          "bilateral_contact_rate": 0.0,
+          "max_height_gain_m": 0.0,
+          "max_continuous_hold_s": 0.0,
+          "variant_success": false
+        }
+      ],
+      "n_variants_succeeded": 3,
+      "n_variants_total": 5,
+      "variant_success_rate": 0.6,
+      "total_trials": 15,
+      "total_trials_passed": 9,
+      "trial_success_rate": 0.6,
+      "target_met_3_of_5": true
+    }
+  ],
+  "global_adjustments": [],
+  "final_sweep": "sweep_0_unmodified_phase3c_config"
+}

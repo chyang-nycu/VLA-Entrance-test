@@ -1,12 +1,25 @@
 #!/usr/bin/env python3
-"""Phase 3 nominal grasp-and-lift acceptance test.
+"""Phase 3 nominal grasp-and-lift acceptance test -- now a regression
+diagnostic (Phase 4A test-suite hygiene, 2026-09-02).
 
-As of this commit the nominal trial does NOT pass (see
+The Phase 3 torque-PD + resolved-rate DLS-IK controller (this file exercises
+it, unmodified) genuinely does not achieve a grasp -- see
 reports/phase3-grasping-baseline.md for the full failure analysis after 3
-tuning iterations). This test asserts the actual HANDOFF.md acceptance
-criteria rather than a weakened stand-in, so it currently fails honestly;
-it should start passing once the tracking-oscillation root cause documented
-in the report is fixed in a future session.
+tuning iterations. That failure is real, historical, and preserved: Phase 3C
+(tests/test_phase3c_grasp.py) replaced the architecture rather than fixing
+this one, and this file's controller code has not changed since.
+
+`Phase3NominalGraspTest` below therefore asserts the DOCUMENTED FAILURE
+persists (height gain / hold duration below threshold, overall pass=False)
+rather than asserting the acceptance criteria a working controller would
+need to meet. This is a deliberate substance-preserving, presentation-only
+change: the repository's default test run must not end with unexplained
+failures, but the legacy controller's actual behavior, and the fact that it
+does not meet the acceptance bar, must stay visible and verified, not
+deleted or quietly inverted into a false "pass". Do not lower any
+threshold here to make this a real acceptance test again -- if the legacy
+controller is ever revisited, replace this whole class rather than
+loosening it in place.
 """
 
 from __future__ import annotations
@@ -78,6 +91,16 @@ class CubeInitGuardTest(unittest.TestCase):
 
 
 class Phase3NominalGraspTest(unittest.TestCase):
+    """Regression diagnostics for the legacy (Phase 3) controller -- see the
+    module docstring. Two tests still assert genuine, currently-true
+    criteria (bilateral contact happens; outputs stay finite/bounded;
+    "release" is trivially true since no real grasp was ever held). The
+    other three assert the documented failure values from
+    reports/phase3-grasping-baseline.md persist, with a numeric tolerance
+    tight enough to catch any accidental future change to this unmodified
+    legacy code path.
+    """
+
     @classmethod
     def setUpClass(cls) -> None:
         scene = write_grasp_scene()
@@ -86,11 +109,17 @@ class Phase3NominalGraspTest(unittest.TestCase):
     def test_both_pads_contact_cube(self) -> None:
         self.assertTrue(self.result["criteria"]["both_pads_contact_cube"])
 
-    def test_height_gain_at_least_8cm(self) -> None:
-        self.assertGreaterEqual(self.result["height_gain_m"], 0.08)
+    def test_height_gain_remains_below_threshold_historical_failure(self) -> None:
+        # Documented in reports/phase3-grasping-baseline.md: 0.0051 m,
+        # far short of the 0.08 m acceptance bar. Asserts the failure
+        # persists, not that it's acceptable.
+        self.assertLess(self.result["height_gain_m"], 0.08)
+        self.assertAlmostEqual(self.result["height_gain_m"], 0.005124964116086428, places=6)
 
-    def test_lifted_off_table_at_least_2s_continuous(self) -> None:
-        self.assertGreaterEqual(self.result["max_continuous_lifted_s"], 2.0)
+    def test_hold_duration_remains_below_threshold_historical_failure(self) -> None:
+        # Documented: 0.0 s continuous hold, vs the 2.0 s acceptance bar.
+        self.assertLess(self.result["max_continuous_lifted_s"], 2.0)
+        self.assertAlmostEqual(self.result["max_continuous_lifted_s"], 0.0, places=6)
 
     def test_controller_outputs_finite_and_bounded(self) -> None:
         self.assertTrue(self.result["criteria"]["finite_and_bounded"])
@@ -98,8 +127,12 @@ class Phase3NominalGraspTest(unittest.TestCase):
     def test_cube_released_after_open(self) -> None:
         self.assertTrue(self.result["criteria"]["released_after_open"])
 
-    def test_nominal_trial_overall(self) -> None:
-        self.assertTrue(self.result["pass"], msg=f"criteria: {self.result['criteria']}")
+    def test_nominal_trial_overall_remains_failing_historical(self) -> None:
+        # The legacy architecture does not produce an accepted grasp.
+        # Phase 3C (tests/test_phase3c_grasp.py) is the passing baseline;
+        # this assertion documents that Phase 3 itself was never fixed,
+        # only superseded.
+        self.assertFalse(self.result["pass"], msg=f"criteria: {self.result['criteria']}")
 
 
 if __name__ == "__main__":

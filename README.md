@@ -5,6 +5,11 @@ Task-local manipulation experiments built on top of the official Unitree
 staged in phases; each phase must pass its acceptance test before the next
 begins.
 
+**Current capability, precisely stated: a fixed-base, torso-constrained
+upper-body manipulation baseline.** The pelvis and torso are rigidly welded
+to the world; only the right arm and gripper move. This is not full-body or
+free-standing manipulation.
+
 ## Layout
 
 - `vendor/unitree_mujoco/` — pinned upstream simulator (git submodule; see
@@ -51,6 +56,7 @@ package versions used so far.
 .venv/bin/python -m unittest tests/test_phase3_controller.py -v   # Phase 3 controller unit
 .venv/bin/python -m unittest tests/test_phase3_grasp.py -v        # Phase 3/3B (historical, torque-PD; 3 FAIL by design)
 .venv/bin/python -m unittest tests/test_phase3c_grasp.py -v       # Phase 3C (position-servo; passing baseline)
+.venv/bin/python -m unittest tests/test_phase4a_grasp_variants.py -v  # Phase 4A (setup-variant sweep)
 ```
 
 ## Phase status
@@ -66,13 +72,20 @@ package versions used so far.
   FAILED after 3 attempts. See `reports/phase3b-controller-stabilization.md`.
 - **Phase 3C — Position-servo controller architecture (bounded position servos +
   waypoint IK + pelvis/torso weld + implicitfast integrator)**: **PASSES**,
-  at attempt 3C-2, deterministic 5/5. This is the current fixed-base
-  grasp-and-lift baseline. See `reports/phase3c-position-servo-baseline.md`
-  and `HANDOFF.md` for the full specification, architecture, and known
-  limitations (fixed-base is pelvis+torso; IK tolerance and gripper gains
-  are specific to the current cube position/mass/friction; the 5-position
-  variant sweep has not yet been run).
-- **Task 2 (full pick-and-place, cameras, dataset collection, etc.)**: not
+  at attempt 3C-2, deterministic 5/5. This is the fixed-base, torso-constrained
+  upper-body manipulation baseline controller. See
+  `reports/phase3c-position-servo-baseline.md`.
+- **Phase 4A — Grasp setup-variant evaluation**: **3/5 variants succeed
+  (60%), 9/15 trials (60%)**, using Phase 3C's unmodified configuration —
+  zero global adjustments needed. The 2 failing variants were correctly
+  predicted unreachable by a pre-run IK feasibility check (a reachability
+  limitation, not a grip-strength one). See `reports/phase4a-grasp-variants.md`
+  and `HANDOFF.md` for the full 5-variant table, feasibility methodology,
+  and known limitations (asymmetric success envelope, likely related to a
+  wrist kinematic singularity near the nominal point; IK tolerance and
+  gripper gains remain specific to the current cube mass/friction).
+- **Task 2 (full pick-and-place transport, target placement, cameras,
+  dataset collection, language variants, policy integration)**: not
   started; requires new, explicit authorization per `HANDOFF.md`.
 
 ## Ground rules (all phases)
