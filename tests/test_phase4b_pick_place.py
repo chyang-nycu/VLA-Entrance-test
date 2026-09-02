@@ -42,15 +42,28 @@ from tasks.g1_pick_place.run_pick_place import (
 # assertion while still exercising the real, unmocked code path.
 _NOMINAL = None
 _VARIANTS = None
+_EXCLUDED_SAMPLE = None
 
 
 def setUpModule() -> None:
-    global _NOMINAL, _VARIANTS
+    global _NOMINAL, _VARIANTS, _EXCLUDED_SAMPLE
     scene = gripper_scene.write_grasp_scene_4b(arm_kp=400.0, arm_kv=25.0, scene_name="g1_grasp_scene_4b.xml")
     _NOMINAL = run_trial_pick_place(scene)
     _VARIANTS = {
         v["id"]: run_trial_pick_place(scene, cube_xy_offset=v["offset"]) for v in STAGE_B_VARIANTS
     }
+    # Phase 4E's grasp-stability repair (reports/phase4e-gripper-integrity-
+    # repair.md) improved placement accuracy enough that y_plus_0.03 -- the
+    # variant this file originally used to test the "failing trial has zero
+    # dwell streak" boundary case -- now completes the full task (see
+    # test_y_plus_variant_now_completes_the_task_after_the_4e_repair below).
+    # A pre-declared-unreachable excluded variant is used instead to keep
+    # exercising the zero-streak invariant; it fails earlier (at
+    # SETTLE_APPROACH, not at the dwell stage), so it is a weaker
+    # substitute for the original boundary case -- flagged here rather than
+    # silently swapped.
+    _excluded_offset = EXCLUDED_UNREACHABLE_VARIANTS[0]["offset"]
+    _EXCLUDED_SAMPLE = run_trial_pick_place(scene, cube_xy_offset=_excluded_offset)
 
 
 class Phase4BTargetSceneTest(unittest.TestCase):
@@ -213,11 +226,24 @@ class Phase4BAbortBehaviorTest(unittest.TestCase):
     """Loss-of-grasp abort: an aggressive transport (1 waypoint -- i.e. a
     single, un-subdivided ramp -- driven in 0.02 s instead of the winning
     Stage A configuration's 2.0 s across 40 waypoints) genuinely and
-    reproducibly breaks bilateral contact during TRANSPORT_ABOVE_TARGET.
-    Real, unmocked physics -- this is a permanent regression check that the
-    abort path fires honestly (reports FAILED, does not force a pass) when
-    the underlying grasp is actually lost, in the same spirit as Stage A
-    Attempt 1's real (slower but still contact-breaking) failure."""
+    reproducibly breaks bilateral contact during TRANSPORT_ABOVE_TARGET/
+    LIFT. Real, unmocked physics -- this is a permanent regression check
+    that the abort path fires honestly (reports FAILED, does not force a
+    pass) when the underlying grasp is actually lost, in the same spirit as
+    Stage A Attempt 1's real (slower but still contact-breaking) failure.
+
+    Phase 4E's grasp-stability repair (reports/phase4e-gripper-integrity-
+    repair.md: taller pads, smoothed LIFT, gripper_kp/kd raised 150/10 ->
+    320/20) made the *current production* gains robust enough that this
+    single-waypoint jerk alone no longer breaks contact (confirmed: it
+    survives even at the minimum possible duration, one physics timestep).
+    This test now ALSO passes explicit, deliberately-weak gripper gains
+    (Phase 3C's original 150/10, still a real, physically-motivated
+    configuration -- not an arbitrary near-zero value) alongside the same
+    aggressive jump, specifically to keep exercising the abort path itself
+    rather than testing whether the *current* production gains are weak
+    enough to fail this particular stress case.
+    """
 
     @classmethod
     def setUpClass(cls) -> None:
@@ -226,7 +252,9 @@ class Phase4BAbortBehaviorTest(unittest.TestCase):
         orig = rp.TRANSPORT_N_WAYPOINTS
         rp.TRANSPORT_N_WAYPOINTS = 1
         try:
-            cls.result = run_trial_pick_place(scene, transport_drive_s=0.02)
+            cls.result = run_trial_pick_place(
+                scene, transport_drive_s=0.02, gripper_kp=rp.GRIPPER_KP_3C, gripper_kd=rp.GRIPPER_KD_3C,
+            )
         finally:
             rp.TRANSPORT_N_WAYPOINTS = orig
 
@@ -271,10 +299,12 @@ class Phase4BSuccessDetectorBoundaryTest(unittest.TestCase):
         self.assertGreaterEqual(_NOMINAL["task_success_dwell_achieved_s"], TASK_SUCCESS_DWELL_S)
 
     def test_failing_variant_never_accumulated_a_full_streak(self) -> None:
-        # y_plus_0.03 fails the target-XY criterion continuously (the cube
-        # never enters the boundary), so its best streak must be 0, not a
-        # partial credit for briefly touching the condition.
-        failing = _VARIANTS["y_plus_0.03"]
+        # Originally used y_plus_0.03 (now passing post-Phase-4E -- see
+        # test_y_plus_variant_now_completes_the_task_after_the_4e_repair);
+        # substituted with a pre-declared-unreachable excluded variant to
+        # keep testing the zero-streak invariant on a still-genuinely-
+        # failing trial (see the note in setUpModule above).
+        failing = _EXCLUDED_SAMPLE
         self.assertFalse(failing["task_pass"])
         self.assertEqual(failing["task_success_dwell_achieved_s"], 0.0)
 
@@ -298,13 +328,24 @@ class Phase4BNominalPickPlaceTest(unittest.TestCase):
         self.assertTrue(_NOMINAL["grasp_pass"])
         self.assertTrue(_NOMINAL["placement_pass"])
 
-    def test_nominal_height_gain_matches_phase3c_unchanged_grasp(self) -> None:
-        # Grasp physics are byte-for-byte reused from Phase 3C -- this must
-        # equal Phase 3C/4A's own recorded nominal height gain exactly.
-        self.assertAlmostEqual(_NOMINAL["height_gain_m"], 0.10838913826086727, places=6)
+    def test_nominal_height_gain_matches_current_scene(self) -> None:
+        # Phase 4E (reports/phase4e-gripper-integrity-repair.md) changed
+        # gripper_scene.write_grasp_scene_4b's finger-pad geometry and
+        # run_pick_place's gripper gains/LIFT trajectory as part of a
+        # grasp-stability repair -- both of which this function calls
+        # unchanged, so its numeric result legitimately moved from Phase
+        # 4B's originally-committed 0.10838913826086727 m (see
+        # reports/phase4b-task1-pick-place.md, left un-edited as the
+        # historical record of that now-superseded configuration) to the
+        # value below. This test tracks CURRENT write_grasp_scene_4b/
+        # run_trial_pick_place behavior, not a frozen historical result.
+        self.assertAlmostEqual(_NOMINAL["height_gain_m"], 0.11746907818355656, places=6)
 
     def test_nominal_final_xy_target_error_within_margin(self) -> None:
-        self.assertAlmostEqual(_NOMINAL["final_xy_target_error_m"], 0.014564117068399008, places=6)
+        # Old (Phase 4B/4C) value: 0.014564117068399008 m -- see the note in
+        # test_nominal_height_gain_matches_current_scene above for why this
+        # number legitimately changed in Phase 4E.
+        self.assertAlmostEqual(_NOMINAL["final_xy_target_error_m"], 0.0017215286829355965, places=6)
         self.assertLess(_NOMINAL["final_xy_target_error_m"], gripper_scene.TARGET_XY_SUCCESS_MARGIN_M)
 
     def test_nominal_retreat_did_not_disturb_cube(self) -> None:
@@ -341,15 +382,23 @@ class Phase4BStageBVariantsTest(unittest.TestCase):
         self.assertTrue(_VARIANTS["nominal"]["task_pass"])
         self.assertTrue(_VARIANTS["x_minus_0.03"]["task_pass"])
 
-    def test_y_plus_variant_grasps_but_fails_placement(self) -> None:
-        # Documented, honestly-reported limitation (see
-        # reports/phase4b-task1-pick-place.md): the grasp itself succeeds
-        # (reusing Phase 3C's unmodified, already-reachable grasp) but the
-        # fixed target's tight XY margin is missed for this cube start.
+    def test_y_plus_variant_now_completes_the_task_after_the_4e_repair(self) -> None:
+        # Originally (Phase 4B, reports/phase4b-task1-pick-place.md, left
+        # unedited as the historical record) this variant grasped
+        # successfully but missed the fixed target's tight XY margin
+        # (20.4 mm vs. a 15 mm bound). Phase 4E's grasp-stability repair
+        # (reports/phase4e-gripper-integrity-repair.md) -- taller finger
+        # pads, smoothed LIFT, higher gripper gains -- incidentally
+        # improved placement accuracy enough that this variant now
+        # completes the full task too. This is reported as a genuine,
+        # measured side effect, not something tuned for directly (Phase 4E
+        # Stage A never targeted Stage B variants at all -- see that
+        # report's explicit note that Stage B was informational-only this
+        # phase because the Stage A gate was not met).
         v = _VARIANTS["y_plus_0.03"]
         self.assertTrue(v["grasp_pass"])
-        self.assertFalse(v["placement_pass"])
-        self.assertFalse(v["task_pass"])
+        self.assertTrue(v["placement_pass"])
+        self.assertTrue(v["task_pass"])
 
     def test_supported_envelope_meets_at_least_two_of_three(self) -> None:
         n_pass = sum(1 for r in _VARIANTS.values() if r["task_pass"])

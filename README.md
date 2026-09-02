@@ -6,16 +6,22 @@ staged in phases; each phase must pass its acceptance test before the next
 begins.
 
 **Current capability, precisely stated: a fixed-base, torso-constrained
-upper-body manipulation baseline that completes Task 1** ("pick up the red
-cube and place it in the blue target area") for its nominal cube position
-and 2 of 3 tested reachable variants. The pelvis and torso are rigidly
-welded to the world; only the right arm and gripper move. This is not
-full-body or free-standing manipulation.
+upper-body manipulation baseline attempting Task 1** ("pick up the red
+cube and place it in the blue target area"). The pelvis and torso are
+rigidly welded to the world; only the right arm and gripper move. This is
+not full-body or free-standing manipulation. **Task 1 success is NOT
+currently claimed** — see the notice below.
 
 > **Previous Task 1 success results are under review following visual
-> detection of collision/support inconsistencies.** See "Phase 4D" below and
-> `reports/phase4d-physics-integrity-audit.md` before relying on any Phase
-> 3C/4A/4B/4C numeric result as a visually-validated success claim.
+> detection of collision/support inconsistencies.** Phase 4D confirmed a
+> visual/collision defect (fixed in Phase 4E) and Phase 4E's grasp-stability
+> repair substantially reduced, but did not eliminate, a real grasp
+> instability found by human video review. Task 1 is not considered valid
+> again until a human visually approves `artifacts/phase4e_task1_corrected.mp4`
+> AND the remaining ~2x max-slip-while-grasped gap is closed in a future,
+> separately authorized phase. See "Phase 4D"/"Phase 4E" below,
+> `reports/phase4d-physics-integrity-audit.md`, and
+> `reports/phase4e-gripper-integrity-repair.md`.
 
 ## Layout
 
@@ -66,7 +72,8 @@ package versions used so far.
 .venv/bin/python -m unittest tests/test_phase4a_grasp_variants.py -v  # Phase 4A (setup-variant sweep)
 .venv/bin/python -m unittest tests/test_phase4b_pick_place.py -v  # Phase 4B (Task 1: complete pick-and-place)
 .venv/bin/python -m unittest tests/test_phase4c_slip_audit.py -v  # Phase 4C (slip-metric audit + video capture)
-.venv/bin/python -m unittest tests/test_phase4d_physics_integrity.py -v  # Phase 4D (physics-integrity audit; 1 EXPECTED failure, see report)
+.venv/bin/python -m unittest tests/test_phase4d_physics_integrity.py -v  # Phase 4D (physics-integrity audit; now fully green post-4E fix)
+.venv/bin/python -m unittest tests/test_phase4e_gripper_integrity.py -v  # Phase 4E (visual/collision fix + grasp-stability repair; honest partial result)
 ```
 
 ## Phase status
@@ -139,6 +146,27 @@ package versions used so far.
   stills reproducing the defect). All prior numeric results stand
   unmodified; only the *visual/interpretive* "Task 1 success" claim is
   under review pending a scene fix and revalidation.
+- **Phase 4E — Gripper visual/collision repair and grasp-stability
+  redesign**: **visual/collision defect (Phase 4D) FIXED** — the vendor
+  decorative hand mesh is removed from Task 1's scene only, a palm and
+  distinguishably-colored fingers were added; `Phase4DDecorativeHandOverlapTest`
+  now genuinely passes. **Grasp stability substantially improved but the
+  tightened acceptance bar is NOT met**: 3 evidence-driven repair attempts
+  (visual+pad geometry; LIFT trajectory smoothing+gain raise; further
+  gain/waypoint increase) reduced max slip while grasped from as much as
+  5.19 cm to 2.05 cm and raised the worst-instant bilateral safety factor
+  from 0.054x to >=1.0x — but the new <=10 mm max-slip-while-grasped
+  criterion is still ~2x over, and a cube-center-within-pad-vertical-
+  overlap criterion also still fails. No 4th attempt was made; no threshold
+  was loosened. Because the required gate was not met, Stage B (the 3
+  reachable variants) was not run as an authorized evaluation — see
+  `reports/phase4e-gripper-integrity-repair.md` for the full evidence,
+  attempt log, and the informational-only Stage B numbers. New evidence
+  video: `artifacts/phase4e_task1_corrected.mp4` (+ close-up
+  `artifacts/phase4e_task1_closeup.mp4`), both with a burned-in overlay of
+  task state/height gain/live slip/contact force. **Task 1 success remains
+  NOT restored, pending human video review and a future phase closing the
+  remaining slip gap.**
 - **Task 2 (cameras, dataset collection, language-conditioned variants,
   policy integration)**: not started; requires new, explicit authorization
   per `HANDOFF.md`.

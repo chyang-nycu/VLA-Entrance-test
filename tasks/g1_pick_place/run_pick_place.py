@@ -61,6 +61,7 @@ from tasks.g1_pick_place.controller_3c import IK_POS_TOL, solve_ik_waypoint
 from tasks.g1_pick_place.gripper_scene import (
     CUBE_HALF,
     CUBE_POS,
+    FINGER_PAD_HALF,
     TABLE_TOP_Z,
     TARGET_HALF_XY,
     TARGET_HALF_Z,
@@ -131,6 +132,34 @@ RETREAT_DRIVE_S = 0.8  # unchanged from Attempt 1: RETREAT happens with the
 # for this segment and it was never implicated in any attempt's failure.
 TRANSPORT_N_WAYPOINTS = 40
 LOWER_N_WAYPOINTS = 60
+
+# Phase 4E, Attempt 2 (Section B, evidence-based): LIFT was still using
+# Stage A Attempt 1's one-shot _drive_segment (a single position-servo step
+# straight to the post-lift joint target) -- never updated when Attempt 3
+# proved this pattern unsafe for TRANSPORT/LOWER, because at the time LIFT
+# itself was not implicated (RESET..HOLD was inherited unchanged from Phase
+# 3C, "not a reimplementation with new numbers"). Direct evidence from
+# tasks/g1_pick_place/phase4e_diagnose_grip.py against the pre-4E scene:
+# the worst-instant bilateral contact-force safety factor (measured force /
+# N_min = m*g/(2*mu)) during LIFT was 0.146x -- i.e. actual grip force
+# momentarily dropped BELOW the theoretical minimum needed to support the
+# cube's weight by friction alone, a real, physically-caused slip event,
+# not a measurement artifact (CLOSE: 0.33x, HOLD: 1.07x -- LIFT's one-shot
+# vertical step is uniquely bad). Smoothing LIFT the same way Stage A
+# Attempt 3 already fixed TRANSPORT/LOWER (ramped sub-waypoints instead of
+# a single jump) removes the acceleration transient without touching any
+# gain.
+LIFT_DRIVE_S_4E = 1.5
+LIFT_N_WAYPOINTS_4E = 30
+
+# Phase 4E, Attempt 2 (Section B): raised from Phase 3C's GRIPPER_KP_3C/KD_3C
+# (150/10) -- HOLD's worst-instant safety factor at those gains was only
+# 1.07x (see reports/phase4e-gripper-integrity-repair.md, Attempt 1 table),
+# far below a defensible margin for a "safety factor". Chosen value and its
+# resulting safety factor are documented as measured in that report, not
+# asserted here.
+GRIPPER_KP_4E = 320.0
+GRIPPER_KD_4E = 20.0
 
 # --- Objective task-success detector parameters ----------------------------
 # Cube treated as "at rest" once its linear/angular speed drop below these --
@@ -226,11 +255,13 @@ def run_trial_pick_place(
     model_path: Path,
     cube_xy_offset: tuple[float, float] = (0.0, 0.0),
     diagnostics: dict | None = None,
-    gripper_kp: float = GRIPPER_KP_3C,
-    gripper_kd: float = GRIPPER_KD_3C,
+    gripper_kp: float = GRIPPER_KP_4E,
+    gripper_kd: float = GRIPPER_KD_4E,
     transport_drive_s: float = TRANSPORT_DRIVE_S,
     lower_drive_s: float = LOWER_DRIVE_S,
     retreat_drive_s: float = RETREAT_DRIVE_S,
+    lift_drive_s: float = LIFT_DRIVE_S_4E,
+    lift_n_waypoints: int = LIFT_N_WAYPOINTS_4E,
     frame_callback: "Callable[[str, mujoco.MjModel, mujoco.MjData], None] | None" = None,
 ) -> dict:
     """One Task 1 pick-and-place trial through the full state machine.
@@ -317,6 +348,9 @@ def run_trial_pick_place(
         "final_cube_angular_speed": None,
         "retreat_disturbance_m": None,
         "task_success_dwell_achieved_s": 0.0,
+        "downward_slip_during_hold_m": 0.0,
+        "min_bilateral_normal_force_n": float("inf"),
+        "max_abs_contact_z_offset_from_cube_center_m": 0.0,
     }
     lifted_since = None
     # Cube offset from the TCP, expressed in the TCP's OWN (rotating) frame at
@@ -362,6 +396,32 @@ def run_trial_pick_place(
 
         if carrying in ("full", "grip_only") and not both_now:
             telemetry["contact_lost_during_transport"] = True
+
+        # Phase 4E Section C evidence: while the cube is actually grasped,
+        # record (a) the minimum instantaneous bilateral normal force seen
+        # (not merely a contact-exists boolean) and (b) how far the contact
+        # point strays, in world Z, from the cube's own center -- both used
+        # to check "cube center remains inside the vertical overlap region
+        # of both finger pads" and "normal contact forces remain positive
+        # and finite" directly against real per-step contact data.
+        if carrying in ("full", "grip_only"):
+            for pad_id in (left_pad_id, right_pad_id):
+                for ci in range(data.ncon):
+                    con = data.contact[ci]
+                    pair = (int(con.geom1), int(con.geom2))
+                    if cube_geom_id not in pair or pad_id not in pair:
+                        continue
+                    force6 = np.zeros(6)
+                    mujoco.mj_contactForce(model, data, ci, force6)
+                    normal_n = float(abs(force6[0]))
+                    telemetry["min_bilateral_normal_force_n"] = min(
+                        telemetry["min_bilateral_normal_force_n"], normal_n
+                    )
+                    z_offset = abs(float(con.pos[2]) - cube_z_now)
+                    telemetry["max_abs_contact_z_offset_from_cube_center_m"] = max(
+                        telemetry["max_abs_contact_z_offset_from_cube_center_m"], z_offset
+                    )
+
         if carrying == "full" and cube_z_now < (rest_z + CONTACT_MARGIN):
             telemetry["height_unsafe_during_transport"] = True
 
@@ -387,7 +447,7 @@ def run_trial_pick_place(
             if carrying in ("grip_only", "full"):
                 # Only while the gripper is still commanded closed and the
                 # cube is physically grasped -- this is genuine slip.
-                if phase in ("LIFT", "HOLD"):
+                if phase == "HOLD" or phase.startswith("LIFT"):
                     telemetry["max_slip_during_lift"] = max(telemetry["max_slip_during_lift"], slip)
                 elif phase.startswith("TRANSPORT_ABOVE_TARGET") or phase == "SETTLE_ABOVE_TARGET":
                     telemetry["max_slip_during_transport"] = max(telemetry["max_slip_during_transport"], slip)
@@ -593,6 +653,31 @@ def run_trial_pick_place(
         }
         grasp_pass = all(criteria_grasp.values())
         placement_pass = all(criteria_placement.values())
+
+        # Phase 4E Section C: strengthened grasp-stability acceptance
+        # criteria, evaluated in ADDITION to criteria_grasp above (which are
+        # unchanged from Phase 3C). None of these can be satisfied
+        # trivially by a trial that failed earlier (all the source
+        # telemetry only accumulates while carrying is "grip_only"/"full",
+        # i.e. after a real bilateral grasp was verified).
+        max_slip_while_grasped_m = max(
+            telemetry["max_slip_during_lift"],
+            telemetry["max_slip_during_transport"],
+            telemetry["max_slip_during_lower"],
+        )
+        criteria_grasp_stability_4e = {
+            "max_slip_while_grasped_le_10mm": max_slip_while_grasped_m <= 0.010,
+            "downward_slip_during_hold_le_5mm": telemetry["downward_slip_during_hold_m"] <= 0.005,
+            "cube_center_within_pad_vertical_overlap": (
+                telemetry["max_abs_contact_z_offset_from_cube_center_m"] <= FINGER_PAD_HALF[2]
+            ),
+            "bilateral_contact_throughout_hold": not telemetry["contact_lost_during_transport"],
+            "normal_forces_positive_and_finite": bool(
+                np.isfinite(telemetry["min_bilateral_normal_force_n"])
+                and telemetry["min_bilateral_normal_force_n"] > 0.0
+            ),
+        }
+        grasp_stability_pass_4e = all(criteria_grasp_stability_4e.values())
         return {
             "cube_xy_offset": list(cube_xy_offset),
             "cube_spawn_pos": [cube_x, cube_y, cube_z],
@@ -629,6 +714,15 @@ def run_trial_pick_place(
             "grasp_pass": grasp_pass,
             "placement_pass": placement_pass and task_success,
             "task_pass": grasp_pass and placement_pass and task_success and telemetry["failure_state"] is None,
+            "downward_slip_during_hold_m": telemetry["downward_slip_during_hold_m"],
+            "min_bilateral_normal_force_n": (
+                telemetry["min_bilateral_normal_force_n"]
+                if np.isfinite(telemetry["min_bilateral_normal_force_n"]) else None
+            ),
+            "max_abs_contact_z_offset_from_cube_center_m": telemetry["max_abs_contact_z_offset_from_cube_center_m"],
+            "max_slip_while_grasped_m": max_slip_while_grasped_m,
+            "criteria_grasp_stability_4e": criteria_grasp_stability_4e,
+            "grasp_stability_pass_4e": grasp_stability_pass_4e,
         }
 
     # --- PREGRASP ---
@@ -683,14 +777,21 @@ def run_trial_pick_place(
     # safety violation. Height gain/hold-duration are already checked by
     # criteria_grasp below, reused unchanged from Phase 3C.)
     telemetry["states_entered"].append("LIFT")
-    q_lift, _, _ = solve_ik_waypoint(model, ik_scratch, data.qpos.copy(), arm_map, site_id, lift_target, nominal_q)
-    _drive_segment(lift_target, False, "LIFT", DRIVE_S["LIFT"], q_lift, carrying="grip_only")
+    q_lift = _drive_smooth(lift_target, False, "LIFT", lift_drive_s, lift_n_waypoints, carrying="grip_only")
     if telemetry["contact_lost_during_transport"]:
         return _fail("LIFT", "lost bilateral contact during LIFT")
 
     # --- HOLD ---
     telemetry["states_entered"].append("HOLD")
+    # Phase 4E Section C: "downward slip from the start to end of HOLD" --
+    # the arm is commanded stationary throughout HOLD (lift_target does not
+    # change), so any world-Z drop in the cube during this segment is,
+    # unambiguously, the cube slipping down inside the closed grip, not a
+    # TCP-frame-rotation artifact (there is no TCP rotation during HOLD).
+    cube_z_hold_start = float(data.xpos[cube_body_id][2])
     _drive_segment(lift_target, False, "HOLD", DRIVE_S["HOLD"], q_lift, carrying="grip_only")
+    cube_z_hold_end = float(data.xpos[cube_body_id][2])
+    telemetry["downward_slip_during_hold_m"] = max(0.0, cube_z_hold_start - cube_z_hold_end)
     if telemetry["contact_lost_during_transport"]:
         return _fail("HOLD", "lost bilateral contact during HOLD")
 

@@ -113,16 +113,30 @@ class PostReleaseIsolationTest(unittest.TestCase):
         cls.result = run_trial_pick_place(scene)
 
     def test_task_still_passes_metric_fix_is_measurement_only(self) -> None:
-        # Confirms this phase changed reporting, not physics/controller
-        # behavior -- exact match to the Phase 4B committed value.
+        # Original intent (Phase 4C): confirm this phase's slip-METRIC fix
+        # changed reporting, not physics/controller behavior, by matching
+        # the Phase 4B committed value exactly. Phase 4E (reports/
+        # phase4e-gripper-integrity-repair.md) subsequently DID change
+        # physics/controller behavior on purpose (gripper gains, finger
+        # geometry, LIFT trajectory) as an evidence-based grasp-stability
+        # repair -- so this test now tracks CURRENT write_grasp_scene_4b/
+        # run_trial_pick_place behavior instead of the frozen Phase 4B
+        # number (which remains correctly preserved, unedited, in
+        # reports/phase4b-task1-pick-place.md and
+        # logs/phase4b_pick_place_trials.json).
         self.assertTrue(self.result["task_pass"])
-        self.assertAlmostEqual(self.result["height_gain_m"], 0.10838913826086727, places=9)
-        self.assertAlmostEqual(self.result["final_xy_target_error_m"], 0.014564117068399008, places=9)
+        self.assertAlmostEqual(self.result["height_gain_m"], 0.11746907818355656, places=9)
+        self.assertAlmostEqual(self.result["final_xy_target_error_m"], 0.0017215286829355965, places=9)
 
     def test_legacy_max_cube_slip_m_reproduces_phase4b_value(self) -> None:
-        # The old (uncorrected) field is retained unmodified so the
-        # historical 0.156 m figure stays reproducible for the addendum.
-        self.assertAlmostEqual(self.result["max_cube_slip_m"], 0.1561555402975266, places=9)
+        # The old (uncorrected) field is retained unmodified -- its
+        # semantics ("dominated by post-release separation, not grasp
+        # slip") still hold post-Phase-4E, but its exact numeric value
+        # necessarily shifted along with the Phase 4E physics change (see
+        # the note above); it is no longer pinned to the frozen Phase 4B
+        # commit's number, which remains preserved in
+        # logs/phase4c_slip_audit.json instead.
+        self.assertAlmostEqual(self.result["max_cube_slip_m"], 0.1550390839758238, places=9)
 
     def test_post_release_separation_dominates_the_old_legacy_number(self) -> None:
         # Root-cause confirmation: the old max_cube_slip_m is explained by

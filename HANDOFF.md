@@ -699,3 +699,70 @@ correct, not a regression to silently fix.
 Per this file's scope, no fix, no dataset collection, and no Task 2 work
 were started in Phase 4D. A revalidation/fix phase requires new, explicit
 authorization.
+
+## Notice: previous Task 1 success results are under review
+
+**Previous Task 1 success results are under review following visual
+detection of collision/support inconsistencies.** See "Phase 4D" above for
+the diagnosis and "Phase 4E" below for the repair attempt and its honest,
+incomplete outcome. Task 1 is NOT considered valid again until a human has
+visually reviewed `artifacts/phase4e_task1_corrected.mp4` AND the
+remaining quantitative grasp-stability gap documented below is closed in a
+future, separately authorized phase.
+
+## Phase 4E — gripper visual/collision repair and grasp-stability redesign
+
+Authorized after a user frame-by-frame review of
+`artifacts/phase4d_failure_reproduction.mp4` found: (1) the cube does rise
+in world Z; (2) it visibly slides downward relative to the gripper
+throughout HOLD -- an unstable near-drop; (3) the white vendor decorative
+hand penetrates the cube; (4) the dark physical collision gripper is
+visually inconsistent with the displayed hand. Full evidence, attempt log,
+and honest outcome: `reports/phase4e-gripper-integrity-repair.md`.
+
+**Section A (visual/collision correspondence): FIXED.** The vendor's
+`right_rubber_hand` decorative mesh is removed from the task-local Task 1
+scene only (`write_grasp_scene_4b`, via new `_build_grasp_tree` parameters
+`finger_pad_half`/`apply_phase4e_gripper_visuals` -- Phase 3/3B/3C's own
+scenes are unaffected, confirmed by unchanged sha256/height-gain values). A
+palm backing plate and two distinguishably-colored finger pads were added.
+`tests/test_phase4d_physics_integrity.py`'s previously-failing-on-purpose
+`Phase4DDecorativeHandOverlapTest` now genuinely passes (updated to check
+the real generated scene, not a permanently-true static fact about the
+vendor STL).
+
+**Sections B/C (grasp-stability evidence and redesign): substantially
+improved, but the tightened acceptance bar is NOT met.** Evidence-first
+diagnosis found two real root causes: (1) LIFT used a one-shot position-
+servo step (never updated when the same defect was fixed for TRANSPORT/
+LOWER in Phase 4B), producing a worst-instant bilateral safety factor of
+only 0.146x (below 1x -- physically-caused slip, not a measurement
+artifact); (2) `solve_ik_waypoint` has no orientation term, so wrist roll
+drifts freely and shows up as up to +/-5cm of finger-pad/cube-center
+vertical misalignment. 3 authorized repair attempts (visual+pad-geometry;
+LIFT smoothing+gain raise; further gain/waypoint increase) reduced max
+slip while grasped from as much as 5.19cm to 2.05cm and raised the worst-
+instant safety factor from 0.054x to consistently >=1.0x -- genuine,
+measured improvement -- but the new <=10mm max-slip-while-grasped
+criterion is still not met (20.5mm, ~2x over), and the cube-center-within-
+pad-vertical-overlap criterion also still fails. No 4th attempt was made;
+no threshold was loosened. `GRIPPER_KP_4E=320.0`/`GRIPPER_KD_4E=20.0`,
+`LIFT_DRIVE_S_4E=1.5`/`LIFT_N_WAYPOINTS_4E=30`, and
+`FINGER_PAD_HALF=(0.012, 0.006, 0.030)` are now `run_pick_place.py`'s/
+`write_grasp_scene_4b`'s defaults.
+
+**Stage D gate not met, so Stage B was not run as an authorized
+evaluation** (informational-only numbers are in
+`logs/phase4e_gripper_integrity.json`, explicitly not to be cited as an
+authorized Stage B result).
+
+New evidence: `artifacts/phase4e_task1_corrected.mp4` (full episode, burned-
+in overlay of task state/height gain/live slip/contact force) and
+`artifacts/phase4e_task1_closeup.mp4` (tight side view). Neither
+`artifacts/phase4d_failure_reproduction.mp4` nor
+`artifacts/phase4b_task1_nominal.mp4` was overwritten.
+
+**Task 1 success is NOT restored.** Per the authorization: human visual
+approval of the new videos is required, and even then, the quantitative
+max-slip-while-grasped gap must be closed in a future, separately
+authorized phase before any success claim is reinstated.

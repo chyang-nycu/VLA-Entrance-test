@@ -29,6 +29,7 @@ from __future__ import annotations
 
 import struct
 import unittest
+import xml.etree.ElementTree as ET
 from pathlib import Path
 
 import mujoco
@@ -218,43 +219,66 @@ class Phase4DLiftIsGenuineTest(unittest.TestCase):
 
 class Phase4DDecorativeHandOverlapTest(unittest.TestCase):
     """Root-cause confirmation for the reported 'hand/fingers pass through
-    the cube' defect. EXPECTED TO FAIL against current code -- this is
-    intentional and documents an unfixed, confirmed defect. Do not loosen
-    this test to make it pass; fix the scene (suppress/hide/remove the
-    vendor decorative mesh in a later, authorized phase) instead.
+    the cube' defect.
 
-    The vendor G1 model's own 'right_rubber_hand' visual mesh (attached to
-    right_wrist_yaw_link, geom contype=0 conaffinity=0 -- collision-free by
-    the vendor's own authoring) is never suppressed, hidden, or removed by
-    this project's scene generator (tasks/g1_pick_place/gripper_scene.py).
-    Its local-frame x-extent (read directly from the STL, transformed by
-    the vendor MJCF's own geom offset) overlaps this project's real
-    functional gripper's local-frame x-extent (the finger pads at
-    FINGER_REACH_X=0.10 +/- their half-width). A non-articulated,
-    collision-free decorative mesh whose extent overlaps the real grasp
-    point will render as visibly clipping through any object grasped
-    there.
+    Originally (Phase 4D, commit e212777) this class's headline test
+    asserted a STATIC geometric fact -- that the vendor mesh's own STL
+    bounding box, at the vendor's own fixed local offset, overlaps
+    FINGER_REACH_X's local-x range -- and was deliberately left FAILING to
+    document an unfixed defect. That static fact is a permanent property of
+    the vendor STL and offset; it stays true forever regardless of what
+    this project's own scene generator does with it, so it could never
+    become a meaningful "is it fixed now" signal by itself.
+
+    Phase 4E (reports/phase4e-gripper-integrity-repair.md) fixed the actual
+    defect by removing the right_rubber_hand geom from the task-local
+    generated scene entirely (tasks/g1_pick_place/gripper_scene.py,
+    _build_grasp_tree()) -- so the real, rendered scene no longer contains
+    a decorative geom that could clip through anything, irrespective of the
+    vendor STL's own static geometry. This test is updated, per Phase 4E's
+    explicit instruction, to check that real condition directly against
+    the actual generated scene -- a stronger, more direct verification of
+    the fix than the original static computation, not a weaker one. The
+    static overlap computation is retained below as a documented,
+    permanently-true fact about the vendor asset (useful context, not a
+    pass/fail condition).
     """
 
-    def test_vendor_decorative_hand_mesh_overlaps_real_gripper_local_x_range(self) -> None:
+    def test_task_local_scene_omits_the_decorative_hand_geom(self) -> None:
+        """Genuine post-fix check: the actual generated Task 1 scene
+        (write_grasp_scene_4b's output, the same generator every Phase 4B/
+        4C/4D test in this file already uses) must not contain a
+        right_rubber_hand geom under right_wrist_yaw_link at all -- not
+        merely "collision-free", genuinely absent from what gets rendered.
+        """
+        scene_path = write_grasp_scene_4b(arm_kp=ARM_KP_4B, arm_kv=ARM_KV_4B, scene_name="g1_grasp_scene_4b.xml")
+        tree = ET.parse(scene_path)
+        found = False
+        for body in tree.getroot().iter("body"):
+            if body.get("name") == "right_wrist_yaw_link":
+                for g in body.iter("geom"):
+                    if g.get("mesh") == "right_rubber_hand":
+                        found = True
+        self.assertFalse(
+            found,
+            "right_rubber_hand geom still present in the generated task-local scene -- "
+            "the Phase 4E fix (removing it in gripper_scene._build_grasp_tree) is not in effect.",
+        )
+
+    def test_vendor_stl_bbox_still_overlaps_finger_range_context_only(self) -> None:
+        """Documents, for context, that the vendor mesh's static geometry
+        would still overlap the finger range if it were ever re-added --
+        this is why removing the geom (not merely disabling its render
+        group) was the correct fix, and is not itself a pass/fail signal
+        about whether the defect is currently fixed (see class docstring).
+        """
         rubber_min, rubber_max = _stl_bbox(VENDOR_MESH_STL)
         rubber_x_lo = RUBBER_HAND_LOCAL_OFFSET[0] + rubber_min[0]
         rubber_x_hi = RUBBER_HAND_LOCAL_OFFSET[0] + rubber_max[0]
         finger_x_lo = FINGER_REACH_X - FINGER_PAD_HALF_X
         finger_x_hi = FINGER_REACH_X + FINGER_PAD_HALF_X
-
         overlaps = rubber_x_lo <= finger_x_hi and rubber_x_hi >= finger_x_lo
-        self.assertFalse(
-            overlaps,
-            f"vendor decorative right_rubber_hand mesh spans local x "
-            f"[{rubber_x_lo:.4f}, {rubber_x_hi:.4f}] m, which overlaps the real "
-            f"functional gripper's local x range [{finger_x_lo:.4f}, {finger_x_hi:.4f}] m -- "
-            "this decorative, collision-free mesh will visibly clip through any "
-            "cube grasped at the real gripper's location. See "
-            "reports/phase4d-physics-integrity-audit.md and "
-            "artifacts/phase4d_collision_debug_close.png for the rendered reproduction. "
-            "NOT FIXED in this phase -- diagnosis only, per HANDOFF.md Phase 4D scope.",
-        )
+        self.assertTrue(overlaps, "expected static vendor-STL overlap fact to still hold (context check)")
 
     def test_vendor_decorative_hand_mesh_geom_is_collision_free_by_vendor_authoring(self) -> None:
         """Confirms the mesh is collision-free by the VENDOR's own MJCF
@@ -262,8 +286,6 @@ class Phase4DDecorativeHandOverlapTest(unittest.TestCase):
         a factual/diagnostic check, expected to pass, establishing that the
         overlap above produces a purely visual defect (no interpenetration
         force), not a physics/contact-solver defect."""
-        import xml.etree.ElementTree as ET
-
         tree = ET.parse(ROOT / "vendor" / "unitree_mujoco" / "unitree_robots" / "g1" / "g1_29dof.xml")
         found = False
         for body in tree.getroot().iter("body"):

@@ -37,7 +37,36 @@ CUBE_POS = (0.33, -0.15, TABLE_TOP_Z + CUBE_HALF)
 # Finger geometry, in the right_wrist_yaw_link local frame. Fingers slide
 # along local Y (perpendicular to the local-X reach/approach direction used
 # by the TCP offset), symmetric about y=0.
-FINGER_PAD_HALF = (0.012, 0.006, 0.022)
+#
+# Phase 4E finding (Section B evidence, tasks/g1_pick_place/
+# phase4e_diagnose_grip.py against the pre-4E scene): the world-Z contact
+# point between each pad and the cube, sampled across a full nominal trial,
+# ranged from -4.16 cm to +5.05 cm relative to the cube's own center (mean
+# +1.53 cm) -- i.e. contact routinely landed outside the cube's own +/-3.5 cm
+# half-height, meaning the grasp was intermittently an edge/corner grab, not
+# a clean side-face grab. Root cause: PREGRASP/APPROACH only constrain the
+# TCP site's *position* (solve_ik_waypoint has no orientation term), so
+# wrist roll about the approach axis is left to the IK's posture-only
+# null-space objective and drifts -- and because the two fingers are offset
+# from the TCP site in local Y (not local Z), any wrist roll shows up as a
+# real world-Z offset between the finger pads and the cube center that pure
+# position IK never corrects. FINGER_PAD_HALF's Z half-extent was widened
+# from 0.022 to 0.030 m (close to the cube's own 0.035 m half-extent) so the
+# pad's own contact face is tall enough to keep covering the cube's side
+# face -- and keep the cube's center within the pads' combined vertical
+# span -- across the observed +/-5 cm range of wrist-roll-induced offset,
+# without requiring a new orientation-constrained IK term (a larger,
+# separately-scoped change).
+#
+# Scoped to Task 1's own scene (write_grasp_scene_4b) only, via
+# _build_grasp_tree's finger_pad_half parameter -- Phase 3/3B/3C's own
+# scenes (write_grasp_scene, write_grasp_scene_3c) keep using
+# LEGACY_FINGER_PAD_HALF unchanged, so their already-verified, previously-
+# reported numeric results (reports/phase3c-position-servo-baseline.md,
+# reports/phase4a-grasp-variants.md) are not perturbed by a Task-1-specific
+# repair.
+LEGACY_FINGER_PAD_HALF = (0.012, 0.006, 0.022)
+FINGER_PAD_HALF = (0.012, 0.006, 0.030)
 FINGER_REACH_X = 0.10
 FINGER_OPEN_Y = 0.075
 FINGER_CONTACT_Y = CUBE_HALF + FINGER_PAD_HALF[1]  # pad face just touches cube
@@ -59,13 +88,28 @@ def _sub(parent: ET.Element, tag: str, **attrs: str) -> ET.Element:
     return ET.SubElement(parent, tag, {k: str(v) for k, v in attrs.items()})
 
 
-def _build_grasp_tree(extra_trunk_weld: bool = False) -> ET.ElementTree:
+def _build_grasp_tree(
+    extra_trunk_weld: bool = False,
+    finger_pad_half: tuple[float, float, float] = LEGACY_FINGER_PAD_HALF,
+    apply_phase4e_gripper_visuals: bool = False,
+) -> ET.ElementTree:
     """Shared builder: fixed pelvis + gripper + table + cube on a fresh copy
-    of the vendor model. Used by both write_grasp_scene() (Phase 3/3B,
+    of the vendor model. Used by write_grasp_scene() (Phase 3/3B,
     torque-motor right arm, unchanged -- always called with
-    extra_trunk_weld=False, byte-for-byte identical output) and
+    extra_trunk_weld=False, byte-for-byte identical output),
     write_grasp_scene_3c() (Phase 3C, position-servo right arm,
-    extra_trunk_weld=True; see that function's docstring for why).
+    extra_trunk_weld=True; see that function's docstring for why), and
+    write_grasp_scene_4b() (Task 1, extra_trunk_weld=True plus
+    finger_pad_half=FINGER_PAD_HALF and apply_phase4e_gripper_visuals=True
+    -- see the Phase 4E comment at FINGER_PAD_HALF's definition and the
+    "Phase 4E fix" comments below for why these are scoped to Task 1's own
+    scene rather than applied unconditionally here).
+
+    `finger_pad_half` defaults to LEGACY_FINGER_PAD_HALF so Phase 3/3B/3C's
+    two callers are byte-for-byte/physics-identical to before Phase 4E.
+    `apply_phase4e_gripper_visuals` gates the decorative-vendor-mesh
+    removal, palm geom, and per-side finger coloring added in Phase 4E --
+    also off by default for the same reason.
     """
     tree = ET.parse(MODEL_XML)
     root = tree.getroot()
@@ -90,7 +134,17 @@ def _build_grasp_tree(extra_trunk_weld: bool = False) -> ET.ElementTree:
     )
     _sub(asset, "material", name="table_mat", rgba="0.45 0.32 0.2 1")
     _sub(asset, "material", name="cube_mat", rgba="0.8 0.2 0.1 1")
-    _sub(asset, "material", name="finger_mat", rgba="0.15 0.15 0.15 1")
+    if apply_phase4e_gripper_visuals:
+        # Phase 4E, Task 1 scene only: two distinguishable finger materials
+        # (left/right) plus a palm material, replacing the single shared
+        # "finger_mat" -- see _build_grasp_tree()'s wrist section for why.
+        # Phase 3/3B/3C's own scenes keep the original single "finger_mat"
+        # (below) unchanged.
+        _sub(asset, "material", name="finger_mat_left", rgba="0.15 0.15 0.22 1")
+        _sub(asset, "material", name="finger_mat_right", rgba="0.28 0.16 0.14 1")
+        _sub(asset, "material", name="palm_mat", rgba="0.2 0.2 0.21 1")
+    else:
+        _sub(asset, "material", name="finger_mat", rgba="0.15 0.15 0.15 1")
 
     worldbody = root.find("worldbody")
     if worldbody is None:
@@ -152,10 +206,53 @@ def _build_grasp_tree(extra_trunk_weld: bool = False) -> ET.ElementTree:
     if wrist is None:
         raise RuntimeError(f"{WRIST_BODY} not found in vendor model")
 
+    if apply_phase4e_gripper_visuals:
+        # Phase 4E fix (Section A), Task 1 scene only: the vendor's own
+        # "right_rubber_hand" visual mesh is a static, non-articulated
+        # decorative geom (contype=0 conaffinity=0 in the VENDOR's own
+        # authoring -- see
+        # vendor/unitree_mujoco/unitree_robots/g1/g1_29dof.xml) whose
+        # bounding box spatially overlaps this project's real, physically-
+        # simulated finger pads (confirmed and reproduced in
+        # reports/phase4d-physics-integrity-audit.md). Because it is
+        # collision-free, removing it changes nothing about any phase's
+        # physics/contact results, only what is rendered -- confirmed by
+        # rerunning every pre-4E phase's test suite unchanged. The vendor
+        # source file itself is never touched (ET.parse() above reads a
+        # fresh copy each call). Scoped to apply_phase4e_gripper_visuals
+        # (i.e. only write_grasp_scene_4b) rather than unconditionally, so
+        # Phase 3/3B/3C's own generated scenes are byte-for-byte unchanged.
+        for child in list(wrist):
+            if child.tag == "geom" and child.get("mesh") == "right_rubber_hand":
+                wrist.remove(child)
+                break
+        else:
+            raise RuntimeError("expected vendor right_rubber_hand geom not found under wrist body")
+
     _sub(
         wrist, "site", name="grasp_tcp", pos=f"{TCP_POS[0]} {TCP_POS[1]} {TCP_POS[2]}",
         size="0.01", rgba="0 1 0 1",
     )
+
+    if apply_phase4e_gripper_visuals:
+        # Phase 4E, Task 1 scene only: a small task-local palm backing
+        # plate so the gripper reads visually as one mechanism (wrist ->
+        # palm -> two fingers) instead of two pads floating in space where
+        # the decorative mesh used to be. Positioned well clear of the
+        # grasp region (front face at local x = PALM_POS_X + PALM_HALF[0]
+        # = 0.042 m, vs. the cube's near face at roughly FINGER_REACH_X -
+        # CUBE_HALF = 0.065 m during a grasp) so it never contacts the
+        # cube; contype/conaffinity=1 so it is a real body if something is
+        # authored differently later, but a 2.3 cm clearance margin means
+        # it does not participate in any grasp in this phase.
+        PALM_POS_X = 0.03
+        PALM_HALF = (0.012, 0.05, 0.018)
+        palm = _sub(wrist, "body", name="palm", pos=f"{PALM_POS_X} 0 0")
+        _sub(
+            palm, "geom", name="palm_geom", type="box",
+            size=f"{PALM_HALF[0]} {PALM_HALF[1]} {PALM_HALF[2]}",
+            material="palm_mat", contype="1", conaffinity="1", mass="0.02",
+        )
 
     for side, y_ref, jrange in (
         ("left", FINGER_OPEN_Y, f"{-(FINGER_OPEN_Y - FINGER_CLOSED_Y):.4f} 0"),
@@ -169,10 +266,11 @@ def _build_grasp_tree(extra_trunk_weld: bool = False) -> ET.ElementTree:
             finger, "joint", name=f"{side}_finger_joint", type="slide",
             axis="0 1 0", range=jrange, damping="2.0", frictionloss="0.05",
         )
+        finger_material = f"finger_mat_{side}" if apply_phase4e_gripper_visuals else "finger_mat"
         _sub(
             finger, "geom", name=f"{side}_finger_pad", type="box",
-            size=f"{FINGER_PAD_HALF[0]} {FINGER_PAD_HALF[1]} {FINGER_PAD_HALF[2]}",
-            material="finger_mat", contype="1", conaffinity="1",
+            size=f"{finger_pad_half[0]} {finger_pad_half[1]} {finger_pad_half[2]}",
+            material=finger_material, contype="1", conaffinity="1",
             friction=FINGER_FRICTION, mass="0.03",
         )
 
@@ -184,6 +282,14 @@ def _build_grasp_tree(extra_trunk_weld: bool = False) -> ET.ElementTree:
         contact = ET.SubElement(root, "contact")
     _sub(contact, "exclude", name="wrist_left_finger_exclude", body1=WRIST_BODY, body2="left_finger")
     _sub(contact, "exclude", name="wrist_right_finger_exclude", body1=WRIST_BODY, body2="right_finger")
+    if apply_phase4e_gripper_visuals:
+        # Phase 4E, Task 1 scene only: the new palm sits close to the wrist
+        # mount and to both fingers' resting position -- exclude its
+        # self-contact pairs the same way the pre-existing wrist/finger
+        # pairs are excluded above.
+        _sub(contact, "exclude", name="wrist_palm_exclude", body1=WRIST_BODY, body2="palm")
+        _sub(contact, "exclude", name="palm_left_finger_exclude", body1="palm", body2="left_finger")
+        _sub(contact, "exclude", name="palm_right_finger_exclude", body1="palm", body2="right_finger")
 
     # --- actuators: motors for the two finger slide joints, bounded force ---
     actuator = root.find("actuator")
@@ -383,9 +489,16 @@ def write_grasp_scene_4b(
     same physical parallel gripper, same cube) plus a static blue target
     pad (see _add_target_pad()) for Task 1's place location. No cube-
     referencing constraint of any kind is added.
+
+    Phase 4E: this is also the only caller that builds with
+    finger_pad_half=FINGER_PAD_HALF (taller pads) and
+    apply_phase4e_gripper_visuals=True (decorative-mesh removal, palm,
+    per-side finger coloring) -- see _build_grasp_tree()'s docstring.
     """
     scene = TASK_DIR / scene_name
-    tree = _build_grasp_tree(extra_trunk_weld=True)
+    tree = _build_grasp_tree(
+        extra_trunk_weld=True, finger_pad_half=FINGER_PAD_HALF, apply_phase4e_gripper_visuals=True,
+    )
     _add_target_pad(tree)
     _apply_position_servo_arm(tree, arm_kp, arm_kv)
     tree.write(scene, encoding="utf-8", xml_declaration=False)

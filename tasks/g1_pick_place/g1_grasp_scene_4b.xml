@@ -57,7 +57,7 @@
     <mesh name="right_wrist_pitch_link" file="right_wrist_pitch_link.STL" />
     <mesh name="right_wrist_yaw_link" file="right_wrist_yaw_link.STL" />
     <mesh name="right_rubber_hand" file="right_rubber_hand.STL" />
-  <texture type="2d" name="groundplane" builtin="checker" mark="edge" rgb1="0.2 0.3 0.4" rgb2="0.1 0.2 0.3" markrgb="0.8 0.8 0.8" width="300" height="300" /><material name="groundplane" texture="groundplane" texuniform="true" texrepeat="5 5" reflectance="0.2" /><material name="table_mat" rgba="0.45 0.32 0.2 1" /><material name="cube_mat" rgba="0.8 0.2 0.1 1" /><material name="finger_mat" rgba="0.15 0.15 0.15 1" /><material name="target_mat" rgba="0.1 0.35 0.9 1" /></asset>
+  <texture type="2d" name="groundplane" builtin="checker" mark="edge" rgb1="0.2 0.3 0.4" rgb2="0.1 0.2 0.3" markrgb="0.8 0.8 0.8" width="300" height="300" /><material name="groundplane" texture="groundplane" texuniform="true" texrepeat="5 5" reflectance="0.2" /><material name="table_mat" rgba="0.45 0.32 0.2 1" /><material name="cube_mat" rgba="0.8 0.2 0.1 1" /><material name="finger_mat_left" rgba="0.15 0.15 0.22 1" /><material name="finger_mat_right" rgba="0.28 0.16 0.14 1" /><material name="palm_mat" rgba="0.2 0.2 0.21 1" /><material name="target_mat" rgba="0.1 0.35 0.9 1" /></asset>
 
   <worldbody>
     <body name="pelvis" pos="0 0 0.793">
@@ -243,8 +243,7 @@
                           <joint name="right_wrist_yaw_joint" pos="0 0 0" axis="0 0 1" range="-1.61443 1.61443" actuatorfrcrange="-5 5" class="wrist_motor" />
                           <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.7 0.7 0.7 1" mesh="right_wrist_yaw_link" />
                           <geom type="mesh" rgba="0.7 0.7 0.7 1" mesh="right_wrist_yaw_link" />
-                          <geom pos="0.0415 -0.003 0" quat="1 0 0 0" type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.7 0.7 0.7 1" mesh="right_rubber_hand" />
-                        <site name="grasp_tcp" pos="0.1 0.0 0.0" size="0.01" rgba="0 1 0 1" /><body name="left_finger" pos="0.1 0.075 0"><joint name="left_finger_joint" type="slide" axis="0 1 0" range="-0.0490 0" damping="2.0" frictionloss="0.05" /><geom name="left_finger_pad" type="box" size="0.012 0.006 0.022" material="finger_mat" contype="1" conaffinity="1" friction="1.2 0.01 0.001" mass="0.03" /></body><body name="right_finger" pos="0.1 -0.075 0"><joint name="right_finger_joint" type="slide" axis="0 1 0" range="0 0.0490" damping="2.0" frictionloss="0.05" /><geom name="right_finger_pad" type="box" size="0.012 0.006 0.022" material="finger_mat" contype="1" conaffinity="1" friction="1.2 0.01 0.001" mass="0.03" /></body></body>
+                          <site name="grasp_tcp" pos="0.1 0.0 0.0" size="0.01" rgba="0 1 0 1" /><body name="palm" pos="0.03 0 0"><geom name="palm_geom" type="box" size="0.012 0.05 0.018" material="palm_mat" contype="1" conaffinity="1" mass="0.02" /></body><body name="left_finger" pos="0.1 0.075 0"><joint name="left_finger_joint" type="slide" axis="0 1 0" range="-0.0490 0" damping="2.0" frictionloss="0.05" /><geom name="left_finger_pad" type="box" size="0.012 0.006 0.03" material="finger_mat_left" contype="1" conaffinity="1" friction="1.2 0.01 0.001" mass="0.03" /></body><body name="right_finger" pos="0.1 -0.075 0"><joint name="right_finger_joint" type="slide" axis="0 1 0" range="0 0.0490" damping="2.0" frictionloss="0.05" /><geom name="right_finger_pad" type="box" size="0.012 0.006 0.03" material="finger_mat_right" contype="1" conaffinity="1" friction="1.2 0.01 0.001" mass="0.03" /></body></body>
                       </body>
                     </body>
                   </body>
@@ -389,4 +388,4 @@
     <accelerometer name="secondary_imu_acc" site="secondary_imu" noise="1e-2" cutoff="157" />
   </sensor>
 
-<equality><weld name="pelvis_fixed" body1="pelvis" solref="0.002 1" solimp="0.9999 0.9999 0.001 0.5 2" /><weld name="torso_fixed" body1="torso_link" body2="pelvis" solref="0.002 1" solimp="0.9999 0.9999 0.001 0.5 2" /></equality><contact><exclude name="wrist_left_finger_exclude" body1="right_wrist_yaw_link" body2="left_finger" /><exclude name="wrist_right_finger_exclude" body1="right_wrist_yaw_link" body2="right_finger" /></contact></mujoco>
+<equality><weld name="pelvis_fixed" body1="pelvis" solref="0.002 1" solimp="0.9999 0.9999 0.001 0.5 2" /><weld name="torso_fixed" body1="torso_link" body2="pelvis" solref="0.002 1" solimp="0.9999 0.9999 0.001 0.5 2" /></equality><contact><exclude name="wrist_left_finger_exclude" body1="right_wrist_yaw_link" body2="left_finger" /><exclude name="wrist_right_finger_exclude" body1="right_wrist_yaw_link" body2="right_finger" /><exclude name="wrist_palm_exclude" body1="right_wrist_yaw_link" body2="palm" /><exclude name="palm_left_finger_exclude" body1="palm" body2="left_finger" /><exclude name="palm_right_finger_exclude" body1="palm" body2="right_finger" /></contact></mujoco>

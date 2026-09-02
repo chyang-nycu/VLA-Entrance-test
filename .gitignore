@@ -19,6 +19,8 @@ datasets/
 # under artifacts/) -- not a generated-debug-output dump.
 !artifacts/phase4b_task1_nominal.mp4
 !artifacts/phase4d_failure_reproduction.mp4
+!artifacts/phase4e_task1_corrected.mp4
+!artifacts/phase4e_task1_closeup.mp4
 
 # Temporary MuJoCo outputs
 *.mjb
