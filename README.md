@@ -12,6 +12,11 @@ and 2 of 3 tested reachable variants. The pelvis and torso are rigidly
 welded to the world; only the right arm and gripper move. This is not
 full-body or free-standing manipulation.
 
+> **Previous Task 1 success results are under review following visual
+> detection of collision/support inconsistencies.** See "Phase 4D" below and
+> `reports/phase4d-physics-integrity-audit.md` before relying on any Phase
+> 3C/4A/4B/4C numeric result as a visually-validated success claim.
+
 ## Layout
 
 - `vendor/unitree_mujoco/` — pinned upstream simulator (git submodule; see
@@ -61,6 +66,7 @@ package versions used so far.
 .venv/bin/python -m unittest tests/test_phase4a_grasp_variants.py -v  # Phase 4A (setup-variant sweep)
 .venv/bin/python -m unittest tests/test_phase4b_pick_place.py -v  # Phase 4B (Task 1: complete pick-and-place)
 .venv/bin/python -m unittest tests/test_phase4c_slip_audit.py -v  # Phase 4C (slip-metric audit + video capture)
+.venv/bin/python -m unittest tests/test_phase4d_physics_integrity.py -v  # Phase 4D (physics-integrity audit; 1 EXPECTED failure, see report)
 ```
 
 ## Phase status
@@ -116,6 +122,23 @@ package versions used so far.
   unit tests) and `logs/phase4c_slip_audit.json` for raw data.
   `reports/phase4b-task1-pick-place.md` is unedited; this is a
   measurement/reporting correction only, no controller or physics change.
+- **Phase 4D — Physics-integrity investigation (diagnosis only, no fix)**:
+  triggered by a user visual inspection reporting (1) the hand/fingers
+  visibly pass through the cube, (2) the cube visibly falls instead of
+  being lifted. **Defect (1) CONFIRMED and reproduced**: the vendor G1
+  model's own decorative, non-articulated, collision-free `right_rubber_hand`
+  visual mesh was never suppressed by this project's scene generator and
+  spatially overlaps the real functional gripper's location, so it renders
+  as clipping through the cube on every grasp — a scene-authoring/visual
+  defect, not a contact-solver defect. **Defect (2) NOT reproduced**: an
+  isolated table-support test and a fresh instrumented rerun both confirm
+  correct physics (cube settles on the table correctly; genuinely rises
+  0.108 m with real nonzero contact force). No fix was implemented in this
+  phase — see `reports/phase4d-physics-integrity-audit.md` for the full
+  gate-by-gate audit, test classification, and evidence (video + zoomed
+  stills reproducing the defect). All prior numeric results stand
+  unmodified; only the *visual/interpretive* "Task 1 success" claim is
+  under review pending a scene fix and revalidation.
 - **Task 2 (cameras, dataset collection, language-conditioned variants,
   policy integration)**: not started; requires new, explicit authorization
   per `HANDOFF.md`.

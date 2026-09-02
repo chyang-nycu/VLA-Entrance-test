@@ -1,0 +1,237 @@
+{
+  "purpose": "Phase 4D physics-integrity investigation -- diagnosis only, no fix applied, no historical report/commit modified, no controller/gain/threshold changed.",
+  "section_a_paths_and_commit": {
+    "repo_root": "/Users/yangjudx/Documents/Robotics",
+    "loaded_mjcf_abs_path": "/Users/yangjudx/Documents/Robotics/tasks/g1_pick_place/g1_grasp_scene_4b.xml",
+    "vendor_model_abs_path": "/Users/yangjudx/Documents/Robotics/vendor/unitree_mujoco/unitree_robots/g1/g1_29dof.xml",
+    "git_commit": "dfeec9ea2ff6a2af96946e77e9de3423f5e2b288",
+    "trial_and_video_capture_use_identical_generated_xml_text": true,
+    "output_video_abs_path": "/Users/yangjudx/Documents/Robotics/artifacts/phase4d_failure_reproduction.mp4"
+  },
+  "section_b_cube_identity": {
+    "cube_body_name": "cube",
+    "cube_body_id": 34,
+    "cube_geom_name": "cube_geom",
+    "cube_geom_id": 77,
+    "cube_joint_name": "cube_joint",
+    "cube_joint_id": 32,
+    "cube_joint_type": 0,
+    "cube_joint_type_is_free": true,
+    "cube_qpos_adr": 38,
+    "cube_dof_adr": 37,
+    "distinct_from_target_pad_geom": true,
+    "distinct_from_tcp_site": true,
+    "distinct_from_left_finger_pad_geom": true,
+    "note": "run_pick_place.run_trial_pick_place resolves cube_body_id/cube_geom_id/cube_joint_id by these exact names at the top of the function and reuses them for every telemetry read (data.xpos[cube_body_id], data.qpos slice via cube_qpos_adr/cube_dof_adr) -- confirmed by direct source read, not assumed."
+  },
+  "section_b_state_consistency_samples": [
+    {
+      "phase": "PREGRASP",
+      "xpos_body": [
+        0.33,
+        -0.15,
+        0.735
+      ],
+      "qpos_free_translation": [
+        0.33,
+        -0.15,
+        0.73496076
+      ],
+      "geom_xpos_rendered": [
+        0.33,
+        -0.15,
+        0.735
+      ],
+      "all_agree": false
+    },
+    {
+      "phase": "CLOSE",
+      "xpos_body": [
+        0.33,
+        -0.15,
+        0.7347844891595694
+      ],
+      "qpos_free_translation": [
+        0.33,
+        -0.15,
+        0.7347844891595694
+      ],
+      "geom_xpos_rendered": [
+        0.33,
+        -0.15,
+        0.7347844891595694
+      ],
+      "all_agree": true
+    },
+    {
+      "phase": "LIFT",
+      "xpos_body": [
+        0.3306040323096801,
+        -0.14886937300182984,
+        0.7359462375049832
+      ],
+      "qpos_free_translation": [
+        0.330763952615259,
+        -0.14879969579571303,
+        0.7362331289802645
+      ],
+      "geom_xpos_rendered": [
+        0.3306040323096801,
+        -0.14886937300182984,
+        0.7359462375049832
+      ],
+      "all_agree": false
+    },
+    {
+      "phase": "HOLD",
+      "xpos_body": [
+        0.3506488954868737,
+        -0.15021054904106634,
+        0.839500739740011
+      ],
+      "qpos_free_translation": [
+        0.3506468969278988,
+        -0.15021034922258958,
+        0.8394873222930901
+      ],
+      "geom_xpos_rendered": [
+        0.3506488954868737,
+        -0.15021054904106634,
+        0.839500739740011
+      ],
+      "all_agree": false
+    },
+    {
+      "phase": "TRANSPORT_ABOVE_TARGET_wp0",
+      "xpos_body": [
+        0.3453470882991003,
+        -0.1501877876178596,
+        0.8219083846358566
+      ],
+      "qpos_free_translation": [
+        0.34532513168852336,
+        -0.15019016651291275,
+        0.8218536024441754
+      ],
+      "geom_xpos_rendered": [
+        0.3453470882991003,
+        -0.1501877876178596,
+        0.8219083846358566
+      ],
+      "all_agree": false
+    },
+    {
+      "phase": "OPEN",
+      "xpos_body": [
+        0.204503910781903,
+        -0.08080434081610847,
+        0.7434069428244825
+      ],
+      "qpos_free_translation": [
+        0.20453170468868245,
+        -0.08080538195152336,
+        0.7434054108648676
+      ],
+      "geom_xpos_rendered": [
+        0.204503910781903,
+        -0.08080434081610847,
+        0.7434069428244825
+      ],
+      "all_agree": false
+    }
+  ],
+  "section_c_cube_table_support": {
+    "table_geom_type": 6,
+    "table_geom_size": [
+      0.22,
+      0.22,
+      0.35
+    ],
+    "table_geom_pos_world": [
+      0.33,
+      -0.15,
+      0.35
+    ],
+    "table_geom_contype": 1,
+    "table_geom_conaffinity": 1,
+    "cube_geom_type": 6,
+    "cube_geom_size": [
+      0.035,
+      0.035,
+      0.035
+    ],
+    "cube_geom_contype": 1,
+    "cube_geom_conaffinity": 1,
+    "cube_mass_kg": 0.05,
+    "timestep_s": 0.002,
+    "integrator": 3,
+    "table_has_separate_collision_geom": false,
+    "initial_cube_bottom_z": 0.7,
+    "table_top_world_z": 0.7,
+    "initial_bottom_minus_table_top": 0.0,
+    "final_cube_center_z": 0.7347844891595694,
+    "final_cube_bottom_z": 0.6997844891595694,
+    "final_bottom_minus_table_top": -0.00021551084043058832,
+    "max_settle_drop_m": 0.00021551084043058832,
+    "final_vertical_speed": -2.1691083383662688e-14,
+    "max_abs_vertical_speed_last_200_steps": 2.1699965167859688e-14,
+    "n_cube_table_contact_force_samples": 5996,
+    "cube_table_contact_force_min": 0.1226249999999999,
+    "cube_table_contact_force_max": 0.14502547964646756,
+    "cube_never_passed_through_table": true,
+    "conclusion": "cube settles correctly on the table; table-support physics is NOT the defect"
+  },
+  "section_d_finger_cube_contact": {
+    "task_pass_of_this_instrumented_rerun": true,
+    "cube_weight_n": 0.49050000000000005,
+    "close_phase_contact_force_n": {
+      "n_samples": 1778,
+      "min": 0.0709758811398734,
+      "max": 0.8989741624207989,
+      "mean": 0.43031904099261553
+    },
+    "hold_phase_contact_force_n": {
+      "n_samples": 11891,
+      "min": 0.23379366129716952,
+      "max": 0.5432054837527097,
+      "mean": 0.3248353297380816
+    },
+    "finger_pad_geom_contype": 1,
+    "finger_pad_geom_conaffinity": 1,
+    "cube_geom_contype": 1,
+    "cube_geom_conaffinity": 1,
+    "real_functional_gripper_local_x_range_m": [
+      0.08800000000000001,
+      0.112
+    ],
+    "vendor_decorative_rubber_hand_mesh_local_x_range_m": [
+      0.041499971277359736,
+      0.17332809948921205
+    ],
+    "vendor_rubber_hand_mesh_geom_contype": 0,
+    "vendor_rubber_hand_mesh_geom_conaffinity": 0,
+    "ranges_overlap": true,
+    "conclusion": "Real finger-pad/cube contact carries genuine nonzero normal force (not merely a detected-contact boolean) and is physically plausible relative to the cube's own weight -- the FUNCTIONAL gripper's physics is correct. However, the vendor's non-articulated, collision-free 'right_rubber_hand' decorative mesh spatially overlaps this same local-x range and is not suppressed/hidden anywhere in this project's scene generator, so it renders as visibly clipping through the cube on every grasp -- this is the confirmed root cause of the reported 'fingers pass through the cube' observation."
+  },
+  "section_e_render_consistency": {
+    "single_mjdata_used_for_control_telemetry_and_rendering": true,
+    "evidence": "record_nominal_episode.py's frame_callback receives the exact same (model, data) instances that run_trial_pick_place steps and reads telemetry from -- confirmed by direct source read of tasks/g1_pick_place/record_nominal_episode.py and tasks/g1_pick_place/run_pick_place.py's _step_once(); no second MjData is stepped or rendered.",
+    "ik_scratch_mjdata_isolation": "controller_3c.solve_ik_waypoint's scratch_data (ik_scratch in run_trial_pick_place) is used ONLY to compute joint targets before a segment is driven -- never read for any telemetry, contact, or success-criteria calculation. Confirmed by source read: every telemetry/criteria field reads from `data`, never `ik_scratch` or `scratch_data`.",
+    "cube_visual_and_collision_geom_same_location": "cube_geom is a single geom (no separate visual-only cube geom exists in the scene) -- visual and collision are inherently the same object for the cube. No mismatch here.",
+    "finger_visual_and_collision_geom_same_location": "left_finger_pad/right_finger_pad are each a single box geom (contype=1 conaffinity=1) with no separate visual-only geom -- the FUNCTIONAL gripper's visual and collision representation are identical. The mismatch is not between a finger's own visual and collision geoms; it is between the functional gripper (real, correct) and an entirely separate, additional decorative mesh left over from the vendor model (right_rubber_hand, see Section D)."
+  },
+  "reproduction_trial_task_pass": true,
+  "reproduction_trial_height_gain_m": 0.10838913826086727,
+  "defect_reproduction_video": {
+    "path": "artifacts/phase4d_failure_reproduction.mp4",
+    "n_frames": 538,
+    "fps": 125.0,
+    "duration_s": 4.304,
+    "size_bytes": 216280,
+    "shows": "CLOSE/LIFT/HOLD, zoomed on the gripper/cube, showing the vendor decorative hand mesh visibly clipping through the cube while the real finger pads correctly grip it"
+  },
+  "collision_debug_stills": {
+    "close": "artifacts/phase4d_collision_debug_close.png",
+    "hold": "artifacts/phase4d_collision_debug_hold.png"
+  }
+}

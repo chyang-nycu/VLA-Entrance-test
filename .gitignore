@@ -18,6 +18,7 @@ datasets/
 # phase deliverables (same precedent as the committed evidence GIFs already
 # under artifacts/) -- not a generated-debug-output dump.
 !artifacts/phase4b_task1_nominal.mp4
+!artifacts/phase4d_failure_reproduction.mp4
 
 # Temporary MuJoCo outputs
 *.mjb

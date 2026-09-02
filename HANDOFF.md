@@ -633,3 +633,69 @@ unexpected failures (94 pre-existing + 10 new).
 Per this file's scope, Task 2 (cameras as a data-collection feature,
 dataset pipeline, language-conditioned variants, policy integration)
 remains unimplemented and unauthorized.
+
+## Notice: previous Task 1 success results under review
+
+**Previous Task 1 success results are under review following visual detection
+of collision/support inconsistencies.**
+
+## Phase 4D — physics-integrity investigation (diagnosis only, no fix)
+
+Triggered by a user visual GUI inspection of the committed Task 1 pipeline
+(commit `dfeec9e`) reporting: (1) the hand/fingers visibly pass through the
+cube, (2) the cube visibly falls instead of being lifted. Full investigation:
+`reports/phase4d-physics-integrity-audit.md`.
+
+**Diagnosis:**
+
+- **Defect (1): CONFIRMED and reproduced.** Root cause: the vendor G1 model's
+  own decorative `right_rubber_hand` visual mesh (fixed to
+  `right_wrist_yaw_link`, non-articulated, `contype="0" conaffinity="0"` by
+  the vendor's own authoring) was never suppressed by this project's scene
+  generator. Its local-frame extent (`[0.0415, 0.1733]` m) overlaps this
+  project's real, physically-simulated finger pads (`[0.088, 0.112]` m), so
+  it renders as visibly clipping through the cube on every grasp, even
+  though it carries zero collision force. This is a scene-authoring/visual
+  defect, not a contact-solver defect. Reproduced in
+  `artifacts/phase4d_failure_reproduction.mp4` and
+  `artifacts/phase4d_collision_debug_close.png`/`_hold.png`.
+- **Defect (2): NOT reproduced** by direct instrumentation of current
+  committed code. An isolated cube/table settling test (no robot motion,
+  3s of gravity) shows correct support (settles within 0.22mm, contact
+  force balances the cube's weight to 4 significant figures, never passes
+  through the table). A fresh instrumented rerun of the real nominal trial
+  shows genuine 0.108m height gain with real nonzero bilateral contact
+  force during HOLD. Most likely explanation: the same decorative-mesh
+  confusion in (1) makes the real (correctly functioning) grip look
+  precarious/asymmetric to a viewer, or an intended
+  `LOWER_TO_TARGET`/`OPEN` transition was misread as an uncontrolled drop.
+  Not treated as a second confirmed bug.
+- **Why 104/104 tests passed anyway**: every "real end-to-end" test (50 of
+  76 across the Phase 3C/4A/4B/4C test files, re-checked class-by-class) is
+  genuinely fresh-simulated, not cached-log-based — but none of them, in
+  any category, ever inspected whether an unrelated, collision-free visual
+  geom spatially overlaps the cube. That is a pure rendering property with
+  zero prior test coverage, not a false-positive or a mocked result. New
+  test `Phase4DDecorativeHandOverlapTest` (in
+  `tests/test_phase4d_physics_integrity.py`) closes that specific gap and
+  **fails on purpose** against current code, to keep the confirmed,
+  unfixed defect visible in the default test run. Do not "fix" this test by
+  loosening it — fix the scene instead, in a future authorized phase.
+
+**No fix was implemented in this phase.** No historical report, log, or
+commit was modified or reinterpreted with different numbers — all prior
+numeric results stand as accurate descriptions of what the simulation
+computed; only the *visual/interpretive* claim of "Task 1 success" is under
+review pending a scene fix (recommended: hide/remove the vendor's decorative
+hand meshes in the task-local scene generator, the same copy-and-edit
+pattern already used for every other task-local scene change) and
+revalidation. Vendor model, controller gains, thresholds, and trajectories
+are all unchanged from `dfeec9e`.
+
+Full test suite after this phase: 117 tests, 1 failure (the intentional,
+documented `Phase4DDecorativeHandOverlapTest` case) — this is expected and
+correct, not a regression to silently fix.
+
+Per this file's scope, no fix, no dataset collection, and no Task 2 work
+were started in Phase 4D. A revalidation/fix phase requires new, explicit
+authorization.
