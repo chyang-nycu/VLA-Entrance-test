@@ -46,8 +46,12 @@ package versions used so far.
 .venv/bin/python -m unittest tests/test_phase2_g1_audit.py -v   # Phase 2
 ```
 
-Phase 3 tests (added once Phase 3 lands): `tests/test_phase3_gripper.py`,
-`tests/test_phase3_controller.py`, `tests/test_phase3_grasp.py`.
+```bash
+.venv/bin/python -m unittest tests/test_phase3_gripper.py -v      # Phase 3 gripper structural
+.venv/bin/python -m unittest tests/test_phase3_controller.py -v   # Phase 3 controller unit
+.venv/bin/python -m unittest tests/test_phase3_grasp.py -v        # Phase 3/3B (historical, torque-PD; 3 FAIL by design)
+.venv/bin/python -m unittest tests/test_phase3c_grasp.py -v       # Phase 3C (position-servo; passing baseline)
+```
 
 ## Phase status
 
@@ -56,9 +60,20 @@ Phase 3 tests (added once Phase 3 lands): `tests/test_phase3_gripper.py`,
 - **Phase 2 — Manipulation feasibility audit**: complete. See
   `reports/phase2-manipulation-audit.md`. Conclusion: stock G1 has no
   actuated gripper/hand; a task-local physical parallel gripper is required.
-- **Phase 3 — Fixed-base grasping baseline**: in progress. See `HANDOFF.md`
-  for the authoritative specification and `reports/phase3-grasping-baseline.md`
-  once available.
+- **Phase 3 — Fixed-base grasping baseline (torque-PD + resolved-rate DLS-IK)**:
+  FAILED after 3 tuning iterations. See `reports/phase3-grasping-baseline.md`.
+- **Phase 3B — Controller stabilization budget (same architecture, evidence-driven tuning)**:
+  FAILED after 3 attempts. See `reports/phase3b-controller-stabilization.md`.
+- **Phase 3C — Position-servo controller architecture (bounded position servos +
+  waypoint IK + pelvis/torso weld + implicitfast integrator)**: **PASSES**,
+  at attempt 3C-2, deterministic 5/5. This is the current fixed-base
+  grasp-and-lift baseline. See `reports/phase3c-position-servo-baseline.md`
+  and `HANDOFF.md` for the full specification, architecture, and known
+  limitations (fixed-base is pelvis+torso; IK tolerance and gripper gains
+  are specific to the current cube position/mass/friction; the 5-position
+  variant sweep has not yet been run).
+- **Task 2 (full pick-and-place, cameras, dataset collection, etc.)**: not
+  started; requires new, explicit authorization per `HANDOFF.md`.
 
 ## Ground rules (all phases)
 

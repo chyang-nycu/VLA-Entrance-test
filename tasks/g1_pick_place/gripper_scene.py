@@ -12,6 +12,8 @@ from __future__ import annotations
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
+import numpy as np
+
 ROOT = Path(__file__).resolve().parents[2]
 VENDOR = ROOT / "vendor" / "unitree_mujoco"
 G1_DIR = VENDOR / "unitree_robots" / "g1"
@@ -57,8 +59,14 @@ def _sub(parent: ET.Element, tag: str, **attrs: str) -> ET.Element:
     return ET.SubElement(parent, tag, {k: str(v) for k, v in attrs.items()})
 
 
-def write_grasp_scene() -> Path:
-    scene = TASK_DIR / "g1_grasp_scene.xml"
+def _build_grasp_tree(extra_trunk_weld: bool = False) -> ET.ElementTree:
+    """Shared builder: fixed pelvis + gripper + table + cube on a fresh copy
+    of the vendor model. Used by both write_grasp_scene() (Phase 3/3B,
+    torque-motor right arm, unchanged -- always called with
+    extra_trunk_weld=False, byte-for-byte identical output) and
+    write_grasp_scene_3c() (Phase 3C, position-servo right arm,
+    extra_trunk_weld=True; see that function's docstring for why).
+    """
     tree = ET.parse(MODEL_XML)
     root = tree.getroot()
     root.set("model", "g1_phase3_grasp")
@@ -117,6 +125,23 @@ def write_grasp_scene() -> Path:
         equality, "weld", name="pelvis_fixed", body1=PELVIS_BODY,
         solref="0.002 1", solimp="0.9999 0.9999 0.001 0.5 2",
     )
+    if extra_trunk_weld:
+        # Phase 3C finding: welding only the pelvis leaves waist_yaw/roll/
+        # pitch (torso_link's joints) unpowered and unconstrained. Under a
+        # strongly-actuated right arm, reaction torques through the shared
+        # torso swing the whole upper body -- diagnosed directly: with only
+        # the pelvis weld, torso_link acquired several rad/s of angular
+        # velocity and the right-wrist TCP error grew unboundedly over a few
+        # seconds even though the arm's own joints tracked their target
+        # closely in torso-relative terms (see
+        # reports/phase3c-position-servo-baseline.md). A "fixed-base MVP"
+        # (decided in Phase 2) implies the whole trunk is rigid, not only
+        # the pelvis free joint; welding torso_link to pelvis as well makes
+        # that assumption actually true instead of only nominally true.
+        _sub(
+            equality, "weld", name="torso_fixed", body1="torso_link", body2=PELVIS_BODY,
+            solref="0.002 1", solimp="0.9999 0.9999 0.001 0.5 2",
+        )
 
     # --- physical parallel gripper attached under right_wrist_yaw_link ---
     wrist = None
@@ -172,6 +197,112 @@ def write_grasp_scene() -> Path:
         actuator, "motor", name="right_finger", joint="right_finger_joint",
         ctrllimited="true", ctrlrange=f"{-FINGER_FORCE_LIMIT} {FINGER_FORCE_LIMIT}",
     )
+
+    return tree
+
+
+def write_grasp_scene() -> Path:
+    scene = TASK_DIR / "g1_grasp_scene.xml"
+    tree = _build_grasp_tree()
+    tree.write(scene, encoding="utf-8", xml_declaration=False)
+    return scene
+
+
+# --- Phase 3C: right-arm torque motors replaced with bounded position servos ---
+# Real per-joint physical force limits from the vendor model (g1_29dof.xml),
+# reused as each new <position> actuator's forcerange -- the servo can never
+# exceed the joint's actual torque authority, same physical honesty as the
+# Phase 3/3B torque motors.
+RIGHT_ARM_JOINT_ACTUATOR_PAIRS = [
+    ("right_shoulder_pitch_joint", "right_shoulder_pitch", 25.0),
+    ("right_shoulder_roll_joint", "right_shoulder_roll", 25.0),
+    ("right_shoulder_yaw_joint", "right_shoulder_yaw", 25.0),
+    ("right_elbow_joint", "right_elbow", 25.0),
+    ("right_wrist_roll_joint", "right_wrist_roll", 25.0),
+    ("right_wrist_pitch_joint", "right_wrist_pitch", 5.0),
+    ("right_wrist_yaw_joint", "right_wrist_yaw", 5.0),
+]
+
+
+def write_grasp_scene_3c(
+    arm_kp: dict[str, float] | float,
+    arm_kv: dict[str, float] | float,
+    scene_name: str = "g1_grasp_scene_3c.xml",
+) -> Path:
+    """Phase 3C variant: same environment/gripper/pelvis-weld/cube as
+    write_grasp_scene(), but the 7 right-arm joints are driven by bounded
+    MuJoCo <position> servos instead of Phase 3/3B's <motor> torque
+    actuators. Actuator *names* are kept identical to the vendor model's
+    (e.g. "right_elbow") so JointMap.build()'s name-based lookup works
+    unchanged for either architecture.
+
+    `arm_kp`/`arm_kv` may be a single float (uniform) or a dict keyed by
+    joint name (per-joint) -- callers resolve gains at the call site so this
+    function stays a pure scene generator, not a tuning policy.
+
+    Also welds torso_link to pelvis (extra_trunk_weld=True) -- see the
+    comment at that weld's construction in _build_grasp_tree() for why this
+    was added specifically for Phase 3C.
+    """
+    scene = TASK_DIR / scene_name
+    tree = _build_grasp_tree(extra_trunk_weld=True)
+    root = tree.getroot()
+
+    # Phase 3C finding: the vendor model has no <option> element, so MuJoCo
+    # defaults to explicit Euler integration. That is fine for Phase 3/3B's
+    # pure-force <motor> actuators, but explicit Euler is well known to be
+    # unstable for stiff <position> servo gains at this timestep (0.002 s) --
+    # observed directly: with Euler, most right-arm joints stayed
+    # permanently saturated in an oscillating limit cycle regardless of
+    # (kp, kv), even though the actual gravity/Coriolis torque needed at the
+    # target pose was small (<3.1 N*m, well inside every joint's force
+    # limit) -- i.e. it was a numerical integration problem, not a physical
+    # one. Switching to MuJoCo's `implicitfast` integrator (which integrates
+    # actuator damping/stiffness implicitly; MuJoCo's own documented
+    # recommendation for damped position/velocity actuators) resolved it
+    # without changing any force limit, gain, or physical parameter.
+    option = root.find("option")
+    if option is None:
+        option = ET.Element("option")
+        root.insert(0, option)
+    option.set("integrator", "implicitfast")
+
+    actuator = root.find("actuator")
+    if actuator is None:
+        raise RuntimeError("actuator section missing after _build_grasp_tree()")
+
+    for joint_name, actuator_name, force_limit in RIGHT_ARM_JOINT_ACTUATOR_PAIRS:
+        old = None
+        for el in actuator.findall("motor"):
+            if el.get("name") == actuator_name:
+                old = el
+                break
+        if old is None:
+            raise RuntimeError(f"expected vendor motor actuator not found: {actuator_name}")
+        actuator.remove(old)
+
+        joint_el = None
+        for body in root.iter("joint"):
+            if body.get("name") == joint_name:
+                joint_el = body
+                break
+        if joint_el is None:
+            raise RuntimeError(f"joint not found: {joint_name}")
+        jrange = joint_el.get("range")
+        if jrange is None:
+            raise RuntimeError(f"joint has no range, required for position ctrlrange: {joint_name}")
+
+        kp = arm_kp[joint_name] if isinstance(arm_kp, dict) else arm_kp
+        kv = arm_kv[joint_name] if isinstance(arm_kv, dict) else arm_kv
+        if not (np.isfinite(kp) and np.isfinite(kv) and kp > 0 and kv >= 0):
+            raise ValueError(f"non-finite/invalid gains for {joint_name}: kp={kp} kv={kv}")
+
+        _sub(
+            actuator, "position", name=actuator_name, joint=joint_name,
+            kp=f"{kp:.6f}", kv=f"{kv:.6f}",
+            ctrllimited="true", ctrlrange=jrange,
+            forcelimited="true", forcerange=f"{-force_limit} {force_limit}",
+        )
 
     tree.write(scene, encoding="utf-8", xml_declaration=False)
     return scene

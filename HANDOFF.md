@@ -207,3 +207,135 @@ the blockers for any future attempt: `reports/phase3b-controller-stabilization.m
 (do not edit retroactively). All raw metrics: `logs/phase3b_controller_tuning.json`.
 Committed separately from Phase 3 (see git log) -- do not proceed to a 4th
 attempt or to Task 2 without a new, explicitly authorized budget.
+
+## Phase 3C — controller-architecture replacement (authorized 2026-09-02)
+
+Phase 3C is authorized as a separate architecture change, not a 4th Phase 3B
+tuning attempt. Phase 3 and Phase 3B reports, logs, commits, and failed
+results are historical and must not be edited or rewritten. The goal is no
+longer to tune the torque-PD + DLS-IK architecture from Phase 3/3B; replace
+it with the simplest physically honest classical controller that can
+validate the task and environment.
+
+Time budget: at most 4 focused implementation/tuning attempts, at most
+~4 hours. Stop when the nominal acceptance test passes reproducibly (5/5
+same-seed reruns), or stop with quantitative evidence if the budget is
+exhausted.
+
+Keep unchanged: fixed pelvis (equality weld); physical parallel gripper;
+physical cube contacts/friction; the `CubeInitGuard` initialization-boundary
+enforcement (no cube weld/attach/teleport/mocap/`xfrc`/post-step qpos-qvel
+writes, for any reason); vendor model byte-for-byte unchanged.
+
+Architecture changes:
+
+1. Replace task-local right-arm torque motors with bounded MuJoCo position
+   servos (or an equivalent task-local bounded position-servo layer).
+   Retain explicit actuator force limits and joint limits; finite gains and
+   damping; log actual actuator forces and saturation; the robot must not
+   become kinematic (physics must still simulate real dynamics); arm `qpos`
+   is never written directly during simulation (mirrors the cube rule).
+2. Redesign IK target generation: position-priority TCP IK; constrain
+   orientation only as much as necessary to align the gripper with the
+   cube (don't over-constrain yaw/wrist-roll if not needed); joint-limit
+   avoidance; a nominal-arm-posture null-space objective; explicit
+   convergence tolerances; compute waypoints offline/per-segment rather
+   than high-frequency resolved-rate IK if that's more stable.
+3. Diagnose reachability before executing: solve PREGRASP, APPROACH,
+   CLOSED-LIFT, and HOLD waypoint IK up front; report residual error for
+   each; reject unreachable targets before simulation; log solved TCP and
+   finger-pad positions relative to the cube.
+4. Conservative state machine: `RESET -> PREGRASP -> SETTLE_PREGRASP ->
+   APPROACH -> SETTLE_APPROACH -> CLOSE -> VERIFY_BILATERAL_CONTACT -> LIFT
+   -> HOLD -> LOWER -> OPEN -> DONE/FAILED`. Must not advance from APPROACH
+   unless TCP velocity and position error are both below tolerance.
+5. Before attempting LIFT, require: both finger pads contact the cube;
+   contacts on opposite cube sides; finger closing velocity near zero or
+   grasp width stabilized; cube not already displaced outside the grasp
+   corridor.
+
+Four-attempt budget (each only if the previous failed):
+- **3C-1**: position-priority IK + bounded position servos (first working
+  implementation of the new architecture).
+- **3C-2**: adjust only servo gains/damping, using measured tracking and
+  saturation evidence.
+- **3C-3**: adjust only grasp geometry/waypoint alignment, using contact
+  evidence.
+- **3C-4**: one final evidence-driven adjustment, changing one identified
+  factor.
+
+Do not enlarge the cube, finger pads, success tolerance, or friction merely
+to force a pass, unless the original physical parameter is demonstrably
+unrealistic — any such change must be explicitly justified and reported,
+not applied silently.
+
+Acceptance criteria (unchanged from Phase 3/3B): bilateral physical finger
+contact; cube lift >= 0.08 m; off-table continuous hold >= 2.0 s; bounded
+finite controller output; physical release after opening; no manipulation
+of cube state after initialization (per the boundary clause above).
+
+If nominal passes: rerun from the same seed >= 5 times, require 5/5
+deterministic success; rerun all Phase 1-3 structural tests; capture a GUI
+video if possible; new local checkpoint commit; stop before full
+pick-and-place and report.
+
+Outputs: `reports/phase3c-position-servo-baseline.md`;
+`logs/phase3c_attempts.json`; updated tests (without weakening historical
+Phase 3/3B acceptance-criteria tests — add new ones for the new
+architecture, preserve old failure tests where practical as historical
+record); update to this file and `docs/work_log.md`.
+
+Note: an uncommitted timestamp-only diff in `logs/g1_mujoco_smoke.json`
+(from an incidental Phase 1 rerun during Phase 3B verification) is
+unrelated to Phase 3C and must not be included in the Phase 3C commit, nor
+deleted/rewritten without explicitly reporting the action taken.
+
+## Phase 3C outcome (2026-09-02) — PASS at attempt 3C-2
+
+**The fixed-base grasp-and-lift acceptance gate is now met.** Nominal trial
+passes all 5 criteria (both pads contact; height gain 0.1084 m >= 0.08 m;
+continuous hold 3.504 s >= 2.0 s; finite/bounded outputs; physical release
+after opening) and is bit-for-bit deterministic across 5/5 reruns from the
+same seed. Full detail, per-attempt evidence, and limitations:
+`reports/phase3c-position-servo-baseline.md` (do not edit retroactively).
+All raw metrics: `logs/phase3c_attempts.json`. Video:
+`artifacts/phase3c_grasp_demo.gif`.
+
+Architecture replaced (not tuned) from Phase 3/3B: 7 right-arm torque
+motors -> bounded MuJoCo `<position>` servos (real per-joint force limits
+retained); continuously-resolved DLS-IK -> waypoint-based position-priority
+IK (solved once per motion segment, null-space joint-limit avoidance +
+posture objective, evidence-based 8mm tolerance); pelvis-only weld ->
+pelvis+torso weld (Phase 2's "fixed-base" assumption was previously only
+nominally true -- the torso/waist was unpowered and free to swing under
+arm reaction torque); default explicit-Euler integrator -> `implicitfast`
+(explicit Euler was numerically unstable with stiff position-servo gains
+at this timestep, independent of the physical parameters).
+
+Attempt 3C-1 (first working implementation, historical Phase 3/3B gripper
+gains kp=40/kd=2): state machine ran cleanly to DONE, bilateral contact
+achieved, but grip strength was insufficient to hold through the LIFT
+transient -- height gain 0.0497 m, hold 0.198 s, then dropped. Attempt 3C-2
+(gripper gain only, kp=150/kd=10, chosen as the smallest sweep value
+clearing the threshold with margin, evidence: gripper force-limit was not
+the bottleneck, gain was) passed outright. Attempts 3C-3/3C-4 were not
+needed.
+
+Phase 3/3B's historical failure tests (`tests/test_phase3_grasp.py`, 3
+nominal-acceptance failures) still reproduce identically -- the old
+torque-PD architecture was not modified, only superseded by a new code
+path for Phase 3C. All regression tests across Phase 2/3/3B/3C pass or fail
+exactly as documented (see the report for the full command list and
+counts).
+
+Limitations carried forward (do not skip re-reading these before any
+follow-on work): the fixed-base is now pelvis+torso, more restrictive than
+originally framed; the grasp waypoint sits near a real kinematic
+singularity (Jacobian singular value ~5e-4) and the 8mm IK tolerance and
+gripper gains are specific to this cube's position/mass/friction, not
+necessarily transferable to a different one; the 5-position-variant sweep
+required by Phase 3's original spec has still not been run (out of scope
+for this report, would need its own reachability diagnosis per variant).
+Per this file's scope, do not proceed to full pick-and-place transport,
+cameras, dataset collection, language variants, or policy integration
+without new, explicit authorization.
