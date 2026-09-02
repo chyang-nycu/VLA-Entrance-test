@@ -458,3 +458,112 @@ workspace Jacobian-conditioning map was not computed (out of scope for
 this phase). Per this file's scope, transport, target placement, cameras,
 dataset collection, and language variants remain unimplemented and
 unauthorized for this phase.
+
+## Phase 4B — Task 1 complete pick-and-place (authorized 2026-09-02)
+
+**Terminology correction (binding):** this is still Task 1 ("pick up the
+red cube and place it in the blue target area"), not Task 2. Task 2
+(cameras, dataset collection, language-conditioned variants, policy
+integration) remains unauthorized.
+
+Preserve unchanged: all Phase 1-4A reports/commits/tests; the exact Phase
+3C controller configuration (`arm_kp=400, arm_kv=25, gripper_kp=150,
+gripper_kd=10`, position-priority IK, 8mm tolerance, pelvis+torso weld,
+`implicitfast` integrator); the physical parallel gripper; the fixed-base,
+torso-constrained scope (torso stays welded); `CubeInitGuard` and every
+anti-cheating constraint; vendor integrity; the documented asymmetric
+grasp-reachability limitation (x+0.03/y-0.03 not re-attempted here).
+
+Scene: add a static blue target pad to the task-local scene only
+(`tasks/g1_pick_place/gripper_scene.py`'s `write_grasp_scene_4b`) — a
+jointless geom (implicitly world-fixed), no equality/weld/tendon/actuator/
+force referencing the cube or the pad; placement success judged from cube
+state, never from color/rendering. Target dimensions/pose documented in
+`gripper_scene.py` and below.
+
+Target selection: reachability analysis (IK residual at
+TRANSPORT_ABOVE_TARGET, LOWER_TO_TARGET, RETREAT) run before simulation
+over a grid of candidate offsets. Chosen target: `(-0.11, +0.07)` m offset
+from the cube's nominal position — table pos `(0.22, -0.08)` — with the
+largest reachability margin found (max residual 3.6mm vs. the 8mm
+tolerance), >=0.10m lateral separation from the cube (meaningful
+transport, not directly under the nominal lift position), within the
+table's edge margin, and in the same (-x, +y) direction Phase 4A already
+found reachable (away from the documented wrist singularity). Rejected
+candidates and their residuals are recorded in
+`reports/phase4b-task1-pick-place.md`.
+
+State machine (extends Phase 3C's grasp stages unchanged): RESET ->
+PREGRASP -> SETTLE_PREGRASP -> APPROACH -> SETTLE_APPROACH -> CLOSE ->
+VERIFY_BILATERAL_CONTACT -> LIFT -> HOLD -> TRANSPORT_ABOVE_TARGET ->
+SETTLE_ABOVE_TARGET -> LOWER_TO_TARGET -> SETTLE_LOWER -> OPEN ->
+VERIFY_RELEASE -> RETREAT -> VERIFY_TASK_SUCCESS -> DONE/FAILED. Transport
+aborts (reports FAILED, does not fake success) if bilateral contact is
+lost or cube height falls below a safe threshold; cube slip relative to
+the gripper (measured in the gripper's own rotating frame, not raw world
+coordinates) is logged for every trial.
+
+Objective task-success detector (all required, continuously, for a
+settling dwell — never on first boundary crossing): cube lifted
+>=0.08m at some point; released by both finger pads; cube center within
+the target pad's footprint margin; cube supported by the table/pad, not
+the gripper; cube linear and angular speed below documented thresholds;
+all of the above true continuously for the dwell window; robot retreated
+without disturbing the cube.
+
+Evaluation order: Stage A (nominal only, <=3 evidence-driven tuning
+attempts, transport/lower/release trajectory parameters only — no gripper
+gain, arm servo gain, or grasp-approach parameter changes without
+quantitative proof of a grasp regression, and none occurred). Stage B
+(only after Stage A passes): the same fixed target against Phase 4A's 3
+reachable variants (nominal, x-0.03, y+0.03), >=3 trials each, one shared
+configuration, no per-variant tuning. The 2 pre-declared unreachable grasp
+variants (x+0.03, y-0.03) are excluded from Task 1's primary success
+denominator and listed separately as known-unsupported setup variants;
+both supported-envelope success and original five-variant coverage are
+reported.
+
+Outputs: `tasks/g1_pick_place/run_pick_place.py`;
+`tests/test_phase4b_pick_place.py`; `logs/phase4b_pick_place_trials.json`;
+`reports/phase4b-task1-pick-place.md`; updates to `README.md`, this file,
+and `docs/work_log.md`.
+
+Commit discipline: exclude the `logs/g1_mujoco_smoke.json` timestamp-only
+diff and the pre-existing Go2w submodule artifact. Show staged files and
+diff summary before committing. One separate local commit, titled exactly
+"feat: complete G1 Task 1 pick and place", not pushed. Stop after
+reporting Task 1 results — do not begin cameras, dataset collection, or
+language-conditioned Task 2 automatically.
+
+## Phase 4B outcome (2026-09-02) — Task 1 complete, Stage A PASS, Stage B 2/3
+
+**Fixed-base, torso-constrained upper-body manipulation baseline**
+(binding framing, unchanged). Stage A: the nominal pick-and-place
+succeeded after 3 evidence-driven tuning attempts on transport/lower
+trajectory shape and timing only (final: 40-waypoint ramped transport over
+2.0s, 60-waypoint ramped lower over 2.0s; no gripper/arm/grasp-approach
+parameter was ever touched) — deterministic 5/5 identical reruns. Stage B:
+2 of the 3 Phase-4A-reachable variants (nominal, x-0.03) complete the full
+task; y+0.03 grasps successfully but narrowly misses the target-XY
+placement margin (20.4mm vs. the 15mm pad margin) — a genuine, honestly
+reported placement-accuracy limit, not a dropped grasp (bilateral contact
+was retained for all 3 variants' full transports). Supported-envelope
+success: 2/3 (67%); original five-variant coverage: 2/5 (the 2
+Phase-4A-unreachable variants, x+0.03 and y-0.03, are excluded from the
+denominator and listed separately, unchanged from Phase 4A). Full detail,
+attempt log, and both result tables: `reports/phase4b-task1-pick-place.md`.
+Raw data: `logs/phase4b_pick_place_trials.json`.
+
+Test-suite hygiene unchanged from Phase 4A: the same 3 Phase 3 legacy
+tests remain regression diagnostics (not re-touched); full suite this
+session: 94 tests, 0 unexpected failures (58 pre-existing + 36 new Phase
+4B tests, 3 of the 58 being the unedited legacy diagnostics).
+
+No `.mp4`/GIF demo artifact was produced this phase: the environment has
+no `ffmpeg`/`imageio-ffmpeg` available for video encoding, and installing
+a new dependency was not authorized — noted honestly rather than skipped
+silently or faked.
+
+Per this file's scope, cameras, dataset collection, language-conditioned
+variants, and policy integration (Task 2) remain unimplemented and
+unauthorized.

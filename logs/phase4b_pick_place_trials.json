@@ -1,0 +1,451 @@
+{
+  "scope": "fixed-base, torso-constrained upper-body manipulation baseline",
+  "scene": "tasks/g1_pick_place/g1_grasp_scene_4b.xml",
+  "shared_configuration": {
+    "arm_kp": 400.0,
+    "arm_kv": 25.0,
+    "gripper_kp": 150.0,
+    "gripper_kd": 10.0,
+    "transport_drive_s": 2.0,
+    "transport_n_waypoints": 40,
+    "lower_drive_s": 2.0,
+    "lower_n_waypoints": 60,
+    "retreat_drive_s": 0.8
+  },
+  "target_xy": [
+    0.22000000000000003,
+    -0.07999999999999999
+  ],
+  "target_xy_success_margin_m": 0.015,
+  "stage_a": {
+    "n_trials": 5,
+    "all_task_pass": true,
+    "deterministic": true,
+    "height_gain_m": 0.10838913826086727,
+    "final_xy_target_error_m": 0.014564117068399008,
+    "max_cube_slip_m": 0.1561555402975266,
+    "settling_time_s": 0.5
+  },
+  "stage_b": {
+    "variants": [
+      {
+        "id": "nominal",
+        "offset_m": [
+          0.0,
+          0.0
+        ],
+        "n_trials": 3,
+        "trials": [
+          {
+            "trial_index": 0,
+            "task_pass": true,
+            "grasp_pass": true,
+            "placement_pass": true,
+            "criteria_grasp": {
+              "both_pads_contact_cube": true,
+              "height_gain_ge_0_08m": true,
+              "lifted_ge_2s_continuous": true,
+              "finite_and_bounded": true,
+              "released_after_open": true
+            },
+            "criteria_placement": {
+              "cube_in_target_xy": true,
+              "cube_supported_not_held": true,
+              "cube_linear_speed_ok": true,
+              "cube_angular_speed_ok": true,
+              "held_continuously_full_dwell": true,
+              "retreated_without_disturbing_cube": true,
+              "no_transport_contact_loss": true,
+              "no_transport_height_violation": true
+            },
+            "failure_state": null,
+            "failure_reason": null,
+            "height_gain_m": 0.10838913826086727,
+            "max_continuous_lifted_s": 6.441999999999684,
+            "max_cube_slip_m": 0.1561555402975266,
+            "contact_lost_during_transport": false,
+            "final_cube_xy": [
+              0.20566426014317166,
+              -0.08256905989408066
+            ],
+            "final_xy_target_error_m": 0.014564117068399008,
+            "final_cube_linear_speed": 2.2788424629984315e-14,
+            "final_cube_angular_speed": 8.224497924305514e-14,
+            "retreat_disturbance_m": 0.002128620200047796,
+            "task_success_dwell_achieved_s": 0.5
+          },
+          {
+            "trial_index": 1,
+            "task_pass": true,
+            "grasp_pass": true,
+            "placement_pass": true,
+            "criteria_grasp": {
+              "both_pads_contact_cube": true,
+              "height_gain_ge_0_08m": true,
+              "lifted_ge_2s_continuous": true,
+              "finite_and_bounded": true,
+              "released_after_open": true
+            },
+            "criteria_placement": {
+              "cube_in_target_xy": true,
+              "cube_supported_not_held": true,
+              "cube_linear_speed_ok": true,
+              "cube_angular_speed_ok": true,
+              "held_continuously_full_dwell": true,
+              "retreated_without_disturbing_cube": true,
+              "no_transport_contact_loss": true,
+              "no_transport_height_violation": true
+            },
+            "failure_state": null,
+            "failure_reason": null,
+            "height_gain_m": 0.10838913826086727,
+            "max_continuous_lifted_s": 6.441999999999684,
+            "max_cube_slip_m": 0.1561555402975266,
+            "contact_lost_during_transport": false,
+            "final_cube_xy": [
+              0.20566426014317166,
+              -0.08256905989408066
+            ],
+            "final_xy_target_error_m": 0.014564117068399008,
+            "final_cube_linear_speed": 2.2788424629984315e-14,
+            "final_cube_angular_speed": 8.224497924305514e-14,
+            "retreat_disturbance_m": 0.002128620200047796,
+            "task_success_dwell_achieved_s": 0.5
+          },
+          {
+            "trial_index": 2,
+            "task_pass": true,
+            "grasp_pass": true,
+            "placement_pass": true,
+            "criteria_grasp": {
+              "both_pads_contact_cube": true,
+              "height_gain_ge_0_08m": true,
+              "lifted_ge_2s_continuous": true,
+              "finite_and_bounded": true,
+              "released_after_open": true
+            },
+            "criteria_placement": {
+              "cube_in_target_xy": true,
+              "cube_supported_not_held": true,
+              "cube_linear_speed_ok": true,
+              "cube_angular_speed_ok": true,
+              "held_continuously_full_dwell": true,
+              "retreated_without_disturbing_cube": true,
+              "no_transport_contact_loss": true,
+              "no_transport_height_violation": true
+            },
+            "failure_state": null,
+            "failure_reason": null,
+            "height_gain_m": 0.10838913826086727,
+            "max_continuous_lifted_s": 6.441999999999684,
+            "max_cube_slip_m": 0.1561555402975266,
+            "contact_lost_during_transport": false,
+            "final_cube_xy": [
+              0.20566426014317166,
+              -0.08256905989408066
+            ],
+            "final_xy_target_error_m": 0.014564117068399008,
+            "final_cube_linear_speed": 2.2788424629984315e-14,
+            "final_cube_angular_speed": 8.224497924305514e-14,
+            "retreat_disturbance_m": 0.002128620200047796,
+            "task_success_dwell_achieved_s": 0.5
+          }
+        ],
+        "n_grasp_pass": 3,
+        "n_placement_pass": 3,
+        "n_task_pass": 3,
+        "transport_contact_retention_rate": 1.0,
+        "max_cube_slip_m": 0.1561555402975266,
+        "final_xy_target_error_m": 0.014564117068399008,
+        "settling_time_s": 0.5,
+        "variant_task_success": true
+      },
+      {
+        "id": "x_minus_0.03",
+        "offset_m": [
+          -0.03,
+          0.0
+        ],
+        "n_trials": 3,
+        "trials": [
+          {
+            "trial_index": 0,
+            "task_pass": true,
+            "grasp_pass": true,
+            "placement_pass": true,
+            "criteria_grasp": {
+              "both_pads_contact_cube": true,
+              "height_gain_ge_0_08m": true,
+              "lifted_ge_2s_continuous": true,
+              "finite_and_bounded": true,
+              "released_after_open": true
+            },
+            "criteria_placement": {
+              "cube_in_target_xy": true,
+              "cube_supported_not_held": true,
+              "cube_linear_speed_ok": true,
+              "cube_angular_speed_ok": true,
+              "held_continuously_full_dwell": true,
+              "retreated_without_disturbing_cube": true,
+              "no_transport_contact_loss": true,
+              "no_transport_height_violation": true
+            },
+            "failure_state": null,
+            "failure_reason": null,
+            "height_gain_m": 0.11035297281226075,
+            "max_continuous_lifted_s": 6.705999999999769,
+            "max_cube_slip_m": 0.1556343062712859,
+            "contact_lost_during_transport": false,
+            "final_cube_xy": [
+              0.21505980298987165,
+              -0.08132576755892669
+            ],
+            "final_xy_target_error_m": 0.005114998154367588,
+            "final_cube_linear_speed": 2.175575612066507e-14,
+            "final_cube_angular_speed": 1.0344731095238164e-15,
+            "retreat_disturbance_m": 0.00037557486853546256,
+            "task_success_dwell_achieved_s": 0.5
+          },
+          {
+            "trial_index": 1,
+            "task_pass": true,
+            "grasp_pass": true,
+            "placement_pass": true,
+            "criteria_grasp": {
+              "both_pads_contact_cube": true,
+              "height_gain_ge_0_08m": true,
+              "lifted_ge_2s_continuous": true,
+              "finite_and_bounded": true,
+              "released_after_open": true
+            },
+            "criteria_placement": {
+              "cube_in_target_xy": true,
+              "cube_supported_not_held": true,
+              "cube_linear_speed_ok": true,
+              "cube_angular_speed_ok": true,
+              "held_continuously_full_dwell": true,
+              "retreated_without_disturbing_cube": true,
+              "no_transport_contact_loss": true,
+              "no_transport_height_violation": true
+            },
+            "failure_state": null,
+            "failure_reason": null,
+            "height_gain_m": 0.11035297281226075,
+            "max_continuous_lifted_s": 6.705999999999769,
+            "max_cube_slip_m": 0.1556343062712859,
+            "contact_lost_during_transport": false,
+            "final_cube_xy": [
+              0.21505980298987165,
+              -0.08132576755892669
+            ],
+            "final_xy_target_error_m": 0.005114998154367588,
+            "final_cube_linear_speed": 2.175575612066507e-14,
+            "final_cube_angular_speed": 1.0344731095238164e-15,
+            "retreat_disturbance_m": 0.00037557486853546256,
+            "task_success_dwell_achieved_s": 0.5
+          },
+          {
+            "trial_index": 2,
+            "task_pass": true,
+            "grasp_pass": true,
+            "placement_pass": true,
+            "criteria_grasp": {
+              "both_pads_contact_cube": true,
+              "height_gain_ge_0_08m": true,
+              "lifted_ge_2s_continuous": true,
+              "finite_and_bounded": true,
+              "released_after_open": true
+            },
+            "criteria_placement": {
+              "cube_in_target_xy": true,
+              "cube_supported_not_held": true,
+              "cube_linear_speed_ok": true,
+              "cube_angular_speed_ok": true,
+              "held_continuously_full_dwell": true,
+              "retreated_without_disturbing_cube": true,
+              "no_transport_contact_loss": true,
+              "no_transport_height_violation": true
+            },
+            "failure_state": null,
+            "failure_reason": null,
+            "height_gain_m": 0.11035297281226075,
+            "max_continuous_lifted_s": 6.705999999999769,
+            "max_cube_slip_m": 0.1556343062712859,
+            "contact_lost_during_transport": false,
+            "final_cube_xy": [
+              0.21505980298987165,
+              -0.08132576755892669
+            ],
+            "final_xy_target_error_m": 0.005114998154367588,
+            "final_cube_linear_speed": 2.175575612066507e-14,
+            "final_cube_angular_speed": 1.0344731095238164e-15,
+            "retreat_disturbance_m": 0.00037557486853546256,
+            "task_success_dwell_achieved_s": 0.5
+          }
+        ],
+        "n_grasp_pass": 3,
+        "n_placement_pass": 3,
+        "n_task_pass": 3,
+        "transport_contact_retention_rate": 1.0,
+        "max_cube_slip_m": 0.1556343062712859,
+        "final_xy_target_error_m": 0.005114998154367588,
+        "settling_time_s": 0.5,
+        "variant_task_success": true
+      },
+      {
+        "id": "y_plus_0.03",
+        "offset_m": [
+          0.0,
+          0.03
+        ],
+        "n_trials": 3,
+        "trials": [
+          {
+            "trial_index": 0,
+            "task_pass": false,
+            "grasp_pass": true,
+            "placement_pass": false,
+            "criteria_grasp": {
+              "both_pads_contact_cube": true,
+              "height_gain_ge_0_08m": true,
+              "lifted_ge_2s_continuous": true,
+              "finite_and_bounded": true,
+              "released_after_open": true
+            },
+            "criteria_placement": {
+              "cube_in_target_xy": false,
+              "cube_supported_not_held": true,
+              "cube_linear_speed_ok": true,
+              "cube_angular_speed_ok": true,
+              "held_continuously_full_dwell": false,
+              "retreated_without_disturbing_cube": false,
+              "no_transport_contact_loss": true,
+              "no_transport_height_violation": true
+            },
+            "failure_state": "VERIFY_TASK_SUCCESS",
+            "failure_reason": "task-success conditions did not hold continuously for 0.5s within 1.5s (best streak 0.000s)",
+            "height_gain_m": 0.1063658535229346,
+            "max_continuous_lifted_s": 6.355999999999655,
+            "max_cube_slip_m": 0.14965241416973632,
+            "contact_lost_during_transport": false,
+            "final_cube_xy": [
+              0.1998544616048069,
+              -0.08306305063794736
+            ],
+            "final_xy_target_error_m": 0.02037707035966726,
+            "final_cube_linear_speed": 2.1664283264448634e-14,
+            "final_cube_angular_speed": 5.573948774023831e-15,
+            "retreat_disturbance_m": 0.005636075389785844,
+            "task_success_dwell_achieved_s": 0.0
+          },
+          {
+            "trial_index": 1,
+            "task_pass": false,
+            "grasp_pass": true,
+            "placement_pass": false,
+            "criteria_grasp": {
+              "both_pads_contact_cube": true,
+              "height_gain_ge_0_08m": true,
+              "lifted_ge_2s_continuous": true,
+              "finite_and_bounded": true,
+              "released_after_open": true
+            },
+            "criteria_placement": {
+              "cube_in_target_xy": false,
+              "cube_supported_not_held": true,
+              "cube_linear_speed_ok": true,
+              "cube_angular_speed_ok": true,
+              "held_continuously_full_dwell": false,
+              "retreated_without_disturbing_cube": false,
+              "no_transport_contact_loss": true,
+              "no_transport_height_violation": true
+            },
+            "failure_state": "VERIFY_TASK_SUCCESS",
+            "failure_reason": "task-success conditions did not hold continuously for 0.5s within 1.5s (best streak 0.000s)",
+            "height_gain_m": 0.1063658535229346,
+            "max_continuous_lifted_s": 6.355999999999655,
+            "max_cube_slip_m": 0.14965241416973632,
+            "contact_lost_during_transport": false,
+            "final_cube_xy": [
+              0.1998544616048069,
+              -0.08306305063794736
+            ],
+            "final_xy_target_error_m": 0.02037707035966726,
+            "final_cube_linear_speed": 2.1664283264448634e-14,
+            "final_cube_angular_speed": 5.573948774023831e-15,
+            "retreat_disturbance_m": 0.005636075389785844,
+            "task_success_dwell_achieved_s": 0.0
+          },
+          {
+            "trial_index": 2,
+            "task_pass": false,
+            "grasp_pass": true,
+            "placement_pass": false,
+            "criteria_grasp": {
+              "both_pads_contact_cube": true,
+              "height_gain_ge_0_08m": true,
+              "lifted_ge_2s_continuous": true,
+              "finite_and_bounded": true,
+              "released_after_open": true
+            },
+            "criteria_placement": {
+              "cube_in_target_xy": false,
+              "cube_supported_not_held": true,
+              "cube_linear_speed_ok": true,
+              "cube_angular_speed_ok": true,
+              "held_continuously_full_dwell": false,
+              "retreated_without_disturbing_cube": false,
+              "no_transport_contact_loss": true,
+              "no_transport_height_violation": true
+            },
+            "failure_state": "VERIFY_TASK_SUCCESS",
+            "failure_reason": "task-success conditions did not hold continuously for 0.5s within 1.5s (best streak 0.000s)",
+            "height_gain_m": 0.1063658535229346,
+            "max_continuous_lifted_s": 6.355999999999655,
+            "max_cube_slip_m": 0.14965241416973632,
+            "contact_lost_during_transport": false,
+            "final_cube_xy": [
+              0.1998544616048069,
+              -0.08306305063794736
+            ],
+            "final_xy_target_error_m": 0.02037707035966726,
+            "final_cube_linear_speed": 2.1664283264448634e-14,
+            "final_cube_angular_speed": 5.573948774023831e-15,
+            "retreat_disturbance_m": 0.005636075389785844,
+            "task_success_dwell_achieved_s": 0.0
+          }
+        ],
+        "n_grasp_pass": 3,
+        "n_placement_pass": 0,
+        "n_task_pass": 0,
+        "transport_contact_retention_rate": 1.0,
+        "max_cube_slip_m": 0.14965241416973632,
+        "final_xy_target_error_m": 0.02037707035966726,
+        "settling_time_s": 0.0,
+        "variant_task_success": false
+      }
+    ],
+    "excluded_unreachable_variants": [
+      {
+        "id": "x_plus_0.03",
+        "offset": [
+          0.03,
+          0.0
+        ],
+        "phase4a_approach_residual_m": 0.02708
+      },
+      {
+        "id": "y_minus_0.03",
+        "offset": [
+          0.0,
+          -0.03
+        ],
+        "phase4a_approach_residual_m": 0.00843
+      }
+    ],
+    "n_variants_task_success": 2,
+    "n_variants_evaluated": 3,
+    "supported_envelope_success_rate": 0.6666666666666666,
+    "original_five_variant_coverage": "2/5"
+  }
+}

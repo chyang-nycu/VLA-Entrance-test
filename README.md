@@ -6,9 +6,11 @@ staged in phases; each phase must pass its acceptance test before the next
 begins.
 
 **Current capability, precisely stated: a fixed-base, torso-constrained
-upper-body manipulation baseline.** The pelvis and torso are rigidly welded
-to the world; only the right arm and gripper move. This is not full-body or
-free-standing manipulation.
+upper-body manipulation baseline that completes Task 1** ("pick up the red
+cube and place it in the blue target area") for its nominal cube position
+and 2 of 3 tested reachable variants. The pelvis and torso are rigidly
+welded to the world; only the right arm and gripper move. This is not
+full-body or free-standing manipulation.
 
 ## Layout
 
@@ -57,6 +59,7 @@ package versions used so far.
 .venv/bin/python -m unittest tests/test_phase3_grasp.py -v        # Phase 3/3B (historical, torque-PD; 3 FAIL by design)
 .venv/bin/python -m unittest tests/test_phase3c_grasp.py -v       # Phase 3C (position-servo; passing baseline)
 .venv/bin/python -m unittest tests/test_phase4a_grasp_variants.py -v  # Phase 4A (setup-variant sweep)
+.venv/bin/python -m unittest tests/test_phase4b_pick_place.py -v  # Phase 4B (Task 1: complete pick-and-place)
 ```
 
 ## Phase status
@@ -84,9 +87,23 @@ package versions used so far.
   and known limitations (asymmetric success envelope, likely related to a
   wrist kinematic singularity near the nominal point; IK tolerance and
   gripper gains remain specific to the current cube mass/friction).
-- **Task 2 (full pick-and-place transport, target placement, cameras,
-  dataset collection, language variants, policy integration)**: not
-  started; requires new, explicit authorization per `HANDOFF.md`.
+- **Phase 4B — Task 1 complete pick-and-place** ("pick up the red cube and
+  place it in the blue target area"): **Stage A (nominal) PASSES,
+  deterministic 5/5**, after 3 evidence-driven tuning attempts on
+  transport/lower trajectory shape and timing only (no gripper/arm/grasp-
+  approach parameter was touched). **Stage B: 2 of the 3 Phase-4A-reachable
+  variants complete the full task (nominal, x-0.03); y+0.03 grasps
+  successfully but narrowly misses the tight target-XY placement margin** —
+  a genuine, honestly reported placement-accuracy limit, not a dropped
+  grasp. Supported-envelope success 2/3 (67%); original five-variant
+  coverage 2/5 (the 2 Phase-4A-unreachable variants remain excluded,
+  unchanged). See `reports/phase4b-task1-pick-place.md` and `HANDOFF.md`
+  for the full attempt log, target-selection evidence, and limitations
+  (measured cube slip under sustained transport load, the tight nominal
+  placement margin).
+- **Task 2 (cameras, dataset collection, language-conditioned variants,
+  policy integration)**: not started; requires new, explicit authorization
+  per `HANDOFF.md`.
 
 ## Ground rules (all phases)
 

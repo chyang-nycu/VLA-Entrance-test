@@ -208,6 +208,58 @@ def write_grasp_scene() -> Path:
     return scene
 
 
+# Phase 4B: static blue target pad for Task 1 ("place it in the blue target
+# area"). Chosen by direct IK-residual evidence over a grid of candidate
+# offsets (see reports/phase4b-task1-pick-place.md, "Target selection") --
+# TARGET_OFFSET_FROM_CUBE = (-0.11, +0.07) was the offset with the largest
+# reachability margin (max residual 3.61 mm across the three carry
+# waypoints, vs. IK_POS_TOL = 8 mm) among candidates that also (a) keep the
+# cube's full footprint on the table with TABLE_EDGE_MARGIN clearance, and
+# (b) require a lateral transport of at least 0.10 m (the cube's own
+# footprint is 0.07 m, so smaller offsets would not constitute "meaningful
+# lateral transport"). This direction (-x, +y relative to the cube) matches
+# Phase 4A's own finding that -x/+y offsets are reachable while +x/-y are
+# not, near the documented wrist singularity.
+TARGET_OFFSET_FROM_CUBE = (-0.11, 0.07)
+TARGET_POS = (CUBE_POS[0] + TARGET_OFFSET_FROM_CUBE[0], CUBE_POS[1] + TARGET_OFFSET_FROM_CUBE[1])
+TARGET_HALF_XY = 0.05  # 10 cm x 10 cm pad -- comfortably larger than the cube's own 7 cm footprint
+TARGET_HALF_Z = 0.0025  # 5 mm thick pad
+TARGET_PAD_TOP_Z = TABLE_TOP_Z + 2 * TARGET_HALF_Z
+# Cube resting on the pad (not held): center height = pad top + cube half-extent.
+TARGET_RELEASE_Z = TARGET_PAD_TOP_Z + CUBE_HALF
+# Containment margin for the success detector: requiring the cube's center to
+# stay within (TARGET_HALF_XY - CUBE_HALF) of the pad center keeps the cube's
+# *entire* footprint on the pad, not just its center point.
+TARGET_XY_SUCCESS_MARGIN_M = TARGET_HALF_XY - CUBE_HALF
+
+
+def _add_target_pad(tree: ET.ElementTree) -> None:
+    """Adds a static blue target pad to the scene. A plain geom on a
+    jointless body (implicitly fixed to the world in MuJoCo) -- no
+    equality/weld/tendon/actuator/force of any kind references it or the
+    cube; placement success is judged from cube state (position/velocity),
+    never from this geom's color or any rendering.
+    """
+    root = tree.getroot()
+    asset = root.find("asset")
+    if asset is None:
+        raise RuntimeError("expected asset section from _build_grasp_tree()")
+    _sub(asset, "material", name="target_mat", rgba="0.1 0.35 0.9 1")
+
+    worldbody = root.find("worldbody")
+    if worldbody is None:
+        raise RuntimeError("expected worldbody from _build_grasp_tree()")
+    target = _sub(
+        worldbody, "body", name="target_pad",
+        pos=f"{TARGET_POS[0]} {TARGET_POS[1]} {TABLE_TOP_Z + TARGET_HALF_Z}",
+    )
+    _sub(
+        target, "geom", name="target_pad_geom", type="box",
+        size=f"{TARGET_HALF_XY} {TARGET_HALF_XY} {TARGET_HALF_Z}",
+        material="target_mat", contype="1", conaffinity="1",
+    )
+
+
 # --- Phase 3C: right-arm torque motors replaced with bounded position servos ---
 # Real per-joint physical force limits from the vendor model (g1_29dof.xml),
 # reused as each new <position> actuator's forcerange -- the servo can never
@@ -224,43 +276,32 @@ RIGHT_ARM_JOINT_ACTUATOR_PAIRS = [
 ]
 
 
-def write_grasp_scene_3c(
+def _apply_position_servo_arm(
+    tree: ET.ElementTree,
     arm_kp: dict[str, float] | float,
     arm_kv: dict[str, float] | float,
-    scene_name: str = "g1_grasp_scene_3c.xml",
-) -> Path:
-    """Phase 3C variant: same environment/gripper/pelvis-weld/cube as
-    write_grasp_scene(), but the 7 right-arm joints are driven by bounded
-    MuJoCo <position> servos instead of Phase 3/3B's <motor> torque
-    actuators. Actuator *names* are kept identical to the vendor model's
-    (e.g. "right_elbow") so JointMap.build()'s name-based lookup works
-    unchanged for either architecture.
+) -> None:
+    """Shared Phase 3C/4B step: replace the 7 right-arm <motor> actuators
+    with bounded MuJoCo <position> servos, and switch the integrator to
+    implicitfast. Factored out of write_grasp_scene_3c() unchanged (byte-for-
+    byte identical resulting logic) so write_grasp_scene_4b() can reuse it
+    without duplicating the tuning rationale below.
 
-    `arm_kp`/`arm_kv` may be a single float (uniform) or a dict keyed by
-    joint name (per-joint) -- callers resolve gains at the call site so this
-    function stays a pure scene generator, not a tuning policy.
-
-    Also welds torso_link to pelvis (extra_trunk_weld=True) -- see the
-    comment at that weld's construction in _build_grasp_tree() for why this
-    was added specifically for Phase 3C.
+    Phase 3C finding: the vendor model has no <option> element, so MuJoCo
+    defaults to explicit Euler integration. That is fine for Phase 3/3B's
+    pure-force <motor> actuators, but explicit Euler is well known to be
+    unstable for stiff <position> servo gains at this timestep (0.002 s) --
+    observed directly: with Euler, most right-arm joints stayed permanently
+    saturated in an oscillating limit cycle regardless of (kp, kv), even
+    though the actual gravity/Coriolis torque needed at the target pose was
+    small (<3.1 N*m, well inside every joint's force limit) -- i.e. it was a
+    numerical integration problem, not a physical one. Switching to
+    MuJoCo's `implicitfast` integrator (which integrates actuator
+    damping/stiffness implicitly; MuJoCo's own documented recommendation for
+    damped position/velocity actuators) resolved it without changing any
+    force limit, gain, or physical parameter.
     """
-    scene = TASK_DIR / scene_name
-    tree = _build_grasp_tree(extra_trunk_weld=True)
     root = tree.getroot()
-
-    # Phase 3C finding: the vendor model has no <option> element, so MuJoCo
-    # defaults to explicit Euler integration. That is fine for Phase 3/3B's
-    # pure-force <motor> actuators, but explicit Euler is well known to be
-    # unstable for stiff <position> servo gains at this timestep (0.002 s) --
-    # observed directly: with Euler, most right-arm joints stayed
-    # permanently saturated in an oscillating limit cycle regardless of
-    # (kp, kv), even though the actual gravity/Coriolis torque needed at the
-    # target pose was small (<3.1 N*m, well inside every joint's force
-    # limit) -- i.e. it was a numerical integration problem, not a physical
-    # one. Switching to MuJoCo's `implicitfast` integrator (which integrates
-    # actuator damping/stiffness implicitly; MuJoCo's own documented
-    # recommendation for damped position/velocity actuators) resolved it
-    # without changing any force limit, gain, or physical parameter.
     option = root.find("option")
     if option is None:
         option = ET.Element("option")
@@ -304,6 +345,49 @@ def write_grasp_scene_3c(
             forcelimited="true", forcerange=f"{-force_limit} {force_limit}",
         )
 
+
+def write_grasp_scene_3c(
+    arm_kp: dict[str, float] | float,
+    arm_kv: dict[str, float] | float,
+    scene_name: str = "g1_grasp_scene_3c.xml",
+) -> Path:
+    """Phase 3C variant: same environment/gripper/pelvis-weld/cube as
+    write_grasp_scene(), but the 7 right-arm joints are driven by bounded
+    MuJoCo <position> servos instead of Phase 3/3B's <motor> torque
+    actuators. Actuator *names* are kept identical to the vendor model's
+    (e.g. "right_elbow") so JointMap.build()'s name-based lookup works
+    unchanged for either architecture.
+
+    `arm_kp`/`arm_kv` may be a single float (uniform) or a dict keyed by
+    joint name (per-joint) -- callers resolve gains at the call site so this
+    function stays a pure scene generator, not a tuning policy.
+
+    Also welds torso_link to pelvis (extra_trunk_weld=True) -- see the
+    comment at that weld's construction in _build_grasp_tree() for why this
+    was added specifically for Phase 3C.
+    """
+    scene = TASK_DIR / scene_name
+    tree = _build_grasp_tree(extra_trunk_weld=True)
+    _apply_position_servo_arm(tree, arm_kp, arm_kv)
+    tree.write(scene, encoding="utf-8", xml_declaration=False)
+    return scene
+
+
+def write_grasp_scene_4b(
+    arm_kp: dict[str, float] | float,
+    arm_kv: dict[str, float] | float,
+    scene_name: str = "g1_grasp_scene_4b.xml",
+) -> Path:
+    """Phase 4B variant: identical to write_grasp_scene_3c() (same pelvis+
+    torso weld, same position-servo right arm, same implicitfast integrator,
+    same physical parallel gripper, same cube) plus a static blue target
+    pad (see _add_target_pad()) for Task 1's place location. No cube-
+    referencing constraint of any kind is added.
+    """
+    scene = TASK_DIR / scene_name
+    tree = _build_grasp_tree(extra_trunk_weld=True)
+    _add_target_pad(tree)
+    _apply_position_servo_arm(tree, arm_kp, arm_kv)
     tree.write(scene, encoding="utf-8", xml_declaration=False)
     return scene
 
