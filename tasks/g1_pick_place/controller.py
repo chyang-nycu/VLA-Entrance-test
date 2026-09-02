@@ -51,6 +51,36 @@ ARM_KD = 18.0
 GRIPPER_KP = 40.0
 GRIPPER_KD = 2.0
 
+# Phase 3B, Attempt 3B-1: the arm's 7 motors are 1:1 torque actuators
+# (verified via model.actuator_gear == [1,0,0,0,0,0] for every right-arm
+# motor, and actuator_ctrlrange already expressed in N*m) but Phase 3 used
+# ARM_KP/ARM_KD uniformly despite a 5x spread in torque authority
+# (shoulder/elbow/wrist_roll +/-25 N*m vs wrist_pitch/wrist_yaw +/-5 N*m).
+# This produced multi-joint oscillation (root-caused in
+# reports/phase3-grasping-baseline.md). compute_per_joint_gains scales Kp
+# linearly and Kd by sqrt(scale) per joint, using the existing ARM_KP/ARM_KD
+# as the reference pair for +/-25 N*m joints, per HANDOFF.md's Phase 3B spec.
+ARM_GAIN_REFERENCE_TORQUE = 25.0
+
+
+def compute_per_joint_gains(
+    ctrl_range: np.ndarray,
+    base_kp: float = ARM_KP,
+    base_kd: float = ARM_KD,
+    reference_torque: float = ARM_GAIN_REFERENCE_TORQUE,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Per-joint (Kp, Kd) scaled by each joint's actual torque authority.
+
+    Requires ctrl units to already be joint N*m torque (gear 1:1) -- callers
+    must verify this themselves (see phase3b_tuning.py's mapping check)
+    rather than assuming it.
+    """
+    torque_limit = ctrl_range[:, 1]  # ctrl_range is symmetric for these motors
+    scale = torque_limit / reference_torque
+    kp = base_kp * scale
+    kd = base_kd * np.sqrt(scale)
+    return kp, kd
+
 # Explicit step/velocity bounds applied to the IK target before PD tracks it,
 # so no single control step commands an unreachable jump.
 ARM_MAX_STEP = 0.03  # rad per control call
@@ -145,12 +175,28 @@ def solve_dls_ik(
     target_quat: np.ndarray | None = None,
     damping: float = DLS_DAMPING,
     max_iters: int = DLS_MAX_ITERS,
+    dls_weights: np.ndarray | None = None,
 ) -> np.ndarray:
     """Damped least-squares Cartesian IK for the controlled joint subset.
 
     Uses a caller-owned scratch MjData so the live simulation state is never
     disturbed. Returns a joint target vector (same order as joint_map.names),
     clipped to each joint's physical range.
+
+    Phase 3B, Attempt 3B-3: `dls_weights` (default None == uniform, i.e.
+    the original unweighted DLS-IK, unchanged behavior) generalizes the
+    solve to a weighted pseudoinverse dq = W J^T (J W J^T + damping^2 I)^-1
+    err, W = diag(dls_weights). Evidence from Attempts 3B-1/3B-2 showed the
+    (torque-agnostic) unweighted IK freely reassigns kinematic load onto
+    whichever joint closes the Cartesian error most efficiently, regardless
+    of that joint's torque authority -- when wrist_pitch/yaw's PD gains were
+    softened, the IK pushed more of the correction onto shoulder/elbow,
+    *raising* their saturation and RMS tracking error even though their
+    gains were untouched (see reports/phase3b-controller-stabilization.md).
+    Weighting the IK by each joint's torque limit (normalized to the
+    strongest joint) discourages relying on low-torque joints for Cartesian
+    closure in the first place, addressing the coupling at its source
+    instead of only downstream in the PD layer.
     """
     scratch_data.qpos[:] = base_qpos
     q = joint_map.get_qpos(scratch_data).copy()
@@ -183,8 +229,13 @@ def solve_dls_ik(
         else:
             J = jacp[:, joint_map.dof_adr]
 
-        JJt = J @ J.T + (damping ** 2) * np.eye(J.shape[0])
-        dq = J.T @ np.linalg.solve(JJt, err)
+        if dls_weights is not None:
+            Jw = J * dls_weights[np.newaxis, :]
+            JWJt = Jw @ J.T + (damping ** 2) * np.eye(J.shape[0])
+            dq = dls_weights * (J.T @ np.linalg.solve(JWJt, err))
+        else:
+            JJt = J @ J.T + (damping ** 2) * np.eye(J.shape[0])
+            dq = J.T @ np.linalg.solve(JJt, err)
 
         step_norm = np.linalg.norm(dq)
         if step_norm > DLS_MAX_DQ_STEP:
@@ -204,8 +255,16 @@ def bounded_pd_step(
     kd: float,
     max_step: float,
     max_qvel: float,
+    diag: dict | None = None,
 ) -> np.ndarray:
-    """One bounded joint-space PD control step. Returns the applied ctrl vector."""
+    """One bounded joint-space PD control step. Returns the applied ctrl vector.
+
+    If `diag` is given (an empty dict the caller owns), it is filled with
+    per-joint instrumentation for this step: commanded torque before
+    clipping, applied torque after clipping, which joints saturated, the
+    feedforward term, and the joint-space tracking error -- used by
+    Phase 3B's instrumentation pass without changing default behavior.
+    """
     qpos = joint_map.get_qpos(data)
     qvel = joint_map.get_qvel(data)
 
@@ -215,16 +274,24 @@ def bounded_pd_step(
     step_target = qpos + delta
 
     gravity_coriolis_ff = data.qfrc_bias[joint_map.dof_adr]
-    torque = kp * (step_target - qpos) - kd * qvel + gravity_coriolis_ff
+    torque_pre_clip = kp * (step_target - qpos) - kd * qvel + gravity_coriolis_ff
 
     overspeed = np.abs(qvel) > max_qvel
-    same_direction = np.sign(qvel) == np.sign(torque - gravity_coriolis_ff)
-    torque = np.where(overspeed & same_direction, gravity_coriolis_ff, torque)
+    same_direction = np.sign(qvel) == np.sign(torque_pre_clip - gravity_coriolis_ff)
+    torque_pre_clip = np.where(overspeed & same_direction, gravity_coriolis_ff, torque_pre_clip)
 
-    torque = np.clip(torque, joint_map.ctrl_range[:, 0], joint_map.ctrl_range[:, 1])
+    torque = np.clip(torque_pre_clip, joint_map.ctrl_range[:, 0], joint_map.ctrl_range[:, 1])
 
     if not np.all(np.isfinite(torque)):
         raise FloatingPointError(f"non-finite control output for joints {joint_map.names}: {torque}")
+
+    if diag is not None:
+        diag["torque_pre_clip"] = torque_pre_clip.copy()
+        diag["torque_post_clip"] = torque.copy()
+        diag["gravity_coriolis_ff"] = gravity_coriolis_ff.copy()
+        diag["saturated"] = np.abs(torque_pre_clip - torque) > 1e-9
+        diag["joint_error"] = (bounded_target - qpos).copy()
+        diag["qvel"] = qvel.copy()
 
     joint_map.set_ctrl(data, torque)
     return torque
@@ -233,6 +300,16 @@ def bounded_pd_step(
 @dataclass
 class G1GraspController:
     model: mujoco.MjModel
+    # Phase 3B: allow per-joint (array) or uniform (scalar) arm gain override.
+    # Defaults reproduce Phase 3's exact original behavior (uniform scalars)
+    # so existing callers/tests are unaffected unless they opt in.
+    arm_kp: float | np.ndarray = ARM_KP
+    arm_kd: float | np.ndarray = ARM_KD
+    arm_max_step: float = ARM_MAX_STEP
+    arm_max_qvel: float = ARM_MAX_QVEL
+    # Phase 3B Attempt 3B-3: optional per-joint DLS-IK weighting (None ==
+    # original unweighted behavior).
+    arm_dls_weights: np.ndarray | None = None
     arm_map: JointMap = field(init=False)
     gripper_map: JointMap = field(init=False)
     tcp_site_id: int = field(init=False)
@@ -249,17 +326,19 @@ class G1GraspController:
     def ik_target_for(self, data: mujoco.MjData, target_pos: np.ndarray, target_quat: np.ndarray | None = None) -> np.ndarray:
         return solve_dls_ik(
             self.model, self.ik_scratch, data.qpos.copy(), self.arm_map, self.tcp_site_id,
-            target_pos, target_quat,
+            target_pos, target_quat, dls_weights=self.arm_dls_weights,
         )
 
-    def track_arm(self, data: mujoco.MjData, joint_target: np.ndarray) -> np.ndarray:
+    def track_arm(self, data: mujoco.MjData, joint_target: np.ndarray, diag: dict | None = None) -> np.ndarray:
         return bounded_pd_step(
-            self.arm_map, data, joint_target, ARM_KP, ARM_KD, ARM_MAX_STEP, ARM_MAX_QVEL,
+            self.arm_map, data, joint_target, self.arm_kp, self.arm_kd,
+            self.arm_max_step, self.arm_max_qvel, diag=diag,
         )
 
-    def track_gripper(self, data: mujoco.MjData, joint_target: np.ndarray) -> np.ndarray:
+    def track_gripper(self, data: mujoco.MjData, joint_target: np.ndarray, diag: dict | None = None) -> np.ndarray:
         return bounded_pd_step(
-            self.gripper_map, data, joint_target, GRIPPER_KP, GRIPPER_KD, GRIPPER_MAX_STEP, GRIPPER_MAX_QVEL,
+            self.gripper_map, data, joint_target, GRIPPER_KP, GRIPPER_KD,
+            GRIPPER_MAX_STEP, GRIPPER_MAX_QVEL, diag=diag,
         )
 
     def tcp_pos(self, data: mujoco.MjData) -> np.ndarray:

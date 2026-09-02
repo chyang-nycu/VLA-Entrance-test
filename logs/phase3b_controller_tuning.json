@@ -1,0 +1,367 @@
+{
+  "scene": "tasks/g1_pick_place/g1_grasp_scene.xml",
+  "ctrl_to_torque_mapping": {
+    "per_joint": [
+      {
+        "joint": "right_shoulder_pitch_joint",
+        "actuator": "right_shoulder_pitch",
+        "gear": [
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "trntype": 0,
+        "ctrl_equals_joint_torque_1to1": true
+      },
+      {
+        "joint": "right_shoulder_roll_joint",
+        "actuator": "right_shoulder_roll",
+        "gear": [
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "trntype": 0,
+        "ctrl_equals_joint_torque_1to1": true
+      },
+      {
+        "joint": "right_shoulder_yaw_joint",
+        "actuator": "right_shoulder_yaw",
+        "gear": [
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "trntype": 0,
+        "ctrl_equals_joint_torque_1to1": true
+      },
+      {
+        "joint": "right_elbow_joint",
+        "actuator": "right_elbow",
+        "gear": [
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "trntype": 0,
+        "ctrl_equals_joint_torque_1to1": true
+      },
+      {
+        "joint": "right_wrist_roll_joint",
+        "actuator": "right_wrist_roll",
+        "gear": [
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "trntype": 0,
+        "ctrl_equals_joint_torque_1to1": true
+      },
+      {
+        "joint": "right_wrist_pitch_joint",
+        "actuator": "right_wrist_pitch",
+        "gear": [
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "trntype": 0,
+        "ctrl_equals_joint_torque_1to1": true
+      },
+      {
+        "joint": "right_wrist_yaw_joint",
+        "actuator": "right_wrist_yaw",
+        "gear": [
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "trntype": 0,
+        "ctrl_equals_joint_torque_1to1": true
+      }
+    ],
+    "ctrl_equals_joint_torque_for_all_arm_joints": true
+  },
+  "gravity_bias_fraction_of_torque_limit_at_forward_pose": {
+    "right_shoulder_pitch_joint": 0.09051994354420341,
+    "right_shoulder_roll_joint": 0.007955180319984479,
+    "right_shoulder_yaw_joint": 5.554345425998209e-06,
+    "right_elbow_joint": 0.08194329446643561,
+    "right_wrist_roll_joint": 0.00017495372543335997,
+    "right_wrist_pitch_joint": 0.09738148188529991,
+    "right_wrist_yaw_joint": 2.7654352651722917e-06
+  },
+  "baseline": {
+    "label": "baseline (Phase 3, uniform Kp=180/Kd=18)",
+    "arm_kp": 180.0,
+    "arm_kd": 18.0,
+    "trajectory_duration_s": null,
+    "height_gain_m": 0.005124964116086428,
+    "max_continuous_lifted_s": 0.0,
+    "cube_xy_displacement_before_close_m": 0.0266941609197731,
+    "left_contact_ever": true,
+    "right_contact_ever": true,
+    "criteria": {
+      "both_pads_contact_cube": true,
+      "height_gain_ge_0_08m": false,
+      "lifted_ge_2s_continuous": false,
+      "finite_and_bounded": true,
+      "released_after_open": true
+    },
+    "pass": false,
+    "instrumentation": {
+      "n_steps_recorded": 3850,
+      "per_joint_saturation_fraction": {
+        "right_shoulder_pitch_joint": 0.0,
+        "right_shoulder_roll_joint": 0.0,
+        "right_shoulder_yaw_joint": 0.056363636363636366,
+        "right_elbow_joint": 0.0,
+        "right_wrist_roll_joint": 0.9241558441558442,
+        "right_wrist_pitch_joint": 0.6820779220779221,
+        "right_wrist_yaw_joint": 0.7480519480519481
+      },
+      "per_joint_rms_tracking_error_rad": {
+        "right_shoulder_pitch_joint": 0.05622333038408728,
+        "right_shoulder_roll_joint": 0.019778954476078595,
+        "right_shoulder_yaw_joint": 0.03123714924133807,
+        "right_elbow_joint": 0.1162241162264397,
+        "right_wrist_roll_joint": 0.008281731772814015,
+        "right_wrist_pitch_joint": 0.0637857907571931,
+        "right_wrist_yaw_joint": 0.01583511015545567
+      },
+      "per_joint_max_tracking_error_rad": {
+        "right_shoulder_pitch_joint": 0.17013550468737257,
+        "right_shoulder_roll_joint": 0.053070887418641105,
+        "right_shoulder_yaw_joint": 0.11649790532009072,
+        "right_elbow_joint": 0.3978619598807286,
+        "right_wrist_roll_joint": 0.03346978795749196,
+        "right_wrist_pitch_joint": 0.23396290864895708,
+        "right_wrist_yaw_joint": 0.051817839594966
+      },
+      "tcp_rms_error_m": 0.06074124060373569,
+      "tcp_max_error_m": 0.11479184541030919
+    }
+  },
+  "attempts": [
+    {
+      "label": "3B-1 (per-joint Kp/Kd scaled by torque authority)",
+      "arm_kp": {
+        "right_shoulder_pitch_joint": 180.0,
+        "right_shoulder_roll_joint": 180.0,
+        "right_shoulder_yaw_joint": 180.0,
+        "right_elbow_joint": 180.0,
+        "right_wrist_roll_joint": 180.0,
+        "right_wrist_pitch_joint": 36.0,
+        "right_wrist_yaw_joint": 36.0
+      },
+      "arm_kd": {
+        "right_shoulder_pitch_joint": 18.0,
+        "right_shoulder_roll_joint": 18.0,
+        "right_shoulder_yaw_joint": 18.0,
+        "right_elbow_joint": 18.0,
+        "right_wrist_roll_joint": 18.0,
+        "right_wrist_pitch_joint": 8.049844718999243,
+        "right_wrist_yaw_joint": 8.049844718999243
+      },
+      "trajectory_duration_s": null,
+      "height_gain_m": 0.000768082024819372,
+      "max_continuous_lifted_s": 0.0,
+      "cube_xy_displacement_before_close_m": 0.015378266140609227,
+      "left_contact_ever": false,
+      "right_contact_ever": true,
+      "criteria": {
+        "both_pads_contact_cube": false,
+        "height_gain_ge_0_08m": false,
+        "lifted_ge_2s_continuous": false,
+        "finite_and_bounded": true,
+        "released_after_open": true
+      },
+      "pass": false,
+      "instrumentation": {
+        "n_steps_recorded": 3850,
+        "per_joint_saturation_fraction": {
+          "right_shoulder_pitch_joint": 0.0,
+          "right_shoulder_roll_joint": 0.0,
+          "right_shoulder_yaw_joint": 0.354025974025974,
+          "right_elbow_joint": 0.035844155844155845,
+          "right_wrist_roll_joint": 0.8644155844155844,
+          "right_wrist_pitch_joint": 0.09480519480519481,
+          "right_wrist_yaw_joint": 0.0412987012987013
+        },
+        "per_joint_rms_tracking_error_rad": {
+          "right_shoulder_pitch_joint": 0.271657994286249,
+          "right_shoulder_roll_joint": 0.28000024169688403,
+          "right_shoulder_yaw_joint": 0.20470508343824884,
+          "right_elbow_joint": 0.5201385809882041,
+          "right_wrist_roll_joint": 0.023814430562113624,
+          "right_wrist_pitch_joint": 0.09880942640818251,
+          "right_wrist_yaw_joint": 0.03955200642356835
+        },
+        "per_joint_max_tracking_error_rad": {
+          "right_shoulder_pitch_joint": 0.8802258772406104,
+          "right_shoulder_roll_joint": 0.6371984424740135,
+          "right_shoulder_yaw_joint": 0.7155202489300152,
+          "right_elbow_joint": 1.4878532017631443,
+          "right_wrist_roll_joint": 0.10319412680980833,
+          "right_wrist_pitch_joint": 0.3715407348212322,
+          "right_wrist_yaw_joint": 0.12077853578251471
+        },
+        "tcp_rms_error_m": 0.2148940671374615,
+        "tcp_max_error_m": 0.31562239255820157
+      }
+    },
+    {
+      "label": "3B-2 (3B-1 gains + settle-before-close gating)",
+      "arm_kp": {
+        "right_shoulder_pitch_joint": 180.0,
+        "right_shoulder_roll_joint": 180.0,
+        "right_shoulder_yaw_joint": 180.0,
+        "right_elbow_joint": 180.0,
+        "right_wrist_roll_joint": 180.0,
+        "right_wrist_pitch_joint": 36.0,
+        "right_wrist_yaw_joint": 36.0
+      },
+      "arm_kd": {
+        "right_shoulder_pitch_joint": 18.0,
+        "right_shoulder_roll_joint": 18.0,
+        "right_shoulder_yaw_joint": 18.0,
+        "right_elbow_joint": 18.0,
+        "right_wrist_roll_joint": 18.0,
+        "right_wrist_pitch_joint": 8.049844718999243,
+        "right_wrist_yaw_joint": 8.049844718999243
+      },
+      "settle_pos_tol_m": 0.008,
+      "settle_vel_tol_rad_s": 0.15,
+      "max_settle_extra_s": 1.5,
+      "settle_extra_s_used": 1.5,
+      "trajectory_duration_s": null,
+      "height_gain_m": 0.000768082024819372,
+      "max_continuous_lifted_s": 0.0,
+      "cube_xy_displacement_before_close_m": 0.015378266169900364,
+      "left_contact_ever": false,
+      "right_contact_ever": true,
+      "criteria": {
+        "both_pads_contact_cube": false,
+        "height_gain_ge_0_08m": false,
+        "lifted_ge_2s_continuous": false,
+        "finite_and_bounded": true,
+        "released_after_open": true
+      },
+      "pass": false,
+      "instrumentation": {
+        "n_steps_recorded": 4600,
+        "per_joint_saturation_fraction": {
+          "right_shoulder_pitch_joint": 0.0,
+          "right_shoulder_roll_joint": 0.0,
+          "right_shoulder_yaw_joint": 0.3297826086956522,
+          "right_elbow_joint": 0.22652173913043477,
+          "right_wrist_roll_joint": 0.8882608695652174,
+          "right_wrist_pitch_joint": 0.3391304347826087,
+          "right_wrist_yaw_joint": 0.0
+        },
+        "per_joint_rms_tracking_error_rad": {
+          "right_shoulder_pitch_joint": 0.2848864364798338,
+          "right_shoulder_roll_joint": 0.3893402142996949,
+          "right_shoulder_yaw_joint": 0.25531255682085696,
+          "right_elbow_joint": 0.6189686516979969,
+          "right_wrist_roll_joint": 0.05330264987835748,
+          "right_wrist_pitch_joint": 0.08497924342648985,
+          "right_wrist_yaw_joint": 0.01920579848762032
+        },
+        "per_joint_max_tracking_error_rad": {
+          "right_shoulder_pitch_joint": 0.8802258772406104,
+          "right_shoulder_roll_joint": 0.731528836273662,
+          "right_shoulder_yaw_joint": 0.6335510199018812,
+          "right_elbow_joint": 1.4878532017631443,
+          "right_wrist_roll_joint": 0.16474009648731666,
+          "right_wrist_pitch_joint": 0.3715407348212322,
+          "right_wrist_yaw_joint": 0.060102944882384976
+        },
+        "tcp_rms_error_m": 0.32110039577351945,
+        "tcp_max_error_m": 0.39768639303948056
+      }
+    },
+    {
+      "label": "3B-3 (baseline uniform Kp/Kd + torque-weighted DLS-IK)",
+      "arm_kp": 180.0,
+      "arm_kd": 18.0,
+      "dls_weights": {
+        "right_shoulder_pitch_joint": 1.0,
+        "right_shoulder_roll_joint": 1.0,
+        "right_shoulder_yaw_joint": 1.0,
+        "right_elbow_joint": 1.0,
+        "right_wrist_roll_joint": 1.0,
+        "right_wrist_pitch_joint": 0.2,
+        "right_wrist_yaw_joint": 0.2
+      },
+      "trajectory_duration_s": null,
+      "height_gain_m": 0.0004981428639365681,
+      "max_continuous_lifted_s": 0.0,
+      "cube_xy_displacement_before_close_m": 0.021482252409269598,
+      "left_contact_ever": true,
+      "right_contact_ever": true,
+      "criteria": {
+        "both_pads_contact_cube": true,
+        "height_gain_ge_0_08m": false,
+        "lifted_ge_2s_continuous": false,
+        "finite_and_bounded": true,
+        "released_after_open": true
+      },
+      "pass": false,
+      "instrumentation": {
+        "n_steps_recorded": 3850,
+        "per_joint_saturation_fraction": {
+          "right_shoulder_pitch_joint": 0.0,
+          "right_shoulder_roll_joint": 0.0,
+          "right_shoulder_yaw_joint": 0.06493506493506493,
+          "right_elbow_joint": 0.0,
+          "right_wrist_roll_joint": 0.9184415584415584,
+          "right_wrist_pitch_joint": 0.6631168831168831,
+          "right_wrist_yaw_joint": 0.6981818181818182
+        },
+        "per_joint_rms_tracking_error_rad": {
+          "right_shoulder_pitch_joint": 0.08284563933605821,
+          "right_shoulder_roll_joint": 0.025472977579269095,
+          "right_shoulder_yaw_joint": 0.02947916847617916,
+          "right_elbow_joint": 0.16298751207315826,
+          "right_wrist_roll_joint": 0.01235533163955268,
+          "right_wrist_pitch_joint": 0.01736258481134583,
+          "right_wrist_yaw_joint": 0.00542681522981152
+        },
+        "per_joint_max_tracking_error_rad": {
+          "right_shoulder_pitch_joint": 0.28706507652060825,
+          "right_shoulder_roll_joint": 0.05932102931027231,
+          "right_shoulder_yaw_joint": 0.13379471394609177,
+          "right_elbow_joint": 0.4999581142149661,
+          "right_wrist_roll_joint": 0.05130844141362151,
+          "right_wrist_pitch_joint": 0.05518216441081069,
+          "right_wrist_yaw_joint": 0.024241262093522287
+        },
+        "tcp_rms_error_m": 0.06439896880407285,
+        "tcp_max_error_m": 0.11804249261184134
+      }
+    }
+  ],
+  "winner": null
+}
