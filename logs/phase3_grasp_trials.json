@@ -1,0 +1,414 @@
+{
+  "scene": "tasks/g1_pick_place/g1_grasp_scene.xml",
+  "nominal": {
+    "cube_xy_offset": [
+      0.0,
+      0.0
+    ],
+    "cube_spawn_pos": [
+      0.33,
+      -0.15,
+      0.735
+    ],
+    "cube_rest_z": 0.735,
+    "height_gain_m": 0.005124964116086428,
+    "max_continuous_lifted_s": 0.0,
+    "criteria": {
+      "both_pads_contact_cube": true,
+      "height_gain_ge_0_08m": false,
+      "lifted_ge_2s_continuous": false,
+      "finite_and_bounded": true,
+      "released_after_open": true
+    },
+    "pass": false,
+    "time_series_sample": [
+      {
+        "t": 0.10000000000000007,
+        "cube_z": 0.7347847032864783,
+        "both_pads_contact": false
+      },
+      {
+        "t": 0.20000000000000015,
+        "cube_z": 0.7347845398255699,
+        "both_pads_contact": false
+      },
+      {
+        "t": 0.3000000000000002,
+        "cube_z": 0.7347845017991405,
+        "both_pads_contact": false
+      },
+      {
+        "t": 0.4000000000000003,
+        "cube_z": 0.7347844923127625,
+        "both_pads_contact": false
+      },
+      {
+        "t": 0.5000000000000003,
+        "cube_z": 0.7346346020160202,
+        "both_pads_contact": false
+      },
+      {
+        "t": 0.6000000000000004,
+        "cube_z": 0.7352174318337859,
+        "both_pads_contact": false
+      },
+      {
+        "t": 0.7000000000000005,
+        "cube_z": 0.7347901961227019,
+        "both_pads_contact": false
+      },
+      {
+        "t": 0.8000000000000006,
+        "cube_z": 0.7346751618125145,
+        "both_pads_contact": false
+      },
+      {
+        "t": 0.9000000000000007,
+        "cube_z": 0.7347572956042147,
+        "both_pads_contact": false
+      },
+      {
+        "t": 1.0000000000000007,
+        "cube_z": 0.7347777231692818,
+        "both_pads_contact": false
+      },
+      {
+        "t": 1.1000000000000008,
+        "cube_z": 0.7347828023585751,
+        "both_pads_contact": false
+      },
+      {
+        "t": 1.2000000000000008,
+        "cube_z": 0.7347840684226158,
+        "both_pads_contact": false
+      },
+      {
+        "t": 1.300000000000001,
+        "cube_z": 0.734784384202695,
+        "both_pads_contact": false
+      },
+      {
+        "t": 1.400000000000001,
+        "cube_z": 0.7347844629762635,
+        "both_pads_contact": false
+      },
+      {
+        "t": 1.500000000000001,
+        "cube_z": 0.7347844826276403,
+        "both_pads_contact": false
+      },
+      {
+        "t": 1.6000000000000012,
+        "cube_z": 0.7347844875300497,
+        "both_pads_contact": false
+      },
+      {
+        "t": 1.7000000000000013,
+        "cube_z": 0.734784488753052,
+        "both_pads_contact": false
+      },
+      {
+        "t": 1.8000000000000014,
+        "cube_z": 0.7347844890581543,
+        "both_pads_contact": false
+      },
+      {
+        "t": 1.9000000000000015,
+        "cube_z": 0.7348432394981277,
+        "both_pads_contact": false
+      },
+      {
+        "t": 2.0000000000000013,
+        "cube_z": 0.7348759802818737,
+        "both_pads_contact": false
+      },
+      {
+        "t": 2.0999999999999903,
+        "cube_z": 0.737474587281901,
+        "both_pads_contact": false
+      },
+      {
+        "t": 2.1999999999999793,
+        "cube_z": 0.7399987569848605,
+        "both_pads_contact": false
+      },
+      {
+        "t": 2.2999999999999683,
+        "cube_z": 0.7387957068305285,
+        "both_pads_contact": false
+      },
+      {
+        "t": 2.3999999999999573,
+        "cube_z": 0.7354793933767987,
+        "both_pads_contact": false
+      },
+      {
+        "t": 2.4999999999999463,
+        "cube_z": 0.7369170313423251,
+        "both_pads_contact": false
+      },
+      {
+        "t": 2.5999999999999353,
+        "cube_z": 0.7367676584602636,
+        "both_pads_contact": false
+      },
+      {
+        "t": 2.6999999999999242,
+        "cube_z": 0.7342193660595039,
+        "both_pads_contact": false
+      },
+      {
+        "t": 2.7999999999999132,
+        "cube_z": 0.7347818925173081,
+        "both_pads_contact": false
+      },
+      {
+        "t": 2.899999999999902,
+        "cube_z": 0.7346730852728192,
+        "both_pads_contact": false
+      },
+      {
+        "t": 2.999999999999891,
+        "cube_z": 0.7346901715781816,
+        "both_pads_contact": false
+      },
+      {
+        "t": 3.09999999999988,
+        "cube_z": 0.7347090613524084,
+        "both_pads_contact": false
+      },
+      {
+        "t": 3.199999999999869,
+        "cube_z": 0.7347657049828169,
+        "both_pads_contact": false
+      },
+      {
+        "t": 3.299999999999858,
+        "cube_z": 0.7347798164494012,
+        "both_pads_contact": false
+      },
+      {
+        "t": 3.399999999999847,
+        "cube_z": 0.7347833242875869,
+        "both_pads_contact": false
+      },
+      {
+        "t": 3.499999999999836,
+        "cube_z": 0.7347841986108298,
+        "both_pads_contact": false
+      },
+      {
+        "t": 3.599999999999825,
+        "cube_z": 0.7347844166796554,
+        "both_pads_contact": false
+      },
+      {
+        "t": 3.699999999999814,
+        "cube_z": 0.7347844710782191,
+        "both_pads_contact": false
+      },
+      {
+        "t": 3.799999999999803,
+        "cube_z": 0.7347844846488292,
+        "both_pads_contact": false
+      },
+      {
+        "t": 3.899999999999792,
+        "cube_z": 0.7347844880342749,
+        "both_pads_contact": false
+      },
+      {
+        "t": 3.999999999999781,
+        "cube_z": 0.7347844888788411,
+        "both_pads_contact": false
+      },
+      {
+        "t": 4.0999999999997705,
+        "cube_z": 0.734784489089535,
+        "both_pads_contact": false
+      },
+      {
+        "t": 4.1999999999997595,
+        "cube_z": 0.7347844891420964,
+        "both_pads_contact": false
+      },
+      {
+        "t": 4.2999999999997485,
+        "cube_z": 0.7347844891552091,
+        "both_pads_contact": false
+      },
+      {
+        "t": 4.3999999999997375,
+        "cube_z": 0.7347844891584803,
+        "both_pads_contact": false
+      },
+      {
+        "t": 4.499999999999726,
+        "cube_z": 0.7347844891592965,
+        "both_pads_contact": false
+      },
+      {
+        "t": 4.599999999999715,
+        "cube_z": 0.7347844891595,
+        "both_pads_contact": false
+      },
+      {
+        "t": 4.699999999999704,
+        "cube_z": 0.7347844891595507,
+        "both_pads_contact": false
+      },
+      {
+        "t": 4.799999999999693,
+        "cube_z": 0.7347844891595633,
+        "both_pads_contact": false
+      },
+      {
+        "t": 4.899999999999682,
+        "cube_z": 0.7347844891595658,
+        "both_pads_contact": false
+      },
+      {
+        "t": 4.999999999999671,
+        "cube_z": 0.7347844891595658,
+        "both_pads_contact": false
+      },
+      {
+        "t": 5.09999999999966,
+        "cube_z": 0.7347844891595658,
+        "both_pads_contact": false
+      },
+      {
+        "t": 5.199999999999649,
+        "cube_z": 0.7347844891595658,
+        "both_pads_contact": false
+      },
+      {
+        "t": 5.299999999999638,
+        "cube_z": 0.7347844891595658,
+        "both_pads_contact": false
+      },
+      {
+        "t": 5.399999999999627,
+        "cube_z": 0.7347844891595658,
+        "both_pads_contact": false
+      },
+      {
+        "t": 5.499999999999616,
+        "cube_z": 0.7347844891595658,
+        "both_pads_contact": false
+      },
+      {
+        "t": 5.599999999999605,
+        "cube_z": 0.7347844891595658,
+        "both_pads_contact": false
+      },
+      {
+        "t": 5.699999999999594,
+        "cube_z": 0.7347844891595658,
+        "both_pads_contact": false
+      },
+      {
+        "t": 5.799999999999583,
+        "cube_z": 0.7347844891595658,
+        "both_pads_contact": false
+      },
+      {
+        "t": 5.899999999999572,
+        "cube_z": 0.7347844891595658,
+        "both_pads_contact": false
+      },
+      {
+        "t": 5.999999999999561,
+        "cube_z": 0.7347844891595658,
+        "both_pads_contact": false
+      },
+      {
+        "t": 6.09999999999955,
+        "cube_z": 0.7347844891595658,
+        "both_pads_contact": false
+      },
+      {
+        "t": 6.199999999999539,
+        "cube_z": 0.7347844891595658,
+        "both_pads_contact": false
+      },
+      {
+        "t": 6.299999999999528,
+        "cube_z": 0.7347844891595658,
+        "both_pads_contact": false
+      },
+      {
+        "t": 6.399999999999517,
+        "cube_z": 0.7347844891595658,
+        "both_pads_contact": false
+      },
+      {
+        "t": 6.499999999999506,
+        "cube_z": 0.7347844891595658,
+        "both_pads_contact": false
+      },
+      {
+        "t": 6.599999999999495,
+        "cube_z": 0.7347844891595658,
+        "both_pads_contact": false
+      },
+      {
+        "t": 6.699999999999484,
+        "cube_z": 0.7348739625895798,
+        "both_pads_contact": false
+      },
+      {
+        "t": 6.799999999999473,
+        "cube_z": 0.7347047456146449,
+        "both_pads_contact": false
+      },
+      {
+        "t": 6.899999999999462,
+        "cube_z": 0.7342136816805294,
+        "both_pads_contact": false
+      },
+      {
+        "t": 6.999999999999451,
+        "cube_z": 0.7336923847529258,
+        "both_pads_contact": false
+      },
+      {
+        "t": 7.09999999999944,
+        "cube_z": 0.7331594552424269,
+        "both_pads_contact": false
+      },
+      {
+        "t": 7.199999999999429,
+        "cube_z": 0.7336944382638263,
+        "both_pads_contact": false
+      },
+      {
+        "t": 7.299999999999418,
+        "cube_z": 0.7334384017011696,
+        "both_pads_contact": false
+      },
+      {
+        "t": 7.399999999999407,
+        "cube_z": 0.7333646497171126,
+        "both_pads_contact": false
+      },
+      {
+        "t": 7.499999999999396,
+        "cube_z": 0.7330088592017738,
+        "both_pads_contact": false
+      },
+      {
+        "t": 7.599999999999385,
+        "cube_z": 0.7333034529265671,
+        "both_pads_contact": false
+      },
+      {
+        "t": 7.699999999999374,
+        "cube_z": 0.7336177080010343,
+        "both_pads_contact": false
+      }
+    ]
+  },
+  "variants": [],
+  "variant_success_rate": null
+}
