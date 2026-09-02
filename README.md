@@ -60,6 +60,7 @@ package versions used so far.
 .venv/bin/python -m unittest tests/test_phase3c_grasp.py -v       # Phase 3C (position-servo; passing baseline)
 .venv/bin/python -m unittest tests/test_phase4a_grasp_variants.py -v  # Phase 4A (setup-variant sweep)
 .venv/bin/python -m unittest tests/test_phase4b_pick_place.py -v  # Phase 4B (Task 1: complete pick-and-place)
+.venv/bin/python -m unittest tests/test_phase4c_slip_audit.py -v  # Phase 4C (slip-metric audit + video capture)
 ```
 
 ## Phase status
@@ -101,6 +102,20 @@ package versions used so far.
   for the full attempt log, target-selection evidence, and limitations
   (measured cube slip under sustained transport load, the tight nominal
   placement margin).
+- **Phase 4C — Task 1 evidence hardening and video capture**: audited Phase
+  4B's reported cube-slip metric and found it conflated genuine grasp-phase
+  slip with post-release TCP-cube separation (the gripper opening and the
+  arm retreating after a successful placement) — root cause confirmed, not
+  guessed: `post_release_tcp_cube_separation_m` (0.149 m for nominal) is
+  within 2 cm of the old `max_cube_slip_m` (0.156 m). **Corrected genuine
+  grasp-phase slip is 3.3–5.4 cm** (phase- and variant-dependent), not
+  14.97–15.62 cm. No pass/fail outcome changed — slip was never an
+  acceptance criterion. Also produced a decode-verified nominal-episode
+  video and 3 still frames. See `reports/phase4c-task1-evidence.md` for the
+  full audit (old vs. corrected definitions, per-variant table, synthetic
+  unit tests) and `logs/phase4c_slip_audit.json` for raw data.
+  `reports/phase4b-task1-pick-place.md` is unedited; this is a
+  measurement/reporting correction only, no controller or physics change.
 - **Task 2 (cameras, dataset collection, language-conditioned variants,
   policy integration)**: not started; requires new, explicit authorization
   per `HANDOFF.md`.

@@ -14,6 +14,11 @@ datasets/
 *.hdf5
 *.npz
 
+# Exception: small, decode-verified evidence videos explicitly committed as
+# phase deliverables (same precedent as the committed evidence GIFs already
+# under artifacts/) -- not a generated-debug-output dump.
+!artifacts/phase4b_task1_nominal.mp4
+
 # Temporary MuJoCo outputs
 *.mjb
 tmp_mujoco*/

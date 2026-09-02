@@ -567,3 +567,69 @@ silently or faked.
 Per this file's scope, cameras, dataset collection, language-conditioned
 variants, and policy integration (Task 2) remain unimplemented and
 unauthorized.
+
+## Phase 4C — Task 1 evidence hardening and video capture (authorized 2026-09-02)
+
+Goal: audit the reported cube-slip metric, produce a viewable nominal
+demonstration, and package Task 1's results so they are understandable
+without running code. No retuning of the successful controller; no Task 2
+work; `reports/phase4b-task1-pick-place.md` preserved unedited.
+
+### Slip-metric audit — root cause confirmed
+
+Phase 4B's `max_cube_slip_m = 0.1561555402975266` (nominal) conflated
+genuine grasp-phase slip with **post-release TCP-cube separation**: the
+code kept updating "slip" on every step for the rest of the trial once a
+grasp reference was captured, with no check that the cube was still being
+carried — so `OPEN`/`RELEASE_SETTLE`/`VERIFY_RELEASE`/`RETREAT`/
+`VERIFY_TASK_SUCCESS` (all post-release, cube intentionally no longer
+held) were silently included. Confirmed directly, not guessed:
+`post_release_tcp_cube_separation_m = 0.14860671167299208` for the nominal
+trial — within 2 cm of the old figure. The TCP-local-frame transform
+itself (`R_tcp^T @ (cube_pos - tcp_pos)`) was already correct — rotation
+was handled properly (confirmed by a synthetic unit test: pure TCP
+rotation with a rigidly-attached cube produces exactly zero slip) — the
+defect was entirely about the time window, not the math.
+
+Corrected metrics, gated on the existing `carrying` signal so slip is only
+counted while the gripper is closed and the cube is grasped:
+`grasp_reference_offset_tcp_frame`, `max_slip_during_lift`,
+`max_slip_during_transport`, `max_slip_during_lower`, `slip_at_release`,
+and `post_release_tcp_cube_separation_m` (never called slip). The legacy
+`max_cube_slip_m` field is retained unmodified so the historical 0.156 m
+figure stays reproducible. **Corrected genuine grasp-phase slip: 3.3–5.4
+cm** (nominal: lift 0.032 m, transport 0.045 m, lower 0.052 m, release
+0.020 m — vs. the old, wrong, single 0.156 m figure). No pass/fail outcome
+changed anywhere — slip was never an acceptance criterion, and `task_pass`
+for all Stage A/Stage B trials is unchanged from `363aa83`.
+
+This was a measurement/reporting fix only: `arm_kp=400.0`, `arm_kv=25.0`,
+`gripper_kp=150.0`, `gripper_kd=10.0`, and every trajectory parameter are
+byte-identical to the committed Phase 4B configuration (verified via diff
+against `363aa83`). 10 new tests added (`tests/test_phase4c_slip_audit.py`):
+3 synthetic math unit tests (pure translation, pure rotation, known 5mm
+displacement), 6 tests confirming post-release isolation on the real
+nominal trial, 1 confirming the fix holds on the y+0.03 variant's
+different (placement-failure) code path.
+
+### Video capture
+
+`imageio-ffmpeg` installed into the existing project venv (user-local,
+no admin/system-wide install) — worked on the first real attempt, so no
+GIF fallback was needed. `artifacts/phase4b_task1_nominal.mp4`: 640x480,
+29.41 fps (physics-stride-synchronized to real-time playback), 375
+frames, 12.75s duration, 229,060 bytes, decode-verified (frame count and
+fps confirmed by reading the file back). Fixed (non-tracking) third-person
+camera; shows G1, red cube, table, and blue target pad throughout. 3 still
+frames captured: grasp, mid-transport, final released-in-target. Full
+detail: `reports/phase4c-task1-evidence.md`.
+
+### Test-suite hygiene
+
+Unchanged pattern from Phase 4A/4B: the 3 Phase 3 legacy regression
+diagnostics remain untouched. Full suite this session: 104 tests, 0
+unexpected failures (94 pre-existing + 10 new).
+
+Per this file's scope, Task 2 (cameras as a data-collection feature,
+dataset pipeline, language-conditioned variants, policy integration)
+remains unimplemented and unauthorized.

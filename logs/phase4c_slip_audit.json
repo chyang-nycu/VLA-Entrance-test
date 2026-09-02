@@ -1,0 +1,288 @@
+{
+  "scope": "fixed-base, torso-constrained upper-body manipulation baseline",
+  "purpose": "Phase 4C audit of Phase 4B's max_cube_slip_m metric -- measurement/reporting fix only, no controller or physics change",
+  "baseline_commit": "363aa83",
+  "shared_configuration_unchanged": {
+    "arm_kp": 400.0,
+    "arm_kv": 25.0,
+    "gripper_kp": 150.0,
+    "gripper_kd": 10.0
+  },
+  "old_definition": "max over every step from grasp verification (VERIFY_BILATERAL_CONTACT) to end of trial of ||R_tcp^T (cube_pos - tcp_pos) - grasp_reference_offset||, with no check that the cube was still being carried -- included OPEN/RELEASE_SETTLE/VERIFY_RELEASE/RETREAT/VERIFY_TASK_SUCCESS steps, i.e. genuine post-release TCP-cube separation, mislabeled as grasp slip.",
+  "corrected_definition": "slip is now only accumulated while `carrying` is 'grip_only' or 'full' (i.e. LIFT/HOLD/TRANSPORT_ABOVE_TARGET/SETTLE_ABOVE_TARGET/LOWER_TO_TARGET/SETTLE_LOWER -- exactly the phases where the gripper is commanded closed and bilateral contact is being monitored), bucketed into max_slip_during_lift/transport/lower and slip_at_release (the last value recorded during SETTLE_LOWER, immediately before OPEN). Post-release motion is reported separately as post_release_tcp_cube_separation_m and is never called slip.",
+  "nominal": {
+    "n_trials": 5,
+    "deterministic": true,
+    "legacy_max_cube_slip_m": 0.1561555402975266,
+    "corrected": {
+      "grasp_reference_offset_tcp_frame": [
+        0.007411424487949642,
+        0.0006838685613156912,
+        0.00630617052028203
+      ],
+      "max_slip_during_lift": 0.031983187089526514,
+      "max_slip_during_transport": 0.04488597847830753,
+      "max_slip_during_lower": 0.051865579682463886,
+      "slip_at_release": 0.019782447361560675,
+      "post_release_tcp_cube_separation_m": 0.14860671167299208
+    },
+    "trials": [
+      {
+        "max_cube_slip_m": 0.1561555402975266,
+        "grasp_reference_offset_tcp_frame": [
+          0.007411424487949642,
+          0.0006838685613156912,
+          0.00630617052028203
+        ],
+        "max_slip_during_lift": 0.031983187089526514,
+        "max_slip_during_transport": 0.04488597847830753,
+        "max_slip_during_lower": 0.051865579682463886,
+        "slip_at_release": 0.019782447361560675,
+        "post_release_tcp_cube_separation_m": 0.14860671167299208
+      },
+      {
+        "max_cube_slip_m": 0.1561555402975266,
+        "grasp_reference_offset_tcp_frame": [
+          0.007411424487949642,
+          0.0006838685613156912,
+          0.00630617052028203
+        ],
+        "max_slip_during_lift": 0.031983187089526514,
+        "max_slip_during_transport": 0.04488597847830753,
+        "max_slip_during_lower": 0.051865579682463886,
+        "slip_at_release": 0.019782447361560675,
+        "post_release_tcp_cube_separation_m": 0.14860671167299208
+      },
+      {
+        "max_cube_slip_m": 0.1561555402975266,
+        "grasp_reference_offset_tcp_frame": [
+          0.007411424487949642,
+          0.0006838685613156912,
+          0.00630617052028203
+        ],
+        "max_slip_during_lift": 0.031983187089526514,
+        "max_slip_during_transport": 0.04488597847830753,
+        "max_slip_during_lower": 0.051865579682463886,
+        "slip_at_release": 0.019782447361560675,
+        "post_release_tcp_cube_separation_m": 0.14860671167299208
+      },
+      {
+        "max_cube_slip_m": 0.1561555402975266,
+        "grasp_reference_offset_tcp_frame": [
+          0.007411424487949642,
+          0.0006838685613156912,
+          0.00630617052028203
+        ],
+        "max_slip_during_lift": 0.031983187089526514,
+        "max_slip_during_transport": 0.04488597847830753,
+        "max_slip_during_lower": 0.051865579682463886,
+        "slip_at_release": 0.019782447361560675,
+        "post_release_tcp_cube_separation_m": 0.14860671167299208
+      },
+      {
+        "max_cube_slip_m": 0.1561555402975266,
+        "grasp_reference_offset_tcp_frame": [
+          0.007411424487949642,
+          0.0006838685613156912,
+          0.00630617052028203
+        ],
+        "max_slip_during_lift": 0.031983187089526514,
+        "max_slip_during_transport": 0.04488597847830753,
+        "max_slip_during_lower": 0.051865579682463886,
+        "slip_at_release": 0.019782447361560675,
+        "post_release_tcp_cube_separation_m": 0.14860671167299208
+      }
+    ]
+  },
+  "stage_b_variants": {
+    "nominal": {
+      "offset_m": [
+        0.0,
+        0.0
+      ],
+      "trials": [
+        {
+          "max_cube_slip_m": 0.1561555402975266,
+          "grasp_reference_offset_tcp_frame": [
+            0.007411424487949642,
+            0.0006838685613156912,
+            0.00630617052028203
+          ],
+          "max_slip_during_lift": 0.031983187089526514,
+          "max_slip_during_transport": 0.04488597847830753,
+          "max_slip_during_lower": 0.051865579682463886,
+          "slip_at_release": 0.019782447361560675,
+          "post_release_tcp_cube_separation_m": 0.14860671167299208
+        },
+        {
+          "max_cube_slip_m": 0.1561555402975266,
+          "grasp_reference_offset_tcp_frame": [
+            0.007411424487949642,
+            0.0006838685613156912,
+            0.00630617052028203
+          ],
+          "max_slip_during_lift": 0.031983187089526514,
+          "max_slip_during_transport": 0.04488597847830753,
+          "max_slip_during_lower": 0.051865579682463886,
+          "slip_at_release": 0.019782447361560675,
+          "post_release_tcp_cube_separation_m": 0.14860671167299208
+        },
+        {
+          "max_cube_slip_m": 0.1561555402975266,
+          "grasp_reference_offset_tcp_frame": [
+            0.007411424487949642,
+            0.0006838685613156912,
+            0.00630617052028203
+          ],
+          "max_slip_during_lift": 0.031983187089526514,
+          "max_slip_during_transport": 0.04488597847830753,
+          "max_slip_during_lower": 0.051865579682463886,
+          "slip_at_release": 0.019782447361560675,
+          "post_release_tcp_cube_separation_m": 0.14860671167299208
+        }
+      ],
+      "task_pass": [
+        true,
+        true,
+        true
+      ],
+      "grasp_pass": [
+        true,
+        true,
+        true
+      ]
+    },
+    "x_minus_0.03": {
+      "offset_m": [
+        -0.03,
+        0.0
+      ],
+      "trials": [
+        {
+          "max_cube_slip_m": 0.1556343062712859,
+          "grasp_reference_offset_tcp_frame": [
+            0.004825117327756862,
+            0.0005574183258331056,
+            0.007119574877318517
+          ],
+          "max_slip_during_lift": 0.018656477438356963,
+          "max_slip_during_transport": 0.025299001832444653,
+          "max_slip_during_lower": 0.03397947504037819,
+          "slip_at_release": 0.007960359308546256,
+          "post_release_tcp_cube_separation_m": 0.14803452854249846
+        },
+        {
+          "max_cube_slip_m": 0.1556343062712859,
+          "grasp_reference_offset_tcp_frame": [
+            0.004825117327756862,
+            0.0005574183258331056,
+            0.007119574877318517
+          ],
+          "max_slip_during_lift": 0.018656477438356963,
+          "max_slip_during_transport": 0.025299001832444653,
+          "max_slip_during_lower": 0.03397947504037819,
+          "slip_at_release": 0.007960359308546256,
+          "post_release_tcp_cube_separation_m": 0.14803452854249846
+        },
+        {
+          "max_cube_slip_m": 0.1556343062712859,
+          "grasp_reference_offset_tcp_frame": [
+            0.004825117327756862,
+            0.0005574183258331056,
+            0.007119574877318517
+          ],
+          "max_slip_during_lift": 0.018656477438356963,
+          "max_slip_during_transport": 0.025299001832444653,
+          "max_slip_during_lower": 0.03397947504037819,
+          "slip_at_release": 0.007960359308546256,
+          "post_release_tcp_cube_separation_m": 0.14803452854249846
+        }
+      ],
+      "task_pass": [
+        true,
+        true,
+        true
+      ],
+      "grasp_pass": [
+        true,
+        true,
+        true
+      ]
+    },
+    "y_plus_0.03": {
+      "offset_m": [
+        0.0,
+        0.03
+      ],
+      "trials": [
+        {
+          "max_cube_slip_m": 0.14965241416973632,
+          "grasp_reference_offset_tcp_frame": [
+            0.008171743192563601,
+            0.0014814802413390233,
+            0.006774909092803682
+          ],
+          "max_slip_during_lift": 0.033395263815526315,
+          "max_slip_during_transport": 0.04666958175878398,
+          "max_slip_during_lower": 0.05374571058323309,
+          "slip_at_release": 0.02059492012600754,
+          "post_release_tcp_cube_separation_m": 0.14137628133738508
+        },
+        {
+          "max_cube_slip_m": 0.14965241416973632,
+          "grasp_reference_offset_tcp_frame": [
+            0.008171743192563601,
+            0.0014814802413390233,
+            0.006774909092803682
+          ],
+          "max_slip_during_lift": 0.033395263815526315,
+          "max_slip_during_transport": 0.04666958175878398,
+          "max_slip_during_lower": 0.05374571058323309,
+          "slip_at_release": 0.02059492012600754,
+          "post_release_tcp_cube_separation_m": 0.14137628133738508
+        },
+        {
+          "max_cube_slip_m": 0.14965241416973632,
+          "grasp_reference_offset_tcp_frame": [
+            0.008171743192563601,
+            0.0014814802413390233,
+            0.006774909092803682
+          ],
+          "max_slip_during_lift": 0.033395263815526315,
+          "max_slip_during_transport": 0.04666958175878398,
+          "max_slip_during_lower": 0.05374571058323309,
+          "slip_at_release": 0.02059492012600754,
+          "post_release_tcp_cube_separation_m": 0.14137628133738508
+        }
+      ],
+      "task_pass": [
+        false,
+        false,
+        false
+      ],
+      "grasp_pass": [
+        true,
+        true,
+        true
+      ]
+    }
+  },
+  "excluded_unreachable_variants": [
+    {
+      "id": "x_plus_0.03",
+      "offset": [
+        0.03,
+        0.0
+      ],
+      "phase4a_approach_residual_m": 0.02708
+    },
+    {
+      "id": "y_minus_0.03",
+      "offset": [
+        0.0,
+        -0.03
+      ],
+      "phase4a_approach_residual_m": 0.00843
+    }
+  ]
+}

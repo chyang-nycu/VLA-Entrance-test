@@ -40,6 +40,7 @@ from __future__ import annotations
 import inspect
 import json
 import re
+from collections.abc import Callable
 from pathlib import Path
 
 import mujoco
@@ -154,6 +155,28 @@ TASK_SUCCESS_DWELL_S = 0.5
 TASK_SUCCESS_MAX_WAIT_S = 1.5  # same budget as the grasp-phase SETTLE_MAX_EXTRA_S
 
 
+# --- Phase 4C: slip-metric math, factored out as pure functions so the
+# frame transform itself can be unit-tested against synthetic rigid-body
+# motions independent of any simulation trial (tests/test_phase4c_slip_audit.py).
+def tcp_local_cube_offset(tcp_pos: np.ndarray, tcp_rot: np.ndarray, cube_pos: np.ndarray) -> np.ndarray:
+    """Cube position expressed in the TCP's own (rotating) frame:
+    R_tcp^T @ (cube_pos - tcp_pos). Invariant under any rigid-body motion of
+    the TCP (translation and/or rotation) that leaves the cube fixed
+    relative to the gripper -- only genuine relative displacement between
+    the cube and the closed fingers changes this value.
+    """
+    return tcp_rot.T @ (np.asarray(cube_pos) - np.asarray(tcp_pos))
+
+
+def relative_slip_m(local_offset_now: np.ndarray, grasp_reference_offset: np.ndarray) -> float:
+    """Magnitude of the change in the TCP-local cube offset since the grasp
+    reference was captured. Zero iff the cube has not moved relative to the
+    closed fingers since grasp verification -- this is "slip", not the raw
+    offset itself and not any post-release separation.
+    """
+    return float(np.linalg.norm(np.asarray(local_offset_now) - np.asarray(grasp_reference_offset)))
+
+
 def diagnose_pick_place_reachability(
     model: mujoco.MjModel,
     arm_map: JointMap,
@@ -208,8 +231,15 @@ def run_trial_pick_place(
     transport_drive_s: float = TRANSPORT_DRIVE_S,
     lower_drive_s: float = LOWER_DRIVE_S,
     retreat_drive_s: float = RETREAT_DRIVE_S,
+    frame_callback: "Callable[[str, mujoco.MjModel, mujoco.MjData], None] | None" = None,
 ) -> dict:
     """One Task 1 pick-and-place trial through the full state machine.
+
+    `frame_callback`, if given, is invoked as `frame_callback(phase, model,
+    data)` after every physics step -- purely for Phase 4C video/still
+    capture (tasks/g1_pick_place/record_nominal_episode.py). It has no
+    effect on control, physics, or any pass/fail decision; default is None,
+    which reproduces the exact pre-4C code path unchanged.
 
     Returns a result dict with `criteria_grasp` (the same 5 keys Phase 3C
     used: both_pads_contact_cube, height_gain_ge_0_08m,
@@ -273,6 +303,12 @@ def run_trial_pick_place(
         "contact_lost_during_transport": False,
         "height_unsafe_during_transport": False,
         "max_cube_slip_m": 0.0,
+        "grasp_reference_offset_tcp_frame": None,
+        "max_slip_during_lift": 0.0,
+        "max_slip_during_transport": 0.0,
+        "max_slip_during_lower": 0.0,
+        "slip_at_release": None,
+        "post_release_tcp_cube_separation_m": 0.0,
         "post_lower_cube_xy": None,
         "post_release_cube_pose": None,
         "final_cube_xy": None,
@@ -303,6 +339,8 @@ def run_trial_pick_place(
         if not np.all(np.isfinite(data.ctrl)):
             telemetry["finite_and_bounded"] = False
         mujoco.mj_step(model, data)
+        if frame_callback is not None:
+            frame_callback(phase, model, data)
         steps_run[0] += 1
         if steps_run[0] == 1:
             guard.lock()
@@ -330,9 +368,45 @@ def run_trial_pick_place(
         if grasp_offset_ref["value"] is not None:
             tcp_pos = data.site_xpos[site_id]
             tcp_rot = data.site_xmat[site_id].reshape(3, 3)
-            local_offset_now = tcp_rot.T @ (cube_xyz - tcp_pos)
-            slip = float(np.linalg.norm(local_offset_now - grasp_offset_ref["value"]))
+            local_offset_now = tcp_local_cube_offset(tcp_pos, tcp_rot, cube_xyz)
+            slip = relative_slip_m(local_offset_now, grasp_offset_ref["value"])
+            # Phase 4C audit finding: the pre-4C code updated max_cube_slip_m
+            # on every step once grasp_offset_ref was set, with no upper
+            # bound -- it never stopped once OPEN/RELEASE_SETTLE/
+            # VERIFY_RELEASE/RETREAT/VERIFY_TASK_SUCCESS began, i.e. long
+            # after the cube was intentionally released and physically
+            # separated from the closed fingers. That post-release TCP-cube
+            # separation (large and expected -- the cube falls away from an
+            # open, retreating gripper) was silently included in "grasp
+            # slip", inflating it far past any real relative motion inside a
+            # closed grip. Retained here unmodified as a legacy field (never
+            # reported as the authoritative number going forward -- see
+            # reports/phase4c-task1-evidence.md) so its old value stays
+            # reproducible for the correction/addendum.
             telemetry["max_cube_slip_m"] = max(telemetry["max_cube_slip_m"], slip)
+            if carrying in ("grip_only", "full"):
+                # Only while the gripper is still commanded closed and the
+                # cube is physically grasped -- this is genuine slip.
+                if phase in ("LIFT", "HOLD"):
+                    telemetry["max_slip_during_lift"] = max(telemetry["max_slip_during_lift"], slip)
+                elif phase.startswith("TRANSPORT_ABOVE_TARGET") or phase == "SETTLE_ABOVE_TARGET":
+                    telemetry["max_slip_during_transport"] = max(telemetry["max_slip_during_transport"], slip)
+                elif phase.startswith("LOWER_TO_TARGET") or phase == "SETTLE_LOWER":
+                    telemetry["max_slip_during_lower"] = max(telemetry["max_slip_during_lower"], slip)
+                    # Overwritten every held step in this bucket, so its
+                    # final value is the slip at the last instant the cube
+                    # was still grasped -- immediately before OPEN.
+                    telemetry["slip_at_release"] = slip
+            else:
+                # carrying is None here (OPEN/RELEASE_SETTLE/VERIFY_RELEASE/
+                # RETREAT/VERIFY_TASK_SUCCESS): the gripper is opening or
+                # already open and the cube is not held. This is TCP-cube
+                # separation after release, not slip -- reported under its
+                # own name and never folded into a "grasp slip" metric.
+                separation = float(np.linalg.norm(cube_xyz - tcp_pos))
+                telemetry["post_release_tcp_cube_separation_m"] = max(
+                    telemetry["post_release_tcp_cube_separation_m"], separation
+                )
 
         is_lifted = cube_z_now > (rest_z + CONTACT_MARGIN)
         if is_lifted:
@@ -535,6 +609,12 @@ def run_trial_pick_place(
             "settle_extra_s": telemetry["settle_extra_s"],
             "reachability": reachability,
             "max_cube_slip_m": telemetry["max_cube_slip_m"],
+            "grasp_reference_offset_tcp_frame": telemetry["grasp_reference_offset_tcp_frame"],
+            "max_slip_during_lift": telemetry["max_slip_during_lift"],
+            "max_slip_during_transport": telemetry["max_slip_during_transport"],
+            "max_slip_during_lower": telemetry["max_slip_during_lower"],
+            "slip_at_release": telemetry["slip_at_release"],
+            "post_release_tcp_cube_separation_m": telemetry["post_release_tcp_cube_separation_m"],
             "contact_lost_during_transport": telemetry["contact_lost_during_transport"],
             "height_unsafe_during_transport": telemetry["height_unsafe_during_transport"],
             "final_cube_xy": telemetry["final_cube_xy"],
@@ -593,7 +673,10 @@ def run_trial_pick_place(
         return _fail("VERIFY_BILATERAL_CONTACT", f"cube displaced {displacement:.4f} m > corridor {GRASP_CORRIDOR_XY_M} m before lift")
     telemetry["both_pads_contact_cube"] = True
     _tcp_rot0 = data.site_xmat[site_id].reshape(3, 3)
-    grasp_offset_ref["value"] = _tcp_rot0.T @ (data.xpos[cube_body_id].copy() - data.site_xpos[site_id].copy())
+    grasp_offset_ref["value"] = tcp_local_cube_offset(
+        data.site_xpos[site_id].copy(), _tcp_rot0, data.xpos[cube_body_id].copy()
+    )
+    telemetry["grasp_reference_offset_tcp_frame"] = grasp_offset_ref["value"].tolist()
 
     # --- LIFT --- ("grip_only": the cube is expected to be below the lift
     # height for most of this segment -- that is the point of LIFT, not a
@@ -748,6 +831,12 @@ def _run_variant(scene_path: Path, variant_id: str, offset: tuple, n_trials: int
                 "height_gain_m": r["height_gain_m"],
                 "max_continuous_lifted_s": r["max_continuous_lifted_s"],
                 "max_cube_slip_m": r["max_cube_slip_m"],
+                "grasp_reference_offset_tcp_frame": r["grasp_reference_offset_tcp_frame"],
+                "max_slip_during_lift": r["max_slip_during_lift"],
+                "max_slip_during_transport": r["max_slip_during_transport"],
+                "max_slip_during_lower": r["max_slip_during_lower"],
+                "slip_at_release": r["slip_at_release"],
+                "post_release_tcp_cube_separation_m": r["post_release_tcp_cube_separation_m"],
                 "contact_lost_during_transport": r["contact_lost_during_transport"],
                 "final_cube_xy": r["final_cube_xy"],
                 "final_xy_target_error_m": r["final_xy_target_error_m"],
@@ -771,6 +860,11 @@ def _run_variant(scene_path: Path, variant_id: str, offset: tuple, n_trials: int
         "n_task_pass": n_task_pass,
         "transport_contact_retention_rate": n_contact_retained / n_trials,
         "max_cube_slip_m": max(t["max_cube_slip_m"] for t in trials),
+        "max_slip_during_lift": max(t["max_slip_during_lift"] for t in trials),
+        "max_slip_during_transport": max(t["max_slip_during_transport"] for t in trials),
+        "max_slip_during_lower": max(t["max_slip_during_lower"] for t in trials),
+        "slip_at_release": max(t["slip_at_release"] for t in trials if t["slip_at_release"] is not None),
+        "post_release_tcp_cube_separation_m": max(t["post_release_tcp_cube_separation_m"] for t in trials),
         "final_xy_target_error_m": trials[-1]["final_xy_target_error_m"],
         "settling_time_s": trials[-1]["task_success_dwell_achieved_s"],
         "variant_task_success": n_task_pass >= (n_trials + 1) // 2,  # majority rule, same convention as Phase 4A
@@ -804,6 +898,11 @@ def main() -> int:
         "height_gain_m": stage_a_trials[0]["height_gain_m"],
         "final_xy_target_error_m": stage_a_trials[0]["final_xy_target_error_m"],
         "max_cube_slip_m": stage_a_trials[0]["max_cube_slip_m"],
+        "max_slip_during_lift": stage_a_trials[0]["max_slip_during_lift"],
+        "max_slip_during_transport": stage_a_trials[0]["max_slip_during_transport"],
+        "max_slip_during_lower": stage_a_trials[0]["max_slip_during_lower"],
+        "slip_at_release": stage_a_trials[0]["slip_at_release"],
+        "post_release_tcp_cube_separation_m": stage_a_trials[0]["post_release_tcp_cube_separation_m"],
         "settling_time_s": stage_a_trials[0]["task_success_dwell_achieved_s"],
     }
 
