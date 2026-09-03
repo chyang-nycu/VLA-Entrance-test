@@ -40,6 +40,14 @@ datasets/
 # unmodified as the original Phase 5B prototype evidence.
 !data/task1_prototype_v2.hdf5
 
+# Exception: Phase 5D's redesigned-policy-action dataset is small (~5.1MB)
+# and explicitly committed as a phase deliverable; regenerate via
+# tasks/g1_pick_place/record_demonstrations_v3.py (deterministic, see
+# data/schema_v3.md). data/task1_prototype.hdf5 and
+# data/task1_prototype_v2.hdf5 above are preserved unmodified as prior
+# phases' evidence.
+!data/task1_prototype_v3.hdf5
+
 # Temporary MuJoCo outputs
 *.mjb
 tmp_mujoco*/

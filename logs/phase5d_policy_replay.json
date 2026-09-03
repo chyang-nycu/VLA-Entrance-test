@@ -1,0 +1,205 @@
+{
+  "attempt_history": {
+    "attempt_1_single_whole_interval_delta": {
+      "description": "One TCP delta per 100ms transition, one IK solve + one linear joint-space ramp across the full interval.",
+      "nominal_max_tcp_error_m": 0.02363318066273272,
+      "meets_10mm_target": false,
+      "diagnosis": "First large single-transition delta (PREGRASP jump from reset pose, magnitude 5.85cm) causes 18.6mm error at that boundary; decoder forces its own commanded reference to fully reach the target within one 100ms interval, giving less settle time than the true multi-transition-held-target trial had at the same wall-clock point."
+    },
+    "attempt_2_ramp_shape_sweep": {
+      "description": "Swept ramp speed from an immediate step (K=1 physics step to reach target) to the full 50-step ramp (K=50), same single whole-interval delta representation.",
+      "sweep_nominal_max_tcp_error_m": {
+        "K=1_step": 0.04974425783583783,
+        "K=5": 0.04954910986909734,
+        "K=10": 0.04974425783583783,
+        "K=15": 0.04951615892438015,
+        "K=20": 0.047055298810825284,
+        "K=25": 0.0444819092902195,
+        "K=50_full_ramp": 0.02363318066273272
+      },
+      "meets_10mm_target": false,
+      "diagnosis": "No single ramp speed worked for every large single-transition delta: faster ramps reduced PREGRASP-transition error but increased a later, larger RETREAT-phase delta error (both measured directly). This is a genuine information gap (a 100ms-wide delta cannot describe a trajectory containing a large sub-100ms-scale reference jump), not a tuning problem -- moved to Attempt 3 per the authorized attempt hierarchy."
+    },
+    "attempt_3_chunked_sub_actions_SHIPPED": {
+      "description": "Fixed-size sub-action chunk: H sub-deltas per 10Hz transition, each decoded with its own one-IK-solve-plus-one-linear-ramp over SUBSTEPS_PER_TRANSITION/H physics steps.",
+      "chunk_size_sweep_nominal_max_tcp_error_m": {
+        "H=1": 0.02363318066273272,
+        "H=2": 0.043138394527259746,
+        "H=5_SHIPPED": 0.008088580498069065,
+        "H=10": 0.007361965615505982
+      },
+      "shipped_chunk_size_h": 5,
+      "sub_action_hz": 50.0,
+      "meets_10mm_target": true,
+      "rationale_for_h5_over_h10": "H=10 measured marginally better (7.36mm vs 8.09mm) but doubles the action-field size for a target already met with margin by H=5; H=2 (43.1mm) still failed, confirming chunk granularity -- not just chunk presence -- matters."
+    }
+  },
+  "nominal": {
+    "exact_execution_replay": {
+      "mode": "exact_execution",
+      "variant_id": "nominal",
+      "n_execution_rows_replayed": 6600,
+      "max_joint_error_rad": 7.035470162009005e-08,
+      "max_tcp_error_m": 3.6506168248669005e-08,
+      "max_cube_error_m": 3.5868089940141766e-08,
+      "final_state_vs_final_observation": {
+        "joint_error_rad": 1.7742913527296622e-08,
+        "tcp_error_m": 6.65463954274292e-09
+      },
+      "first_divergence_execution_step": null,
+      "tolerances": {
+        "joint_rad": 0.0001,
+        "tcp_m": 0.001,
+        "cube_m": 0.001
+      },
+      "within_tolerance": true,
+      "stored_success": true,
+      "note": "Unchanged from Phase 5C -- literal applied_ctrl replay, no IK re-solve."
+    },
+    "policy_action_replay": {
+      "mode": "policy_action",
+      "variant_id": "nominal",
+      "n_transitions_replayed": 132,
+      "max_tcp_error_m": 0.008088580498069065,
+      "max_joint_error_rad": 0.2378054203493689,
+      "max_cube_error_m": 0.00675053733100686,
+      "final_tcp_error_m": 0.005652875702815636,
+      "final_joint_error_rad": 0.02475754076369811,
+      "final_cube_error_m": 0.002592894164027093,
+      "replayed_final_xy_target_error_m": 0.004309498369550169,
+      "target_placement_within_margin": true,
+      "tolerance_tcp_m": 0.01,
+      "within_tolerance": true,
+      "stored_success": true,
+      "first_divergence_transition": null,
+      "first_divergence_phase": null,
+      "accumulated_delta_drift": {
+        "quartile_tcp_error_profile": {
+          "tcp_err_at_frac_0.00_m": 7.44584426092387e-09,
+          "tcp_err_at_frac_0.25_m": 0.0009432897734390967,
+          "tcp_err_at_frac_0.50_m": 0.002408592371609223,
+          "tcp_err_at_frac_0.75_m": 0.0043066756233459185,
+          "tcp_err_at_frac_1.00_m": 0.005652875702815636
+        },
+        "running_max_is_monotonic_nondecreasing": true,
+        "interpretation": "monotonic-nondecreasing running-max is consistent with (but does not prove) unbounded accumulation; a profile that rises then falls indicates bounded, self-correcting error instead"
+      },
+      "state_machine_note": "This replay does not reimplement the state machine's SETTLE/VERIFY gating (same disclosed limitation as Phase 5C) -- 'state-machine phase agreement' is reported via the recorded state_machine_phase metadata field (ground truth from the original collection) aligned to each transition index, not independently re-derived. Physical success/placement outcome is judged via final cube position agreement (target_placement_within_margin) rather than an independently re-run success-detector boolean.",
+      "action_chunk_h": 5,
+      "sub_action_hz": 50.0,
+      "note": "Decodes ONLY policy/actions/{tcp_delta_position,tcp_delta_orientation,gripper_command} through a chunked ramp decoder (H sub-actions per 10Hz transition) that composes each sub-delta onto an internally-tracked commanded reference (never re-read from measured state mid-episode) -- the direct fix for Phase 5C's repeated-static-phase-goal bug, and for Phase 5D attempts 1-2's single-whole-interval-delta shortfall (see reports/phase5d-policy-action-redesign.md)."
+    }
+  },
+  "x_minus_0.03": {
+    "exact_execution_replay": {
+      "mode": "exact_execution",
+      "variant_id": "x_minus_0.03",
+      "n_execution_rows_replayed": 6600,
+      "max_joint_error_rad": 4.295865096981544e-08,
+      "max_tcp_error_m": 3.384977893100913e-08,
+      "max_cube_error_m": 3.4740064783781635e-08,
+      "final_state_vs_final_observation": {
+        "joint_error_rad": 2.151439387754195e-08,
+        "tcp_error_m": 9.890675903835765e-09
+      },
+      "first_divergence_execution_step": null,
+      "tolerances": {
+        "joint_rad": 0.0001,
+        "tcp_m": 0.001,
+        "cube_m": 0.001
+      },
+      "within_tolerance": true,
+      "stored_success": true,
+      "note": "Unchanged from Phase 5C -- literal applied_ctrl replay, no IK re-solve."
+    },
+    "policy_action_replay": {
+      "mode": "policy_action",
+      "variant_id": "x_minus_0.03",
+      "n_transitions_replayed": 132,
+      "max_tcp_error_m": 0.005988017046700113,
+      "max_joint_error_rad": 0.07601196644830788,
+      "max_cube_error_m": 0.008624495466659093,
+      "final_tcp_error_m": 0.005103870810721354,
+      "final_joint_error_rad": 0.024866288085090244,
+      "final_cube_error_m": 0.0038280051737067185,
+      "replayed_final_xy_target_error_m": 0.002716080469325082,
+      "target_placement_within_margin": true,
+      "tolerance_tcp_m": 0.01,
+      "within_tolerance": true,
+      "stored_success": true,
+      "first_divergence_transition": null,
+      "first_divergence_phase": null,
+      "accumulated_delta_drift": {
+        "quartile_tcp_error_profile": {
+          "tcp_err_at_frac_0.00_m": 7.44584426092387e-09,
+          "tcp_err_at_frac_0.25_m": 0.00026204656752957324,
+          "tcp_err_at_frac_0.50_m": 0.0022041197780259558,
+          "tcp_err_at_frac_0.75_m": 0.0027470976342756064,
+          "tcp_err_at_frac_1.00_m": 0.005103870810721354
+        },
+        "running_max_is_monotonic_nondecreasing": true,
+        "interpretation": "monotonic-nondecreasing running-max is consistent with (but does not prove) unbounded accumulation; a profile that rises then falls indicates bounded, self-correcting error instead"
+      },
+      "state_machine_note": "This replay does not reimplement the state machine's SETTLE/VERIFY gating (same disclosed limitation as Phase 5C) -- 'state-machine phase agreement' is reported via the recorded state_machine_phase metadata field (ground truth from the original collection) aligned to each transition index, not independently re-derived. Physical success/placement outcome is judged via final cube position agreement (target_placement_within_margin) rather than an independently re-run success-detector boolean.",
+      "action_chunk_h": 5,
+      "sub_action_hz": 50.0,
+      "note": "Decodes ONLY policy/actions/{tcp_delta_position,tcp_delta_orientation,gripper_command} through a chunked ramp decoder (H sub-actions per 10Hz transition) that composes each sub-delta onto an internally-tracked commanded reference (never re-read from measured state mid-episode) -- the direct fix for Phase 5C's repeated-static-phase-goal bug, and for Phase 5D attempts 1-2's single-whole-interval-delta shortfall (see reports/phase5d-policy-action-redesign.md)."
+    }
+  },
+  "x_plus_0.03": {
+    "exact_execution_replay": {
+      "mode": "exact_execution",
+      "variant_id": "x_plus_0.03",
+      "n_execution_rows_replayed": 1550,
+      "max_joint_error_rad": 7.694809411873393e-08,
+      "max_tcp_error_m": 4.3967489873169194e-08,
+      "max_cube_error_m": 3.35370780511624e-08,
+      "final_state_vs_final_observation": {
+        "joint_error_rad": 3.4999246834033215e-08,
+        "tcp_error_m": 1.4670873666682327e-08
+      },
+      "first_divergence_execution_step": null,
+      "tolerances": {
+        "joint_rad": 0.0001,
+        "tcp_m": 0.001,
+        "cube_m": 0.001
+      },
+      "within_tolerance": true,
+      "stored_success": false,
+      "note": "Unchanged from Phase 5C -- literal applied_ctrl replay, no IK re-solve."
+    },
+    "policy_action_replay": {
+      "mode": "policy_action",
+      "variant_id": "x_plus_0.03",
+      "n_transitions_replayed": 31,
+      "max_tcp_error_m": 0.012770174640436558,
+      "max_joint_error_rad": 0.3420495997678885,
+      "max_cube_error_m": 2.455096901925874e-08,
+      "final_tcp_error_m": 0.0034788762779270834,
+      "final_joint_error_rad": 0.24161592504556717,
+      "final_cube_error_m": 1.63623210766577e-08,
+      "replayed_final_xy_target_error_m": 0.15652475842498526,
+      "target_placement_within_margin": false,
+      "tolerance_tcp_m": 0.01,
+      "within_tolerance": false,
+      "stored_success": false,
+      "first_divergence_transition": 8,
+      "first_divergence_phase": "APPROACH",
+      "accumulated_delta_drift": {
+        "quartile_tcp_error_profile": {
+          "tcp_err_at_frac_0.00_m": 7.44584426092387e-09,
+          "tcp_err_at_frac_0.25_m": 0.0023009997402409,
+          "tcp_err_at_frac_0.50_m": 0.0037395822548427753,
+          "tcp_err_at_frac_0.75_m": 0.003465834251309966,
+          "tcp_err_at_frac_1.00_m": 0.0034788762779270834
+        },
+        "running_max_is_monotonic_nondecreasing": true,
+        "interpretation": "monotonic-nondecreasing running-max is consistent with (but does not prove) unbounded accumulation; a profile that rises then falls indicates bounded, self-correcting error instead"
+      },
+      "state_machine_note": "This replay does not reimplement the state machine's SETTLE/VERIFY gating (same disclosed limitation as Phase 5C) -- 'state-machine phase agreement' is reported via the recorded state_machine_phase metadata field (ground truth from the original collection) aligned to each transition index, not independently re-derived. Physical success/placement outcome is judged via final cube position agreement (target_placement_within_margin) rather than an independently re-run success-detector boolean.",
+      "action_chunk_h": 5,
+      "sub_action_hz": 50.0,
+      "note": "Decodes ONLY policy/actions/{tcp_delta_position,tcp_delta_orientation,gripper_command} through a chunked ramp decoder (H sub-actions per 10Hz transition) that composes each sub-delta onto an internally-tracked commanded reference (never re-read from measured state mid-episode) -- the direct fix for Phase 5C's repeated-static-phase-goal bug, and for Phase 5D attempts 1-2's single-whole-interval-delta shortfall (see reports/phase5d-policy-action-redesign.md)."
+    }
+  }
+}

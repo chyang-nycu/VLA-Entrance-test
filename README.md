@@ -289,6 +289,25 @@ passing diagnostic, not a broken build.
   original Phase 5B evidence). See `reports/phase5c-replay-fidelity.md`
   and `data/schema_v2.md` for the full audit, per-episode numbers, and
   divergence diagnosis.
+- **Phase 5D — redesigned VLA policy-action representation**: fixes Phase
+  5C's remaining policy-action-replay gap (max TCP error ~97-98mm) by
+  redesigning the stored action semantics, not just the decoder. Each 10Hz
+  transition now stores the expert's actual commanded TCP-reference
+  **delta** (world-frame position, TCP-local-frame orientation, verified
+  numerically not assumed) instead of a repeated static goal. Two attempts
+  (a single whole-interval delta, then a ramp-speed sweep) each reduced but
+  did not close the gap — diagnosed as a genuine information gap, not a
+  tuning problem: a 100ms-wide delta cannot describe a trajectory
+  containing a large sub-100ms-scale reference jump (e.g. the initial
+  RESET→PREGRASP step). **Attempt 3 (shipped)**: a fixed-size sub-action
+  chunk (H=5 sub-deltas per transition, 50Hz) — measured **8.09mm**
+  (nominal) and **5.99mm** (x_minus_0.03) max TCP error, both under the
+  ≤10mm target. Exact execution replay unchanged from Phase 5C (~3.7e-8m,
+  machine precision). New `data/task1_prototype_v3.hdf5` (additive —
+  `data/task1_prototype.hdf5` and `data/task1_prototype_v2.hdf5` are
+  preserved unmodified as historical evidence). See
+  `reports/phase5d-policy-action-redesign.md` and `data/schema_v3.md` for
+  the full three-attempt history and per-episode numbers.
 - **Task 2 (language-conditioned variants, scaled dataset collection,
   policy integration)**: not started; requires new, explicit authorization
   per `HANDOFF.md`.

@@ -1094,3 +1094,70 @@ success-thresholds/camera and the canonical manifest's content are
 byte-identical to Phase 5B (verified via `git diff`); vendor pin
 unchanged; no push. Per this phase's instructions, scaled collection and
 Task 2 remain out of scope and unimplemented.
+
+## Phase 5D — redesigned VLA policy-action representation (authorized 2026-09-03)
+
+Full record: `reports/phase5d-policy-action-redesign.md`, schema reference
+`data/schema_v3.md`, raw numbers `logs/phase5d_policy_replay.json`.
+`data/task1_prototype.hdf5`, `data/task1_prototype_v2.hdf5`, their reports,
+and commits `67ccf89`/`965b947` are preserved unmodified as historical
+evidence — this phase is entirely additive (`_v3` files).
+
+**Root cause of Phase 5C's remaining ~97-98mm policy-replay error**: the
+stored `cartesian_target` was one static per-phase goal repeated across
+every transition of a multi-second phase; this phase replaces it with
+`policy/actions/{tcp_delta_position,tcp_delta_orientation,gripper_command}`
+— the expert's actual commanded TCP-reference DELTA over each 100ms
+interval, derived via forward kinematics of `execution/arm_joint_target`
+(never from privileged cube/target state). Position delta is world frame
+(measured to coincide with the robot-base frame to ~0.19mm, the pelvis
+weld's independently-measured softness from Phase 5A); orientation delta
+is TCP-local body frame using MuJoCo's native `mju_subQuat`/
+`mju_quatIntegrate` pair, with the right/body-frame composition order
+verified numerically (not assumed) against a hand-constructed
+left-vs-right-composition discriminator test.
+
+**Three attempts, in the authorized order** (full numbers in the report):
+1. Single whole-interval delta, one IK solve + one linear ramp across
+   100ms: 23.6mm max (down from 96.9mm, still over target). Diagnosed:
+   `_drive_segment` phases (PREGRASP, RETREAT, ...) issue a fixed target
+   ONCE and hold it for many subsequent transitions, so the true trial had
+   far more than 100ms to converge to it — forcing the decoder to fully
+   reach the same target within one interval starves the position-servo of
+   settle time it actually had.
+2. Ramp-speed sweep (immediate step through the full 50-step ramp): no
+   single speed worked everywhere — fast ramps fixed the PREGRASP jump
+   (4.7mm) but made a later RETREAT-phase jump much worse (~49.5mm), and
+   vice versa. Diagnosed as a genuine information gap (one 100ms delta
+   cannot describe a trajectory with a large sub-100ms reference change),
+   not a tuning problem.
+3. **Shipped**: fixed-size sub-action chunk, H=5 sub-deltas per 10Hz
+   transition (50Hz sub-action rate), each decoded with its own one-IK-
+   solve-plus-one-ramp over 10 physics steps. Measured **8.09mm** (nominal)
+   and **5.99mm** (x_minus_0.03) max TCP error — both under the ≤10mm
+   target. H=2 (43.1mm) still failed; H=10 (7.36mm) was measured but not
+   shipped since H=5 already meets the target with margin.
+
+**Exact execution replay unchanged from Phase 5C** (~3.4-4.4e-8m across all
+three episodes — `execution/` group untouched by this phase).
+
+**x_plus_0.03** (pre-grasp reachability failure): 12.77mm max policy-replay
+error — the ≤10mm bar applies only to successful episodes per this phase's
+authorization; this episode's requirement (identical failure stage/label)
+is met (`SETTLE_APPROACH`, `stored_success=False` reproduced), reported
+honestly rather than folded into the successful-episode claim.
+
+**Tests**: `tests/test_phase5d_policy_actions.py`, 25 new tests covering
+synthetic-delta recovery, rotation-composition/frame verification,
+causality (auxiliary field reconstructed purely from its own transition's
+execution data), no off-by-one shift, no-phase-goal-repetition (plus a
+tamper test that injects the old bug pattern and confirms the validator
+catches it), manifest/decoder-hash mismatch rejection, and the shipped
+10mm regression on both successful episodes.
+
+Full regression this session: **256 tests, 0 unexpected failures** (231
+pre-existing unchanged + 25 new). Task 1 controller/gains/geometry/
+success-thresholds/camera and the canonical manifest's content are
+byte-identical to Phase 5B/5C (verified via `git diff`); vendor pin
+unchanged; no push. Per this phase's instructions, scaled collection
+remains out of scope and unimplemented.

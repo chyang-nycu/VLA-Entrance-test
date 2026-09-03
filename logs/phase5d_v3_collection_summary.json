@@ -1,0 +1,77 @@
+{
+  "episodes": [
+    {
+      "variant_id": "nominal",
+      "success": true,
+      "failure_state": null,
+      "failure_reason": null,
+      "n_transitions": 132,
+      "n_observations": 133,
+      "n_execution_rows": 6600,
+      "physics_steps_total": 6622,
+      "wall_total_s": 9.187492894008756,
+      "action_derivation_s": 2.737236571032554,
+      "render_time_s": 4.2277181294048205,
+      "final_xy_target_error_m": 0.0017215286829355965,
+      "tcp_delta_position_stats_m": {
+        "max": 0.1488541215658188,
+        "mean": 0.001172284479252994
+      },
+      "tcp_delta_orientation_stats_rad": {
+        "max": 0.6869692206382751,
+        "mean": 0.005213598720729351
+      }
+    },
+    {
+      "variant_id": "x_minus_0.03",
+      "success": true,
+      "failure_state": null,
+      "failure_reason": null,
+      "n_transitions": 132,
+      "n_observations": 133,
+      "n_execution_rows": 6600,
+      "physics_steps_total": 6610,
+      "wall_total_s": 8.355869919992983,
+      "action_derivation_s": 1.1045679380185902,
+      "render_time_s": 3.7062292175833136,
+      "final_xy_target_error_m": 0.00454784842759046,
+      "tcp_delta_position_stats_m": {
+        "max": 0.14904901385307312,
+        "mean": 0.001196391531266272
+      },
+      "tcp_delta_orientation_stats_rad": {
+        "max": 0.6882337331771851,
+        "mean": 0.005333849228918552
+      }
+    },
+    {
+      "variant_id": "x_plus_0.03",
+      "success": false,
+      "failure_state": "SETTLE_APPROACH",
+      "failure_reason": "TCP did not settle within tolerance before CLOSE",
+      "n_transitions": 31,
+      "n_observations": 32,
+      "n_execution_rows": 1550,
+      "physics_steps_total": 1551,
+      "wall_total_s": 2.0863564950414,
+      "action_derivation_s": 0.983817049942445,
+      "render_time_s": 0.9416820678743534,
+      "final_xy_target_error_m": null,
+      "tcp_delta_position_stats_m": {
+        "max": 0.08539625257253647,
+        "mean": 0.0010389526141807437
+      },
+      "tcp_delta_orientation_stats_rad": {
+        "max": 0.46188607811927795,
+        "mean": 0.005273769143968821
+      }
+    }
+  ],
+  "manifest_sha256": "f7375efc18d00fd83b2c75228bac76a7c23922913e104d6970e9b8241b9c290b",
+  "schema_version": "3.0.0",
+  "decoder_configuration_hash": "9ef9bd49fc376f125c10be5b46d21a45148a79a2057f32d28afc849629a81d86",
+  "action_schema_version": "3.0.0",
+  "hdf5_path": "data/task1_prototype_v3.hdf5",
+  "hdf5_size_bytes": 5102516,
+  "hdf5_sha256": "d8223205865974937daf94a1dd9a971e6d919d150ad7c4a58eb42aec9b5bd8be"
+}
