@@ -1321,3 +1321,60 @@ file under `tasks/g1_pick_place/` except reading it); vendor pin
 unchanged; the pre-existing Go2w `terrain.STL` case-collision artifact and
 `logs/g1_mujoco_smoke.json`'s timestamp-only drift were left untouched,
 per every prior phase's same practice. No push.
+
+## Task 2 — language-conditioned two-object selection (optional, time-boxed; authorized 2026-09-03)
+
+Branch `task2-language-selection`, created from `35f15a5` (the accepted
+Task 1/entrance-test submission commit on `main`). Optional per the
+entrance test's own framing; does not implement Task 3, retune the
+controller, alter the Phase 5E/entrance-test dataset, recollect episodes,
+or integrate a model. Full account: `reports/task2-language-selection.md`.
+
+**Scene**: `tasks/g1_pick_place/task2_language_selection.py::write_task2_scene()`
+re-parses `write_grasp_scene_5a()`'s own output (never called with
+different arguments, never edited) and adds one new body, `cube2` (green),
+with identical size/mass/friction to the existing red `cube` (imported
+constants, never redefined).
+
+**Controller**: `run_pick_place.run_trial_pick_place` gained four new
+OPTIONAL parameters (`cube_body_name`/`cube_geom_name`/`cube_joint_name`,
+default `"cube"`/`"cube_geom"`/`"cube_joint"` — Task 1's exact literal
+names — and `distractor`, default `None`) so the SAME control logic can act
+on a caller-specified body and, when given, track a second body's
+displacement purely as read-only telemetry. Every existing Phase 4B-5E call
+site uses none of these, so the default call path is byte-for-byte
+unaffected — verified directly (`tests/test_task2_language_selection.py::TestTask1NonRegression`,
+and re-confirmed in this phase's own full-suite re-run: Task 1's nominal
+trial still reports `task_pass=True`, `final_xy_target_error_m≈1.72mm`,
+matching every prior phase's documented figure). No visual recognition or
+learned language understanding is used anywhere — `parse_selected_object()`
+is a trivial keyword lookup over exactly the two authorized instruction
+strings, and the physical task is driven by an explicit
+`selected_object_id`, never re-derived from text inside the control loop.
+
+**Slot placement was found empirically, not guessed** — a real, reportable
+finding in its own right: an 8cm-separated candidate slot that looked
+geometrically safe (clear of the gripper's footprint by simple distance)
+measured 48.7mm of real distractor displacement in a full physics trial,
+traced to `RETREAT`'s pre-existing one-shot joint-space `_drive_segment`
+(never Cartesian-smoothed in Task 1, since Task 1 never had a second object
+nearby for it to sweep through) carrying the arm through an uncontrolled
+joint-space path close to that slot. A second candidate fixed the
+displacement (5.0mm) but was only marginally visible to the onboard camera
+(9/19,200 green pixels). A three-way search (reachability + measured
+displacement in both directions + camera pixel count) found a slot meeting
+all three: 0.0mm/1.7mm displacement, 30/19,200 green pixels visible.
+
+**Result**: all 4 required configurations (red/green selected x
+nominal/swapped arrangement) x 3 deterministic trials each — **12/12
+pass**. Selected-object success 12/12; wrong-object placement 0/12;
+distractor displacement 0.0-1.73mm (well under the 10mm requirement in
+every trial); onboard camera confirmed to see both objects and the target
+at reset. Two videos recorded and decode-verified
+(`artifacts/task2_red_instruction.mp4`, `artifacts/task2_green_instruction.mp4`).
+
+Full suite re-run this phase: 288 pre-existing + 23 new Task 2 tests = 311
+tests, 0 unexpected failures (exact runtime in
+`reports/task2-language-selection.md` Section I). Committed on
+`task2-language-selection` only, as `"feat: add language-conditioned
+two-object Task 2"` — not merged to `main`, not pushed.

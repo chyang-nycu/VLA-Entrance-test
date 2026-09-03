@@ -25,6 +25,14 @@ datasets/
 !artifacts/phase4f_bilateral_contact_view.mp4
 !artifacts/phase5a_head_camera.mp4
 
+# Exception: Task 2 (optional, time-boxed language-conditioned two-object
+# selection) evidence videos, small (~0.7MB each) and explicitly committed
+# as phase deliverables, same precedent as the Task 1 videos above.
+# Regenerate via tasks/g1_pick_place/task2_language_selection.py
+# (deterministic -- no RNG anywhere in this pipeline).
+!artifacts/task2_red_instruction.mp4
+!artifacts/task2_green_instruction.mp4
+
 # Exception: Phase 6 submission video package -- copies of already-committed,
 # decode-verified evidence videos above (task1_third_person.mp4 =
 # artifacts/phase4f_task1_full.mp4, task1_onboard_rgb.mp4 =

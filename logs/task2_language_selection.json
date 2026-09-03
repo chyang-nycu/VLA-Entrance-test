@@ -1,0 +1,536 @@
+{
+  "scene_path": "/Users/yangjudx/Documents/Robotics/tasks/g1_pick_place/g1_grasp_scene_task2.xml",
+  "reachability": {
+    "A": {
+      "offset": [
+        0.0,
+        0.0
+      ],
+      "all_reachable": true
+    },
+    "B": {
+      "offset": [
+        -0.08,
+        -0.1
+      ],
+      "all_reachable": true
+    }
+  },
+  "camera_check": {
+    "non_blank": true,
+    "sees_red_cube": true,
+    "sees_green_cube": true,
+    "sees_blue_target": true,
+    "red_pixel_fraction": 0.054322916666666665,
+    "green_pixel_fraction": 0.0015625,
+    "blue_pixel_fraction": 0.0014583333333333334
+  },
+  "trials": [
+    {
+      "instruction": "Pick up the red cube and place it in the blue target area.",
+      "selected_object_id": "red",
+      "distractor_object_id": "green",
+      "arrangement": "A",
+      "selected_offset": [
+        0.0,
+        0.0
+      ],
+      "distractor_offset": [
+        -0.08,
+        -0.1
+      ],
+      "task_pass": true,
+      "selected_identity_agrees": true,
+      "distractor": {
+        "initial_xy": [
+          0.25,
+          -0.25
+        ],
+        "final_xy": [
+          0.25,
+          -0.25
+        ],
+        "max_displacement_m": 0.0,
+        "displacement_within_10mm": true,
+        "in_target_xy": false
+      },
+      "wrong_object_placed": false,
+      "task2_pass": true,
+      "failure_state": null,
+      "failure_reason": null,
+      "final_xy_target_error_m": 0.0017215286829369415,
+      "trial_index": 0
+    },
+    {
+      "instruction": "Pick up the red cube and place it in the blue target area.",
+      "selected_object_id": "red",
+      "distractor_object_id": "green",
+      "arrangement": "A",
+      "selected_offset": [
+        0.0,
+        0.0
+      ],
+      "distractor_offset": [
+        -0.08,
+        -0.1
+      ],
+      "task_pass": true,
+      "selected_identity_agrees": true,
+      "distractor": {
+        "initial_xy": [
+          0.25,
+          -0.25
+        ],
+        "final_xy": [
+          0.25,
+          -0.25
+        ],
+        "max_displacement_m": 0.0,
+        "displacement_within_10mm": true,
+        "in_target_xy": false
+      },
+      "wrong_object_placed": false,
+      "task2_pass": true,
+      "failure_state": null,
+      "failure_reason": null,
+      "final_xy_target_error_m": 0.0017215286829369415,
+      "trial_index": 1
+    },
+    {
+      "instruction": "Pick up the red cube and place it in the blue target area.",
+      "selected_object_id": "red",
+      "distractor_object_id": "green",
+      "arrangement": "A",
+      "selected_offset": [
+        0.0,
+        0.0
+      ],
+      "distractor_offset": [
+        -0.08,
+        -0.1
+      ],
+      "task_pass": true,
+      "selected_identity_agrees": true,
+      "distractor": {
+        "initial_xy": [
+          0.25,
+          -0.25
+        ],
+        "final_xy": [
+          0.25,
+          -0.25
+        ],
+        "max_displacement_m": 0.0,
+        "displacement_within_10mm": true,
+        "in_target_xy": false
+      },
+      "wrong_object_placed": false,
+      "task2_pass": true,
+      "failure_state": null,
+      "failure_reason": null,
+      "final_xy_target_error_m": 0.0017215286829369415,
+      "trial_index": 2
+    },
+    {
+      "instruction": "Pick up the green cube and place it in the blue target area.",
+      "selected_object_id": "green",
+      "distractor_object_id": "red",
+      "arrangement": "A",
+      "selected_offset": [
+        -0.08,
+        -0.1
+      ],
+      "distractor_offset": [
+        0.0,
+        0.0
+      ],
+      "task_pass": true,
+      "selected_identity_agrees": true,
+      "distractor": {
+        "initial_xy": [
+          0.33,
+          -0.15
+        ],
+        "final_xy": [
+          0.33146960927690583,
+          -0.15022029556529976
+        ],
+        "max_displacement_m": 0.0017329258041010953,
+        "displacement_within_10mm": true,
+        "in_target_xy": false
+      },
+      "wrong_object_placed": false,
+      "task2_pass": true,
+      "failure_state": null,
+      "failure_reason": null,
+      "final_xy_target_error_m": 0.006833216462908001,
+      "trial_index": 0
+    },
+    {
+      "instruction": "Pick up the green cube and place it in the blue target area.",
+      "selected_object_id": "green",
+      "distractor_object_id": "red",
+      "arrangement": "A",
+      "selected_offset": [
+        -0.08,
+        -0.1
+      ],
+      "distractor_offset": [
+        0.0,
+        0.0
+      ],
+      "task_pass": true,
+      "selected_identity_agrees": true,
+      "distractor": {
+        "initial_xy": [
+          0.33,
+          -0.15
+        ],
+        "final_xy": [
+          0.33146960927690583,
+          -0.15022029556529976
+        ],
+        "max_displacement_m": 0.0017329258041010953,
+        "displacement_within_10mm": true,
+        "in_target_xy": false
+      },
+      "wrong_object_placed": false,
+      "task2_pass": true,
+      "failure_state": null,
+      "failure_reason": null,
+      "final_xy_target_error_m": 0.006833216462908001,
+      "trial_index": 1
+    },
+    {
+      "instruction": "Pick up the green cube and place it in the blue target area.",
+      "selected_object_id": "green",
+      "distractor_object_id": "red",
+      "arrangement": "A",
+      "selected_offset": [
+        -0.08,
+        -0.1
+      ],
+      "distractor_offset": [
+        0.0,
+        0.0
+      ],
+      "task_pass": true,
+      "selected_identity_agrees": true,
+      "distractor": {
+        "initial_xy": [
+          0.33,
+          -0.15
+        ],
+        "final_xy": [
+          0.33146960927690583,
+          -0.15022029556529976
+        ],
+        "max_displacement_m": 0.0017329258041010953,
+        "displacement_within_10mm": true,
+        "in_target_xy": false
+      },
+      "wrong_object_placed": false,
+      "task2_pass": true,
+      "failure_state": null,
+      "failure_reason": null,
+      "final_xy_target_error_m": 0.006833216462908001,
+      "trial_index": 2
+    },
+    {
+      "instruction": "Pick up the red cube and place it in the blue target area.",
+      "selected_object_id": "red",
+      "distractor_object_id": "green",
+      "arrangement": "swapped",
+      "selected_offset": [
+        -0.08,
+        -0.1
+      ],
+      "distractor_offset": [
+        0.0,
+        0.0
+      ],
+      "task_pass": true,
+      "selected_identity_agrees": true,
+      "distractor": {
+        "initial_xy": [
+          0.33,
+          -0.15
+        ],
+        "final_xy": [
+          0.33146960927690583,
+          -0.15022029556529976
+        ],
+        "max_displacement_m": 0.0017329258041010953,
+        "displacement_within_10mm": true,
+        "in_target_xy": false
+      },
+      "wrong_object_placed": false,
+      "task2_pass": true,
+      "failure_state": null,
+      "failure_reason": null,
+      "final_xy_target_error_m": 0.006833216462908671,
+      "trial_index": 0
+    },
+    {
+      "instruction": "Pick up the red cube and place it in the blue target area.",
+      "selected_object_id": "red",
+      "distractor_object_id": "green",
+      "arrangement": "swapped",
+      "selected_offset": [
+        -0.08,
+        -0.1
+      ],
+      "distractor_offset": [
+        0.0,
+        0.0
+      ],
+      "task_pass": true,
+      "selected_identity_agrees": true,
+      "distractor": {
+        "initial_xy": [
+          0.33,
+          -0.15
+        ],
+        "final_xy": [
+          0.33146960927690583,
+          -0.15022029556529976
+        ],
+        "max_displacement_m": 0.0017329258041010953,
+        "displacement_within_10mm": true,
+        "in_target_xy": false
+      },
+      "wrong_object_placed": false,
+      "task2_pass": true,
+      "failure_state": null,
+      "failure_reason": null,
+      "final_xy_target_error_m": 0.006833216462908671,
+      "trial_index": 1
+    },
+    {
+      "instruction": "Pick up the red cube and place it in the blue target area.",
+      "selected_object_id": "red",
+      "distractor_object_id": "green",
+      "arrangement": "swapped",
+      "selected_offset": [
+        -0.08,
+        -0.1
+      ],
+      "distractor_offset": [
+        0.0,
+        0.0
+      ],
+      "task_pass": true,
+      "selected_identity_agrees": true,
+      "distractor": {
+        "initial_xy": [
+          0.33,
+          -0.15
+        ],
+        "final_xy": [
+          0.33146960927690583,
+          -0.15022029556529976
+        ],
+        "max_displacement_m": 0.0017329258041010953,
+        "displacement_within_10mm": true,
+        "in_target_xy": false
+      },
+      "wrong_object_placed": false,
+      "task2_pass": true,
+      "failure_state": null,
+      "failure_reason": null,
+      "final_xy_target_error_m": 0.006833216462908671,
+      "trial_index": 2
+    },
+    {
+      "instruction": "Pick up the green cube and place it in the blue target area.",
+      "selected_object_id": "green",
+      "distractor_object_id": "red",
+      "arrangement": "swapped",
+      "selected_offset": [
+        0.0,
+        0.0
+      ],
+      "distractor_offset": [
+        -0.08,
+        -0.1
+      ],
+      "task_pass": true,
+      "selected_identity_agrees": true,
+      "distractor": {
+        "initial_xy": [
+          0.25,
+          -0.25
+        ],
+        "final_xy": [
+          0.25,
+          -0.25
+        ],
+        "max_displacement_m": 0.0,
+        "displacement_within_10mm": true,
+        "in_target_xy": false
+      },
+      "wrong_object_placed": false,
+      "task2_pass": true,
+      "failure_state": null,
+      "failure_reason": null,
+      "final_xy_target_error_m": 0.0017215286829379806,
+      "trial_index": 0
+    },
+    {
+      "instruction": "Pick up the green cube and place it in the blue target area.",
+      "selected_object_id": "green",
+      "distractor_object_id": "red",
+      "arrangement": "swapped",
+      "selected_offset": [
+        0.0,
+        0.0
+      ],
+      "distractor_offset": [
+        -0.08,
+        -0.1
+      ],
+      "task_pass": true,
+      "selected_identity_agrees": true,
+      "distractor": {
+        "initial_xy": [
+          0.25,
+          -0.25
+        ],
+        "final_xy": [
+          0.25,
+          -0.25
+        ],
+        "max_displacement_m": 0.0,
+        "displacement_within_10mm": true,
+        "in_target_xy": false
+      },
+      "wrong_object_placed": false,
+      "task2_pass": true,
+      "failure_state": null,
+      "failure_reason": null,
+      "final_xy_target_error_m": 0.0017215286829379806,
+      "trial_index": 1
+    },
+    {
+      "instruction": "Pick up the green cube and place it in the blue target area.",
+      "selected_object_id": "green",
+      "distractor_object_id": "red",
+      "arrangement": "swapped",
+      "selected_offset": [
+        0.0,
+        0.0
+      ],
+      "distractor_offset": [
+        -0.08,
+        -0.1
+      ],
+      "task_pass": true,
+      "selected_identity_agrees": true,
+      "distractor": {
+        "initial_xy": [
+          0.25,
+          -0.25
+        ],
+        "final_xy": [
+          0.25,
+          -0.25
+        ],
+        "max_displacement_m": 0.0,
+        "displacement_within_10mm": true,
+        "in_target_xy": false
+      },
+      "wrong_object_placed": false,
+      "task2_pass": true,
+      "failure_state": null,
+      "failure_reason": null,
+      "final_xy_target_error_m": 0.0017215286829379806,
+      "trial_index": 2
+    }
+  ],
+  "representative_episodes": [
+    {
+      "instruction_canonical": "Pick up the red cube and place it in the blue target area.",
+      "instruction_utterance": "Pick up the red cube and place it in the blue target area.",
+      "selected_object_id": "red",
+      "arrangement": "A",
+      "red_initial_offset": [
+        0.0,
+        0.0
+      ],
+      "green_initial_offset": [
+        -0.08,
+        -0.1
+      ],
+      "final_xy_target_error_m": 0.0017215286829369415,
+      "distractor_max_displacement_m": 0.0,
+      "success": true
+    },
+    {
+      "instruction_canonical": "Pick up the red cube and place it in the blue target area.",
+      "instruction_utterance": "Pick up the green cube and place it in the blue target area.",
+      "selected_object_id": "green",
+      "arrangement": "A",
+      "red_initial_offset": [
+        0.0,
+        0.0
+      ],
+      "green_initial_offset": [
+        -0.08,
+        -0.1
+      ],
+      "final_xy_target_error_m": 0.006833216462908001,
+      "distractor_max_displacement_m": 0.0017329258041010953,
+      "success": true
+    },
+    {
+      "instruction_canonical": "Pick up the red cube and place it in the blue target area.",
+      "instruction_utterance": "Pick up the red cube and place it in the blue target area.",
+      "selected_object_id": "red",
+      "arrangement": "swapped",
+      "red_initial_offset": [
+        -0.08,
+        -0.1
+      ],
+      "green_initial_offset": [
+        0.0,
+        0.0
+      ],
+      "final_xy_target_error_m": 0.006833216462908671,
+      "distractor_max_displacement_m": 0.0017329258041010953,
+      "success": true
+    },
+    {
+      "instruction_canonical": "Pick up the red cube and place it in the blue target area.",
+      "instruction_utterance": "Pick up the green cube and place it in the blue target area.",
+      "selected_object_id": "green",
+      "arrangement": "swapped",
+      "red_initial_offset": [
+        -0.08,
+        -0.1
+      ],
+      "green_initial_offset": [
+        0.0,
+        0.0
+      ],
+      "final_xy_target_error_m": 0.0017215286829379806,
+      "distractor_max_displacement_m": 0.0,
+      "success": true
+    }
+  ],
+  "n_configs": 4,
+  "n_configs_all_3_pass": 4,
+  "overall_pass": true,
+  "video_results": {
+    "red": {
+      "task_pass": true,
+      "n_frames": 389,
+      "video_path": "/Users/yangjudx/Documents/Robotics/artifacts/task2_red_instruction.mp4"
+    },
+    "green": {
+      "task_pass": true,
+      "n_frames": 389,
+      "video_path": "/Users/yangjudx/Documents/Robotics/artifacts/task2_green_instruction.mp4"
+    }
+  },
+  "distractor_displacement_tol_m": 0.01
+}
