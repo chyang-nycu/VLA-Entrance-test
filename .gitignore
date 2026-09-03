@@ -32,6 +32,14 @@ datasets/
 # data/schema.md).
 !data/task1_prototype.hdf5
 
+# Exception: Phase 5C's two-rate (policy + execution) replacement/addition
+# dataset is small (~5.0MB, mostly the added 500Hz execution trace) and
+# explicitly committed as a phase deliverable; regenerate via
+# tasks/g1_pick_place/record_demonstrations_v2.py (deterministic, see
+# data/schema_v2.md). data/task1_prototype.hdf5 above is preserved
+# unmodified as the original Phase 5B prototype evidence.
+!data/task1_prototype_v2.hdf5
+
 # Temporary MuJoCo outputs
 *.mjb
 tmp_mujoco*/

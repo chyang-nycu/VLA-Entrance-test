@@ -1,0 +1,186 @@
+{
+  "phase": "5C",
+  "date": "2026-09-03",
+  "section_a_timing_and_action_semantics_audit": {
+    "physics_timestep_s": 0.002,
+    "physics_hz": 500.0,
+    "actuator_control_update_rate_hz": 500.0,
+    "actuator_control_update_rate_note": "The arm's commanded joint target (data.ctrl for the native <position> actuators) is linearly re-interpolated ('ramped_target') and re-applied via _step_once on EVERY physics step during LIFT/TRANSPORT_ABOVE_TARGET/LOWER_TO_TARGET (run_pick_place._drive_smooth, verified directly by reading the source: the ramp loop is nested inside the per-waypoint loop, with n_substeps physics steps per waypoint). Confirmed: trajectory ramps recompute a new interpolated target every physics step, not once per waypoint.",
+    "ik_waypoint_solve_rate": {
+      "LIFT": "30 waypoints / 1.5s = 20 Hz (one solve_ik_waypoint call per waypoint; ~25 physics steps of linear ramp between consecutive solved joint targets)",
+      "TRANSPORT_ABOVE_TARGET": "40 waypoints / 2.0s = 20 Hz (~25 physics steps of ramp per waypoint)",
+      "LOWER_TO_TARGET": "60 waypoints / 2.0s = 30 Hz (~17 physics steps of ramp per waypoint)"
+    },
+    "policy_observation_action_rate_hz": 10.0,
+    "rgb_rate_hz": 10.0,
+    "low_level_updates_per_policy_transition": 50,
+    "ramps_recomputed_every_physics_step": true,
+    "action_field_semantic_classification": {
+      "v1_cartesian_target": "high-level Cartesian command: the static per-phase goal in effect for the whole 100ms block (often identical across many consecutive 10Hz transitions within one multi-second phase)",
+      "v1_arm_joint_position_target": "actual applied actuator command, sampled once, at the single instant the 50th physics step of the block completes (an instantaneous end-of-interval sample, NOT a value that was 'held' for the interval) -- equals data.ctrl for the arm at that instant, because the arm uses native MuJoCo <position> actuators",
+      "v1_gripper_target": "software PD position setpoint at that same sampling instant (target at end of interval)",
+      "v1_applied_ctrl": "same instantaneous end-of-interval sample as arm_joint_position_target concatenated with the gripper's resulting bounded-PD torque output",
+      "v2_execution_arm_joint_target": "actual applied actuator command, recorded at EVERY physics step (not just the end-of-interval sample) -- interpolation endpoint of that step's ramp",
+      "v2_execution_applied_ctrl": "actual applied actuator command, literal data.ctrl vector sent to mj_step this physics step",
+      "v2_policy_high_level_actions_cartesian_target": "unchanged semantics from v1 -- high-level Cartesian command, static per-phase goal, NOT a per-100ms interpolation endpoint"
+    },
+    "quantified_source_of_phase5b_4_9cm_error": {
+      "method": "Replay the SAME nominal episode's literal 500Hz execution/applied_ctrl trace directly (exact execution replay) versus Phase 5B's original 10Hz zero-order-hold-of-arm_joint_position_target replay, against the identical live physics.",
+      "phase5b_zoh_replay_max_tcp_error_m": 0.0487,
+      "phase5c_exact_execution_replay_max_tcp_error_m": 3.6506168248669005e-08,
+      "reduction_factor": "~1.33 million times smaller",
+      "conclusion": "The entire ~4.9cm error is attributable to the 10Hz zero-order-hold discarding the intra-transition 500Hz ramp; replaying the literal fine-grained applied_ctrl instead removes essentially all of it (residual is floating-point step-order accumulation, not information loss). No other source (actuator lag, controller nonlinearity, IK re-solve nondeterminism) contributes meaningfully."
+    }
+  },
+  "section_b_schema": {
+    "policy_group_rate_hz": 10.0,
+    "execution_group_rate_hz": 500.0,
+    "rgb_duplicated_at_execution_rate": false,
+    "schema_doc": "data/schema_v2.md"
+  },
+  "section_c_and_d_replay_results": {
+    "exact_execution_replay": {
+      "targets": {
+        "joint_rad": 0.0001,
+        "tcp_m": 0.001,
+        "cube_m": 0.001
+      },
+      "nominal": {
+        "max_joint_error_rad": 7.035470162009005e-08,
+        "max_tcp_error_m": 3.6506168248669005e-08,
+        "max_cube_error_m": 3.5868089940141766e-08,
+        "final_joint_error_rad": 1.7742913527296622e-08,
+        "final_tcp_error_m": 6.65463954274292e-09,
+        "first_divergence_execution_step": null,
+        "within_tolerance": true,
+        "stored_success_carried_over_not_independently_redetermined": true
+      },
+      "x_minus_0.03": {
+        "max_joint_error_rad": 4.295865096981544e-08,
+        "max_tcp_error_m": 3.384977893100913e-08,
+        "max_cube_error_m": 3.4740064783781635e-08,
+        "final_joint_error_rad": 2.151439387754195e-08,
+        "final_tcp_error_m": 9.890675903835765e-09,
+        "first_divergence_execution_step": null,
+        "within_tolerance": true,
+        "stored_success_carried_over_not_independently_redetermined": true
+      },
+      "x_plus_0.03": {
+        "max_joint_error_rad": 7.694809411873393e-08,
+        "max_tcp_error_m": 4.3967489873169194e-08,
+        "max_cube_error_m": 3.35370780511624e-08,
+        "final_joint_error_rad": 3.4999246834033215e-08,
+        "final_tcp_error_m": 1.4670873666682327e-08,
+        "first_divergence_execution_step": null,
+        "within_tolerance": true,
+        "note": "31 transitions / 1550 execution rows, entirely within PREGRASP/APPROACH/SETTLE_APPROACH -- fails before any _drive_smooth ramped segment begins.",
+        "stored_success_carried_over_not_independently_redetermined": true
+      },
+      "mujoco_bit_exactness_note": "Not literally bit-exact (residual ~1e-8, floating-point accumulation over thousands of mj_step calls with a fresh MjData/model instance), but 4-5 orders of magnitude tighter than the 1e-4rad/1e-3m targets in every episode -- targets met with large margin, not loosened."
+    },
+    "policy_action_replay": {
+      "target_tcp_m": 0.01,
+      "decoder": "K_WAYPOINTS_PER_POLICY_STEP=5 sub-waypoints per 100ms interval, reusing solve_ik_waypoint/bounded_pd_step, ramping toward the SAME static per-phase cartesian_target every interval (this is the fix for Phase 5B's hold-constant bug)",
+      "nominal": {
+        "max_tcp_error_m": 0.0968981659458809,
+        "final_tcp_error_m": 0.006326514792885744,
+        "final_cube_error_m": 0.011341413288004283,
+        "within_tolerance_on_max": false,
+        "within_tolerance_on_final": true,
+        "stored_success": true
+      },
+      "x_minus_0.03": {
+        "max_tcp_error_m": 0.09829617408310115,
+        "final_tcp_error_m": 0.0063065846053455485,
+        "final_cube_error_m": 0.008829497489370038,
+        "within_tolerance_on_max": false,
+        "within_tolerance_on_final": true,
+        "stored_success": true
+      },
+      "x_plus_0.03": {
+        "max_tcp_error_m": 0.02150843541000312,
+        "final_tcp_error_m": 0.003817541003648579,
+        "final_cube_error_m": 1.63623210766577e-08,
+        "within_tolerance_on_max": false,
+        "within_tolerance_on_final": true,
+        "stored_success": false,
+        "note": "Degenerate case: fails at SETTLE_APPROACH before any multi-second ramped phase begins, so this metric mostly reflects PREGRASP/APPROACH IK-decoder differences, not the LOWER/TRANSPORT divergence mechanism below."
+      },
+      "honest_result": "The <=10mm MAXIMUM policy-action-replay TCP error target is NOT met for nominal or x_minus_0.03 (measured ~97-98mm max). The <=10mm target IS met for the FINAL TCP error at episode end (6.3mm both) and final cube error is small (1.1cm nominal, 0.9cm x_minus_0.03). This is not adjusted or loosened to force a pass -- see divergence_diagnosis below for the mechanism.",
+      "divergence_diagnosis": {
+        "method": "Per-transition TCP error traced against the recorded phase label for the nominal episode.",
+        "worst_transitions": [
+          {
+            "transition_index": 86,
+            "phase": "LOWER_TO_TARGET_wp7",
+            "error_m": 0.0969
+          },
+          {
+            "transition_index": 67,
+            "phase": "TRANSPORT_ABOVE_TARGET_wp7",
+            "error_m": 0.0944
+          },
+          {
+            "transition_index": 68,
+            "phase": "TRANSPORT_ABOVE_TARGET_wp9",
+            "error_m": 0.0938
+          }
+        ],
+        "mechanism": "high_level_actions.cartesian_target stores ONE static Cartesian GOAL per phase (e.g. the same TRANSPORT_ABOVE_TARGET_POS value repeats across all ~40 consecutive 10Hz transitions of that phase). The real collection-time controller reaches that goal via a slow multi-second, multi-waypoint linear ramp (40 waypoints over 2.0s for TRANSPORT, 60 over 2.0s for LOWER). The policy-action decoder, having only the repeated static goal and no notion of 'which waypoint number this is', re-ramps toward that SAME distant goal within every single 100ms interval. This produces a different (faster, more direct, first-order-lag-like) path shape than the true trajectory -- large mid-phase position error -- while still converging toward the same final endpoint each phase actually reaches, which is why the error shrinks back down by the end of each phase and the FINAL state ends up close.",
+        "conclusion": "This is a real, structural limitation of a 'static per-phase goal' high-level action representation, not a decoder bug: a per-transition Cartesian value stored at 10Hz genuinely under-specifies the intended path shape during a multi-second ramped phase. Closing this gap would require either a richer action (e.g. the next INCREMENTAL sub-waypoint target rather than the final phase goal) or accepting the current final-state-only fidelity. This phase does not change the stored high_level_actions representation (out of scope -- see Phase 5C authorization, which asks for two-rate dataset + replay validation, not a redesign of the action semantics); it documents the gap honestly for a future phase to decide whether to address."
+      }
+    },
+    "observation_only_visualization_replay": "Exercised for nominal via replay_demonstration_v2.visualize_episode -- 6-frame contact sheet, zero physics stepped, produced successfully."
+  },
+  "section_e_transition_alignment_tests": {
+    "file": "tests/test_phase5c_replay_fidelity.py",
+    "test_count": 17,
+    "result": "17/17 passing",
+    "shifted_action_tamper_test": "test_manually_shifted_action_array_fails_validation -- manually np.roll()-shifts nominal's cartesian_target by one transition in a copied HDF5 file; validate_dataset_v2.validate_file correctly reports >=1 error referencing the mismatch."
+  },
+  "section_f_v2_dataset": {
+    "path": "data/task1_prototype_v2.hdf5",
+    "size_bytes": 4995223,
+    "sha256": "89dc2410bfa98631047bf3b951e94bd8feec01130fd5ce28c8e8dae45340b4a7",
+    "schema_version": "2.0.0",
+    "canonical_manifest_sha256": "f7375efc18d00fd83b2c75228bac76a7c23922913e104d6970e9b8241b9c290b",
+    "regeneration_command": "python3 -m tasks.g1_pick_place.record_demonstrations_v2",
+    "episodes": [
+      {
+        "variant_id": "nominal",
+        "success": true,
+        "termination_reason": "DONE",
+        "n_transitions": 132,
+        "n_observations": 133,
+        "n_execution_rows": 6600,
+        "wall_total_s": 8.835
+      },
+      {
+        "variant_id": "x_minus_0.03",
+        "success": true,
+        "termination_reason": "DONE",
+        "n_transitions": 132,
+        "n_observations": 133,
+        "n_execution_rows": 6600,
+        "wall_total_s": 8.587
+      },
+      {
+        "variant_id": "x_plus_0.03",
+        "success": false,
+        "termination_reason": "SETTLE_APPROACH",
+        "n_transitions": 31,
+        "n_observations": 32,
+        "n_execution_rows": 1550,
+        "wall_total_s": 2.223
+      }
+    ],
+    "validator_result": "VALIDATION PASSED, 0 errors"
+  },
+  "compliance": {
+    "vendor_untouched": true,
+    "phase5b_files_byte_identical": true,
+    "task1_controller_gains_geometry_thresholds_camera_unchanged": true,
+    "no_push": true,
+    "stopped_after_reporting_no_scaling": true
+  }
+}

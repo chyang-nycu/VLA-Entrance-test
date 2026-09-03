@@ -266,6 +266,29 @@ passing diagnostic, not a broken build.
   `reports/phase5b-data-pipeline.md` and `data/schema.md` for the full
   schema, per-episode results, validator/replay output, and this
   substitution's measured record.
+- **Phase 5C — VLA action/replay fidelity fix**: diagnoses and fixes the
+  root cause of Phase 5B's ~4.9cm nominal replay error. Quantified: the
+  entire error was the 10Hz zero-order-hold of a single per-transition
+  action sample discarding the real controller's 500Hz intra-transition
+  ramp (`run_pick_place._drive_smooth` re-interpolates the commanded joint
+  target on every physics step). Adds a second, execution-rate (500Hz)
+  data group alongside the unchanged 10Hz policy group, and three
+  distinguished replay modes: **exact execution replay** (replays the
+  literal per-step applied ctrl — max TCP error ~3.7e-8m, essentially
+  machine precision, vs. the targets of 1e-4rad/1e-3m) and **policy-action
+  replay** (decodes only the 10Hz action stream through the same
+  IK/PD primitives the real controller uses). Policy-action replay's
+  **maximum** TCP error during an episode does **not** meet the ≤10mm
+  target (measured ~97-98mm) — diagnosed and disclosed, not adjusted to
+  pass: the stored `cartesian_target` is one static per-phase goal, so a
+  decoder re-ramping toward it every 100ms takes a different path shape
+  than the true multi-second waypoint ramp, even though it converges to
+  the same final point (final TCP error 6.3mm, within target). New
+  `data/task1_prototype_v2.hdf5` (additive — `data/task1_prototype.hdf5`
+  and `reports/phase5b-data-pipeline.md` are preserved unmodified as the
+  original Phase 5B evidence). See `reports/phase5c-replay-fidelity.md`
+  and `data/schema_v2.md` for the full audit, per-episode numbers, and
+  divergence diagnosis.
 - **Task 2 (language-conditioned variants, scaled dataset collection,
   policy integration)**: not started; requires new, explicit authorization
   per `HANDOFF.md`.

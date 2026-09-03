@@ -1030,3 +1030,67 @@ copied success thresholds cross-checked byte-for-byte against
 unchanged. Per this phase's instructions, scaled collection, language-
 conditioned Task 2, and model training remain out of scope and
 unimplemented; stopped after exactly 3 episodes.
+
+## Phase 5C — VLA action/replay fidelity fix (authorized 2026-09-03)
+
+Full record: `reports/phase5c-replay-fidelity.md`, schema reference
+`data/schema_v2.md`, raw numbers `logs/phase5c_replay_fidelity.json`.
+`data/task1_prototype.hdf5`, `reports/phase5b-data-pipeline.md`, and
+commit `67ccf89` are preserved unmodified as the original Phase 5B
+prototype evidence — this phase is entirely additive (`_v2` files).
+
+**Root cause of Phase 5B's 4.9cm replay error, quantified**: the arm's
+commanded joint target actually changes every physics step (500Hz) during
+`LIFT`/`TRANSPORT_ABOVE_TARGET`/`LOWER_TO_TARGET` (`run_pick_place._drive_smooth`
+ramps linearly between IK-solved waypoints), but Phase 5B's dataset only
+sampled one instantaneous end-of-interval value per 100ms transition, and
+its replay held that single sample constant (zero-order hold) across the
+whole interval — discarding the real intra-transition ramp entirely.
+Replaying the *same* nominal episode's literal 500Hz `applied_ctrl` trace
+instead drops the max TCP replay error from 4.87cm to 3.65e-8m (~1.3
+million times smaller) — proving this ZOH gap was the entire error, with
+no other meaningful contributor.
+
+**Two-rate schema** (`data/task1_prototype_v2.hdf5`): unchanged 10Hz
+`policy/` group (observations, high-level actions, RGB — RGB not
+duplicated elsewhere) plus a new 500Hz `execution/` group (one row per
+physics step: literal applied ctrl, joint/TCP/cube state, transition-index
+mapping into its parent policy transition). `execution_hz=500` was chosen
+because that is the actual rate the controller's set-point changes at,
+confirmed by reading `_drive_smooth`'s source, not picked arbitrarily.
+
+**Three replay modes, both honestly measured**:
+- **Exact execution replay** (replays literal per-step `applied_ctrl`):
+  max TCP error 3.4-4.4e-8m across all three episodes, 4-5 orders of
+  magnitude tighter than the 1e-4rad/1e-3m targets. Not literally
+  bit-exact (floating-point accumulation), but the achieved tolerance is
+  measured and justified, not loosened.
+- **Policy-action replay** (decodes only the 10Hz action stream through
+  the same IK/PD primitives, re-ramping toward the recorded static goal
+  every 100ms instead of holding it constant): the **maximum** TCP error
+  during an episode does **not** meet the ≤10mm target (measured
+  ~97-98mm for the two successful episodes) — diagnosed, not adjusted to
+  pass. Root cause: `cartesian_target` stores one static per-phase goal
+  repeated across every transition inside a multi-second phase (e.g. all
+  ~40 transitions of `TRANSPORT_ABOVE_TARGET` share one value); a decoder
+  with no waypoint-index information re-ramps toward that same distant
+  goal every 100ms, producing a different (faster, more direct) path
+  shape than the true multi-waypoint ramp, even though it converges to
+  the same final point (final TCP error 6.3mm on both successful
+  episodes, within target). Closing this would require a richer
+  per-transition action (e.g. the next incremental waypoint, not the
+  phase's final goal) — explicitly out of scope for this phase, which
+  authorized a two-rate dataset and honest replay validation, not an
+  action-representation redesign.
+
+**Tests**: `tests/test_phase5c_replay_fidelity.py`, 17 new tests covering
+all 7 required transition-alignment properties plus a deliberately
+shifted-action tamper test (`np.roll()`s a recorded action array by one
+transition in a copied file; `validate_dataset_v2` correctly flags it).
+
+Full regression this session: **231 tests, 0 unexpected failures** (214
+pre-existing unchanged + 17 new). Task 1 controller/gains/geometry/
+success-thresholds/camera and the canonical manifest's content are
+byte-identical to Phase 5B (verified via `git diff`); vendor pin
+unchanged; no push. Per this phase's instructions, scaled collection and
+Task 2 remain out of scope and unimplemented.

@@ -1,0 +1,48 @@
+{
+  "episodes": [
+    {
+      "variant_id": "nominal",
+      "success": true,
+      "failure_state": null,
+      "failure_reason": null,
+      "n_transitions": 132,
+      "n_observations": 133,
+      "n_execution_rows": 6600,
+      "physics_steps_total": 6622,
+      "wall_total_s": 8.83515677799005,
+      "render_time_s": 3.8181777757708915,
+      "final_xy_target_error_m": 0.0017215286829355965
+    },
+    {
+      "variant_id": "x_minus_0.03",
+      "success": true,
+      "failure_state": null,
+      "failure_reason": null,
+      "n_transitions": 132,
+      "n_observations": 133,
+      "n_execution_rows": 6600,
+      "physics_steps_total": 6610,
+      "wall_total_s": 8.586897294968367,
+      "render_time_s": 3.822755016910378,
+      "final_xy_target_error_m": 0.00454784842759046
+    },
+    {
+      "variant_id": "x_plus_0.03",
+      "success": false,
+      "failure_state": "SETTLE_APPROACH",
+      "failure_reason": "TCP did not settle within tolerance before CLOSE",
+      "n_transitions": 31,
+      "n_observations": 32,
+      "n_execution_rows": 1550,
+      "physics_steps_total": 1551,
+      "wall_total_s": 2.2226641309680417,
+      "render_time_s": 1.0018390361801721,
+      "final_xy_target_error_m": null
+    }
+  ],
+  "manifest_sha256": "f7375efc18d00fd83b2c75228bac76a7c23922913e104d6970e9b8241b9c290b",
+  "schema_version": "2.0.0",
+  "hdf5_path": "data/task1_prototype_v2.hdf5",
+  "hdf5_size_bytes": 4995223,
+  "hdf5_sha256": "89dc2410bfa98631047bf3b951e94bd8feec01130fd5ce28c8e8dae45340b4a7"
+}
