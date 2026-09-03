@@ -5,12 +5,19 @@ Task-local manipulation experiments built on top of the official Unitree
 staged in phases; each phase must pass its acceptance test before the next
 begins.
 
-**Current capability, precisely stated: a fixed-base, torso-constrained
-upper-body manipulation baseline that completes Task 1** ("pick up the red
-cube and place it in the blue target area") **as an entrance-test
-prototype, with a documented grasp-slip limitation.** The pelvis and torso
-are rigidly welded to the world; only the right arm and gripper move. This
-is not full-body or free-standing manipulation.
+**Current capability, precisely stated: a two-task Unitree G1 manipulation
+prototype with classical expert control, language-associated VLA
+demonstration interfaces, physical interaction validation, and replay
+instrumentation.** A fixed-base, torso-constrained upper-body manipulation
+baseline completes **Task 1** ("pick up the red cube and place it in the
+blue target area") as an entrance-test prototype, with a documented
+grasp-slip limitation, and **Task 2** ("language-conditioned two-object
+selection", merged from `task2-language-selection`) adds a second cube
+where the instruction determines which cube a privileged scripted expert
+grasps and places. The pelvis and torso are rigidly welded to the world;
+only the right arm and gripper move. This is not full-body or
+free-standing manipulation, and not a production-ready or universally
+model-ready system.
 
 > **Task 1 acceptance status (Phase 4F human decision, 2026-09-02):**
 > human visual review of `artifacts/phase4f_task1_full.mp4` and
@@ -83,6 +90,7 @@ package versions used so far.
 .venv/bin/python -m unittest tests/test_phase4f_orientation_grasp.py -v  # Phase 4F (orientation-constrained IK + pad-mount fix; strict 10mm slip bar honestly still failing as a diagnostic, not project breakage)
 .venv/bin/python -m unittest tests/test_phase5a_onboard_camera.py -v  # Phase 5A (onboard RGB observation camera smoke test)
 .venv/bin/python -m unittest tests/test_phase5b_dataset.py -v  # Phase 5B (VLA demonstration dataset: canonical manifest, HDF5 schema, validator, replay)
+.venv/bin/python -m unittest tests/test_task2_language_selection.py -v  # Task 2 (language-conditioned two-object selection)
 ```
 
 `test_max_slip_while_grasped_still_exceeds_tightened_bar` and
@@ -350,24 +358,32 @@ passing diagnostic, not a broken build.
   determination. Full suite re-run: 288 tests, 0 unexpected failures. See
   `submission/entrance_test_report.md` for the complete account.
 - **Task 2 — language-conditioned two-object selection** (optional,
-  time-boxed; branch `task2-language-selection`, not merged to `main`):
+  time-boxed; committed as `5f119ce` on branch `task2-language-selection`,
+  independently audited 2026-09-03, merged into `main`):
   extends the Task 1 scene with a second, physically-identical green cube
   (`tasks/g1_pick_place/task2_language_selection.py`) and reuses Task 1's
   own unmodified scripted controller, now able to act on a caller-specified
   cube (an additive, default-preserving parameter added to
-  `run_trial_pick_place`) driven by an oracle-supplied object identity —
-  never visual recognition or learned language understanding. All 4
-  required configurations (red/green x nominal/swapped) x 3 deterministic
-  trials each (12/12) pass: the selected cube is grasped and placed, the
-  distractor never moves more than 1.73mm or enters the target, and the
-  onboard camera confirms both objects and the target are visible at reset.
-  See `reports/task2-language-selection.md` for the full evidence,
-  including the empirical slot-placement search (an 8cm-separated
-  candidate that looked geometrically safe was measured to disturb the
-  distractor by 48.7mm via an uncontrolled RETREAT joint-space sweep — not
-  guessed, found by instrumenting the actual trial). Scaled dataset
-  collection and policy integration for this task remain not started;
-  require new, explicit authorization per `HANDOFF.md`.
+  `run_trial_pick_place`). This is a **language-conditioned task
+  specification with a privileged scripted expert**: `selected_object_id`
+  is supplied directly by the task specification, never parsed from text or
+  visually recognized at trial time; `parse_selected_object()` is used only
+  to build labels. All 4 required configurations (red/green x
+  nominal/swapped), **three repeated deterministic executions per
+  configuration** (no RNG anywhere in this pipeline — not distinct seeds),
+  12/12 trials pass: the selected cube is grasped and placed, the
+  distractor never moves more than 1.73mm (measured as the maximum
+  displacement over the entire episode, not final-minus-initial) or enters
+  the target, and the onboard camera confirms both objects and the target
+  are visible at reset. See `reports/task2-language-selection.md` and
+  `submission/entrance_test_report.md` Section 14 for the full evidence,
+  including the empirical slot-placement search (a rejected 8cm-separated
+  candidate slot measured 48.7mm of real distractor displacement peaking
+  during RETREAT — an uncontrolled joint-space sweep, independently
+  reproduced during the audit as a genuine physical disturbance, not a
+  metric bug, and excluded from the 4 final passing configurations).
+  Scaled dataset collection and policy integration for this task remain not
+  started; require new, explicit authorization per `HANDOFF.md`.
 
 ## Ground rules (all phases)
 

@@ -1378,3 +1378,35 @@ tests, 0 unexpected failures (exact runtime in
 `reports/task2-language-selection.md` Section I). Committed on
 `task2-language-selection` only, as `"feat: add language-conditioned
 two-object Task 2"` — not merged to `main`, not pushed.
+
+## Task 2 — independent audit and merge (2026-09-03)
+
+Independently audited commit `5f119ce` before merge, per a separate
+authorization to audit/integrate/document the completed Task 2 work.
+Verified directly, not merely re-read from the report: recomputed maximum
+distractor displacement from `logs/task2_language_selection.json`'s raw
+per-trial data (1.733mm, matching the reported figure); independently
+re-simulated both the shipped `SLOT_B_OFFSET=(-0.08,-0.10)` (12/12 pass,
+matching the committed log) and the rejected `(-0.08, 0.0)` candidate
+(48.72mm max displacement, peaking at the RETREAT phase per direct
+phase-by-phase instrumentation — confirms a real arm/gripper-sweep
+disturbance, not a metric or indexing bug, and confirms this candidate is
+excluded from the 4 final configurations); confirmed the 4 new
+`run_trial_pick_place` parameters are optional and default to Task 1's
+exact prior literal values via `git diff 35f15a5..5f119ce`; decode-verified
+both `artifacts/task2_*_instruction.mp4` videos with `ffmpeg -f null -`
+(389 frames, 640x480, 29.41fps, 13.23s each) and visually confirmed the
+correct cube is manipulated with the distractor undisturbed in both. Ran
+the Task 2 test module (23/23 pass) and the directly-relevant Task 1
+regression modules (`test_phase4b_pick_place.py` +
+`test_phase4c_slip_audit.py`, 46/46 pass), both before and after merging.
+
+**Verdict: PASS, no material defects or misleading documentation found.**
+No corrective commit was needed on the Task 2 branch. Merged into `main`
+via a non-fast-forward merge commit (preserves both branches' history,
+introduces no vendor-submodule or smoke-log changes). The pre-existing
+unrelated `vendor/unitree_mujoco` local-state drift and
+`logs/g1_mujoco_smoke.json` timestamp drift were left untouched throughout,
+per every prior phase's practice. `submission/` was then updated to
+include Task 2 (videos, report Section 14, `results_summary.json`,
+`video_manifest.json`) in a separate local commit. No push.

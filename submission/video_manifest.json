@@ -34,6 +34,32 @@
       "duration_s": 4.28,
       "sha256": "fe79913b61300bda7a8a0faa3c0e87a700fd2bc36a5a21834af90f8a2fb91125",
       "size_bytes": 137782
+    },
+    {
+      "filename": "task2_red_instruction.mp4",
+      "path": "submission/videos/task2_red_instruction.mp4",
+      "source_path": "artifacts/task2_red_instruction.mp4",
+      "task": "task2",
+      "instruction": "Pick up the red cube and place it in the blue target area.",
+      "description": "Task 2 (language-conditioned two-object selection), arrangement A, red cube instructed. Third-person view of one full, passing trial with a burned-in text overlay naming the instruction and state-machine phase. Confirms visually: the red cube is grasped, lifted, transported, and placed in the blue target; the green distractor cube is undisturbed throughout. selected_object_id is supplied by the task specification, not parsed from language by any onboard model.",
+      "resolution": "640x480",
+      "fps": 29.41,
+      "duration_s": 13.23,
+      "sha256": "0572ccb805db5c45633688b62118a389ec0f296e0a573c1eb57f6c369dd0694e",
+      "size_bytes": 743973
+    },
+    {
+      "filename": "task2_green_instruction.mp4",
+      "path": "submission/videos/task2_green_instruction.mp4",
+      "source_path": "artifacts/task2_green_instruction.mp4",
+      "task": "task2",
+      "instruction": "Pick up the green cube and place it in the blue target area.",
+      "description": "Task 2 (language-conditioned two-object selection), arrangement A, green cube instructed -- same physical scene/arrangement as task2_red_instruction.mp4, only the instructed object differs. Third-person view of one full, passing trial with a burned-in text overlay naming the instruction and state-machine phase. Confirms visually: the green cube is grasped, lifted, transported, and placed in the blue target; the red distractor cube is undisturbed throughout.",
+      "resolution": "640x480",
+      "fps": 29.41,
+      "duration_s": 13.23,
+      "sha256": "7a82c1f775b50cab08bbd40a9a86b678f772cb83d3d817cb44f42e4f6ed6fb98",
+      "size_bytes": 701187
     }
   ]
 }

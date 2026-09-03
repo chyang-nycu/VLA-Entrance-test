@@ -179,6 +179,17 @@ single episode — passing `--episode` is silently ignored and it replays
 `validate_scaled_dataset`'s replay pass). Use one of the three explicit
 per-mode invocations above to replay exactly one selected episode.
 
+## 12. Task 2 test module
+
+```bash
+.venv/bin/python -m unittest tests/test_task2_language_selection.py -v
+```
+
+Verified during the Task 2 audit/merge (2026-09-03). Runtime: **~73s**.
+23/23 pass, 0 failures. Read-only with respect to `git`-tracked state
+except regenerating `tasks/g1_pick_place/g1_grasp_scene_task2.xml` (a
+tracked, deterministically-reproducible generated scene file).
+
 ## Reproducibility summary
 
 | Command | Verified this phase | Runtime observed |
@@ -195,3 +206,4 @@ per-mode invocations above to replay exactly one selected episode.
 | Exact replay | yes | ~6s |
 | Policy replay | yes | ~5s |
 | One-episode replay (3 sub-commands) | yes | ~4s / ~3s / ~1s |
+| Task 2 test module (23 tests) | yes | ~73s |

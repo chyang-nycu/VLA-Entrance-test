@@ -43,6 +43,8 @@ datasets/
 !submission/videos/task1_third_person.mp4
 !submission/videos/task1_onboard_rgb.mp4
 !submission/videos/optional_debug_before_after.mp4
+!submission/videos/task2_red_instruction.mp4
+!submission/videos/task2_green_instruction.mp4
 
 # Exception: Phase 5B's 3-episode VLA demonstration dataset prototype is
 # small (~1.7MB) and explicitly committed as a phase deliverable, not a

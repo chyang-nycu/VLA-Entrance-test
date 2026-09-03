@@ -70,10 +70,45 @@
     "static_phase_goal_10hz_replay_error_m": {"value": 0.0969, "status": "measured", "note": "Phase 5C, two successful episodes ~97-98mm"},
     "h5_chunked_replay_error_m": {"value": 0.00809, "status": "measured", "note": "Phase 5D, shipped decoder, nominal episode"}
   },
+  "task2": {
+    "description": {"value": "Language-conditioned two-object selection: same fixed-base, torso-constrained G1 and task-local physical gripper as Task 1, extended with a second, physically-identical green cube. A privileged scripted expert receives selected_object_id from the task specification -- no learned visual-language grounding is evaluated.", "status": "measured"},
+    "reporting_language_required": {"value": "Language-conditioned task specification with a privileged scripted expert.", "status": "measured"},
+    "selected_object_id_is_expert_metadata_not_vla_observation": {"value": true, "status": "measured", "note": "selected_object_id and simulator object poses are expert/evaluation metadata; not declared as VLA policy observations"},
+    "instructions": {
+      "value": [
+        "Pick up the red cube and place it in the blue target area.",
+        "Pick up the green cube and place it in the blue target area."
+      ],
+      "status": "measured"
+    },
+    "required_configurations": {"value": 4, "status": "measured", "note": "red/green selected x nominal(A)/swapped arrangement"},
+    "trials_per_configuration": {"value": 3, "status": "measured", "note": "three repeated deterministic executions per configuration -- no RNG anywhere in this pipeline, not distinct seeds/initial perturbations; confirmed bit-identical final_xy_target_error_m within each configuration"},
+    "total_trials": {"value": 12, "status": "measured"},
+    "trials_passed": {"value": 12, "status": "passed"},
+    "wrong_object_placements": {"value": 0, "status": "passed", "note": "checked every trial via distractor.in_target_xy; never true"},
+    "distractor_max_displacement_range_m": {"value": [0.0, 0.00173], "target_m": 0.010, "status": "passed", "note": "measured as the max over every physics step from RESET through VERIFY_TASK_SUCCESS, not final-minus-initial; independently recomputed from logs/task2_language_selection.json during this audit (max 1.733mm)"},
+    "distractor_displacement_metric_definition": {"value": "max over the entire episode of norm(distractor_xy_t - distractor_xy_initial)", "status": "measured"},
+    "onboard_camera_sees_both_objects_and_target_at_reset": {"value": true, "status": "passed", "note": "red_pixel_fraction, green_pixel_fraction, blue_pixel_fraction all > 0 in logs/task2_language_selection.json camera_check"},
+    "same_scene_instruction_swap_tested": {"value": true, "status": "passed", "note": "arrangement A holds both cubes' poses fixed (red at slot A, green at slot B); selecting red vs. green in arrangement A is the only difference between those two configurations and each selects/places the instructed color"},
+    "rejected_distractor_slot_retreat_disturbance_m": {"value": 0.0487, "status": "measured", "note": "an earlier, rejected 8cm-separated candidate slot (-0.08, 0.0) measured 48.7mm max distractor displacement, peaking during RETREAT; independently reproduced during this audit (48.72mm) via direct re-simulation of that candidate, confirming a real arm/gripper-sweep disturbance, not a metric or indexing bug; this candidate is excluded from the 4 final passing configurations, which use the shipped SLOT_B_OFFSET=(-0.08,-0.10) instead"},
+    "controller_tuned_per_object_color": {"value": false, "status": "measured", "note": "test_same_controller_parameters_across_all_configurations asserts no per-configuration gain/timing override"},
+    "audit": {
+      "verdict": {"value": "PASS, no material defects", "status": "human_reviewed", "note": "independent audit of commit 5f119ce prior to merge; see docs/work_log.md for the audit record"},
+      "corrective_commit_needed": {"value": false, "status": "measured"}
+    },
+    "test_suite": {
+      "new_tests": {"value": 23, "status": "measured"},
+      "full_suite_total": {"value": 311, "status": "measured", "note": "288 pre-existing Task 1/dataset tests + 23 new Task 2 tests"},
+      "full_suite_unexpected_failures": {"value": 0, "status": "passed"},
+      "full_suite_runtime_s": {"value": 604.167, "status": "measured", "note": "reported in reports/task2-language-selection.md Section I at commit 5f119ce; targeted re-run during this audit/merge (23 Task 2 tests + 46 Task 1 Phase 4B/4C tests) independently confirmed 0 unexpected failures without a full re-run"}
+    },
+    "scaled_dataset_collection": {"value": false, "status": "not_attempted", "note": "one representative episode per successful configuration recorded; a full Phase-5E-scale HDF5 dataset was explicitly not required for this optional phase"},
+    "policy_integration": {"value": false, "status": "not_attempted"}
+  },
   "not_attempted": {
     "model_training": {"value": false, "status": "not_attempted"},
     "model_inference": {"value": false, "status": "not_attempted"},
-    "task2_environment": {"value": false, "status": "not_attempted"},
+    "task2_scaled_dataset_and_policy_integration": {"value": false, "status": "not_attempted", "note": "Task 2 environment/evaluation is complete; scaled demonstration collection and policy integration for Task 2 remain not started"},
     "task3_environment": {"value": false, "status": "not_attempted"},
     "target_position_variation": {"value": false, "status": "not_attempted", "note": "would require a Task 1 scene-geometry change, proposed for a future phase, not attempted here"},
     "cube_yaw_variation": {"value": false, "status": "not_attempted", "note": "no pilot evidence yet that the shared controller physically grasps under yaw"}

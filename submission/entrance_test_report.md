@@ -1,9 +1,18 @@
-# G1 MuJoCo Entrance-Test Report — Task 1 Pick-and-Place with VLA-Oriented Demonstration Data
+# G1 MuJoCo Entrance-Test Report — Two-Task Manipulation Prototype with VLA-Oriented Demonstration Data
 
-Date: 2026-09-03. Author: this repository's automated engineering log, compiled
-in Phase 6 from the project's own reports/logs/tests (`reports/*.md`,
-`HANDOFF.md`, `docs/work_log.md`) — every figure below is sourced from one of
-those files or independently re-measured during this phase, not invented.
+Date: 2026-09-03 (updated after Task 2 audit/merge). Author: this
+repository's automated engineering log, compiled in Phase 6 from the
+project's own reports/logs/tests (`reports/*.md`, `HANDOFF.md`,
+`docs/work_log.md`) and updated after an independent audit of Task 2 —
+every figure below is sourced from one of those files, independently
+re-measured, or independently re-derived from raw trial data during this
+update, not invented.
+
+A two-task Unitree G1 manipulation prototype with classical expert control,
+language-associated VLA demonstration interfaces, physical interaction
+validation, and replay instrumentation. This is not a production-ready or
+universally model-ready system: see Section 11 for Task 1's limitations and
+Section 14 for Task 2's.
 
 ## 1. Executive Summary
 
@@ -22,8 +31,26 @@ strict 10mm grasp-slip engineering bar is **not** met (measured 25.92mm).
 the original physics to ~1e-8m; the shipped policy-action decoder meets a
 10mm replay-fidelity target on 18 of the 24 behavior-cloning-pool episodes
 outright (22 of 29 dataset-wide), with every excess-error case isolated to
-the post-release RETREAT phase and traced to a documented mechanism. Task 2,
-Task 3, and any form of model training/inference were never attempted.
+the post-release RETREAT phase and traced to a documented mechanism.
+
+**Task 2** ("language-conditioned two-object selection") is also complete:
+the same fixed-base G1 and physical gripper, extended with a second,
+physically-identical green cube. A privileged scripted expert receives
+`selected_object_id` from the task specification — this is a
+**language-conditioned task specification with a privileged scripted
+expert**, not natural-language parsing or visual-language grounding.
+All 4 required configurations (red/green selected x nominal/swapped
+arrangement), 3 deterministic repeats each (12/12 trials), pass: zero
+wrong-object placements, distractor displacement 0.0–1.73mm (measured as
+the maximum over the entire episode, well under a 10mm gate), and the
+onboard camera confirms both objects and the target are visible at reset.
+An independent audit (2026-09-03) of the Task 2 commit found no material
+defects and reproduced its key measurements directly, including a rejected
+8cm-separated candidate slot that measured ~48.7mm of real distractor
+displacement during RETREAT — an engineering finding, not a passing result.
+See Section 14. Task 3, model training, and model inference were never
+attempted; Task 2's own scaled dataset collection and policy integration
+also remain not started.
 
 ## 2. Scope and Environment Choice
 
@@ -44,8 +71,10 @@ Task 3, and any form of model training/inference were never attempted.
 
 ## 3. Task Design
 
-**Task 1** (the only task implemented): *"Pick up the red cube and place it
-in the blue target area."* Fixed-base, torso-constrained upper-body
+Two simulation tasks are now completed.
+
+**Task 1**: *"Pick up the red cube and place it in the blue target area."*
+Single-object pick-and-place. Fixed-base, torso-constrained upper-body
 manipulation scope — the pelvis and torso are rigidly welded to the world
 via MuJoCo equality constraints. This is a deliberate, binding scope
 decision (Phase 4A): never described as full-body or free-standing
@@ -53,9 +82,16 @@ manipulation. A free-standing probe (Phase 2) showed 0.93m of pelvis drift
 in 2 seconds under small arm torques, which is why the fixed-base MVP was
 chosen in the first place.
 
-Task 2 (language-conditioned variants beyond the 3 fixed instruction
-templates, policy integration) and Task 3 were never implemented or
-authorized in any phase.
+**Task 2**: language-conditioned two-object selection — the same
+fixed-base, torso-constrained G1 and physical gripper as Task 1, with a
+second, physically-identical green cube added. The instruction ("Pick up
+the red/green cube and place it in the blue target area.") determines which
+cube a privileged scripted expert grasps and places; see Section 14 for the
+full evidence. This is an optional, time-boxed extension, not a
+requalification of Task 1.
+
+Task 3 (a distinct simulation environment) and any form of model
+training/inference were never implemented or attempted in any phase.
 
 ## 4. Unitree G1 and Task-Local Gripper
 
@@ -490,7 +526,125 @@ See [`submission/REPRODUCE.md`](REPRODUCE.md) — every command listed there
 was actually executed in this environment during this phase, with real
 observed runtimes recorded.
 
-## 14. Future Work
+## 14. Task 2 — Language-Conditioned Two-Object Selection
+
+Full evidence: `reports/task2-language-selection.md`. Committed as
+`5f119ce` on branch `task2-language-selection`, independently audited on
+2026-09-03, and merged into `main`. Required reporting language: **language-
+conditioned task specification with a privileged scripted expert.**
+`selected_object_id` and simulator object poses are expert/evaluation
+metadata, not declared VLA policy observations.
+
+**Scene and controller**: `write_task2_scene()` adds one new body (`cube2`,
+green) to Task 1's own unmodified scene, identical size/mass/friction to
+the existing red cube. `run_trial_pick_place` gained four optional
+parameters (`cube_body_name`/`cube_geom_name`/`cube_joint_name`, defaulting
+to Task 1's literal names, and `distractor`, defaulting to `None`) so the
+same, otherwise-unmodified scripted controller can act on a caller-specified
+cube and track a second cube's displacement as read-only telemetry. No
+visual recognition or learned language understanding is used anywhere:
+`parse_selected_object()` is a keyword lookup over exactly the two
+authorized instruction strings, used only to build labels — the physical
+task is driven directly by `selected_object_id`.
+
+**Instructions**:
+1. "Pick up the red cube and place it in the blue target area."
+2. "Pick up the green cube and place it in the blue target area."
+
+**Configurations and trials**: 4 required configurations (red/green
+selected x nominal(A)/swapped arrangement), **three repeated deterministic
+executions per configuration** — this pipeline has no RNG anywhere, so the
+3 repeats are bit-identical reruns, not distinct seeds or initial
+perturbations. 12/12 trials pass.
+
+| Selected | Arrangement | task2_pass (3/3) | wrong-object placed | distractor max disp. | final target error |
+| --- | --- | --- | --- | --- | --- |
+| red | A | True | No | 0.0mm | 1.72mm |
+| green | A | True | No | 1.73mm | 6.83mm |
+| red | swapped | True | No | 1.73mm | 6.83mm |
+| green | swapped | True | No | 0.0mm | 1.72mm |
+
+Arrangement A holds both cubes at fixed poses (red at slot A, green at slot
+B); selecting red vs. green within arrangement A is the only difference
+between those two rows, and each correctly selects and places the
+instructed color — a same-scene instruction swap, not two different
+physical scenes with different "correct" answers.
+
+**Physical integrity**: both cubes are initialized once, before the first
+physics step, through their own `CubeInitGuard` instance (the same class
+Task 1 uses) — no weld, attachment, teleport, or direct qpos/qvel write for
+either cube after that point, for any reason. Distractor displacement is
+measured as **the maximum over the entire episode** of
+`norm(distractor_xy_t - distractor_xy_initial)`, tracked every physics step
+from RESET through `VERIFY_TASK_SUCCESS` — not a final-minus-initial
+figure. Independently recomputed during this audit directly from
+`logs/task2_language_selection.json`'s raw per-trial data: **maximum
+1.733mm** across all 12 trials, against the 10mm gate. Wrong-object
+placement is checked every trial (`distractor.in_target_xy`) and never
+occurs (0/12). Per-axis height/orientation and wrong-object grasp/placement
+*counts* are not separately instrumented in this pipeline beyond the XY
+displacement and target-containment checks above.
+
+**The rejected 8cm distractor slot (engineering finding, not a pass)**: an
+earlier candidate slot `(-0.08, 0.0)`, 8cm from the grasp slot and
+IK-reachable, was rejected after a full physics trial measured **48.7mm**
+of real distractor displacement. Independently reproduced during this audit
+by re-simulating that exact candidate: **48.72mm**, peaking at the RETREAT
+phase (phase-by-phase instrumentation shows displacement building through
+LOWER_TO_TARGET/OPEN/RELEASE_SETTLE and peaking at RETREAT, then easing
+slightly by VERIFY_TASK_SUCCESS) — confirmed as a real arm/gripper sweep
+disturbance caused by `RETREAT`'s pre-existing one-shot joint-space
+trajectory segment (never Cartesian-smoothed in Task 1, which never had a
+second object nearby), not a metric or indexing bug. This candidate is
+**not** among the 4 final passing configurations, which use the shipped
+`SLOT_B_OFFSET = (-0.08, -0.10)` instead, found via a three-way search
+(reachability, measured displacement in both grasp directions, and onboard-
+camera pixel visibility). The controller was not tuned separately per
+object color for any candidate.
+
+**Onboard camera**: `head_cam`'s first post-reset frame (arrangement A)
+shows both cubes and the target — `sees_red_cube`, `sees_green_cube`,
+`sees_blue_target` all true (`logs/task2_language_selection.json`
+`camera_check`), a rendering/visibility smoke check, not task-success logic.
+
+**Videos**: `submission/videos/task2_red_instruction.mp4` and
+`task2_green_instruction.mp4` (640x480, 29.41fps, 389 frames, 13.23s each) —
+decode-verified via `ffmpeg -f null -` during this audit and visually
+inspected: each shows the instructed cube grasped, transported, and placed
+in the target, with the distractor cube undisturbed in its original
+position throughout.
+
+**Task 1 non-regression**: the 4 new parameters on `run_trial_pick_place`
+are optional and default to Task 1's exact prior literal values (`"cube"`/
+`"cube_geom"`/`"cube_joint"`/`None`). **Task 1's default execution semantics
+and measured nominal result are unchanged** (`run_pick_place.py` itself was
+modified — the new parameters are additive, not byte-for-byte-unchanged
+file content). Independently re-verified during this audit: the Task 1
+Phase 4B/4C regression modules (46 tests) and the Task 2 module (23 tests)
+all pass, both before and after the merge to `main`.
+
+**Test suite and full-suite evidence**: 23 new tests
+(`tests/test_task2_language_selection.py`) covering red/green selection,
+same-scene instruction swap, wrong-object rejection, distractor
+displacement, reset/`CubeInitGuard` behavior, camera visibility, and Task 1
+non-regression. `reports/task2-language-selection.md` Section I records a
+full-suite run at commit `5f119ce`: **311 tests (288 pre-existing + 23 new),
+0 unexpected failures, 604.167s.** This audit did not re-run the full
+10-minute suite (the recorded evidence is complete, matches the commit's
+own file/test count, and reports exit status, count, and runtime); instead
+it independently re-ran the Task 2 module and the directly-relevant Task 1
+regression modules, both before and after merging into `main`, with 0
+unexpected failures each time.
+
+**Audit verdict**: independent audit of commit `5f119ce` (2026-09-03) found
+no material defects or misleading documentation. No corrective commit was
+needed. Merged into `main` via a non-fast-forward merge commit, preserving
+both branches' history.
+
+**Not attempted for Task 2**: a full Phase-5E-scale demonstration dataset,
+model policy integration, and Task 3.
+
+## 15. Future Work
 
 - Close the RETREAT-phase policy-replay generalization gap (Section 10,
   item 13) — larger H, or a position-dependent correction for large
