@@ -1,0 +1,270 @@
+{
+  "scope": "Phase 5A onboard RGB observation smoke test",
+  "configuration_used": "write_grasp_scene_4b + use_oriented_ik=False (see module docstring for why, not Phase 4F's config)",
+  "task_pass": true,
+  "height_gain_m": 0.11746907818355656,
+  "camera_specification": {
+    "parent_body": "torso_link",
+    "pos_local": [
+      0.1139635,
+      0.0,
+      0.34299999999999997
+    ],
+    "quat_local": null,
+    "fovy_deg": 90.0,
+    "resolution_wh": [
+      160,
+      120
+    ],
+    "znear_far_note": "MuJoCo <visual><map znear/zfar> are multiples of model.stat.extent, not absolute meters",
+    "rgb_dtype_channel_order": "uint8, HWC, RGB (mujoco.Renderer.render() default)",
+    "world_camera_convention": "camera looks down local -Z; local +Y is image-up; local +X is image-right (MuJoCo convention)",
+    "extrinsic_at_reset": {
+      "position_world": [
+        0.11,
+        0.0,
+        1.19
+      ],
+      "rotation_world": [
+        [
+          -0.5854905538443587,
+          0.7330004327782017,
+          -0.34628193268779645
+        ],
+        [
+          -0.810679228399881,
+          -0.5293892014509235,
+          0.25009250694118634
+        ],
+        [
+          0.0,
+          0.4271503704014816,
+          0.9041806020181352
+        ]
+      ]
+    },
+    "intrinsics": {
+      "width": 160,
+      "height": 120,
+      "fx": 60.00000000000001,
+      "fy": 60.00000000000001,
+      "cx": 80.0,
+      "cy": 60.0,
+      "fovy_deg": 90.0,
+      "fovx_deg": 106.26020470831196,
+      "matrix": [
+        [
+          60.00000000000001,
+          0.0,
+          80.0
+        ],
+        [
+          0.0,
+          60.00000000000001,
+          60.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    "quat_local_wxyz": [
+      -0.44421302511375477,
+      -0.09964693370649927,
+      0.19488506252102808,
+      0.8687721734311904
+    ]
+  },
+  "visibility": {
+    "RESET": {
+      "shape": [
+        120,
+        160,
+        3
+      ],
+      "dtype": "uint8",
+      "finite": true,
+      "in_range_0_255": true,
+      "not_blank": true,
+      "red_cube_px": 1061,
+      "blue_target_px": 28
+    },
+    "PREGRASP": {
+      "shape": [
+        120,
+        160,
+        3
+      ],
+      "dtype": "uint8",
+      "finite": true,
+      "in_range_0_255": true,
+      "not_blank": true,
+      "red_cube_px": 1061,
+      "blue_target_px": 28
+    },
+    "APPROACH": {
+      "shape": [
+        120,
+        160,
+        3
+      ],
+      "dtype": "uint8",
+      "finite": true,
+      "in_range_0_255": true,
+      "not_blank": true,
+      "red_cube_px": 1031,
+      "blue_target_px": 27
+    },
+    "CLOSE": {
+      "shape": [
+        120,
+        160,
+        3
+      ],
+      "dtype": "uint8",
+      "finite": true,
+      "in_range_0_255": true,
+      "not_blank": true,
+      "red_cube_px": 1050,
+      "blue_target_px": 18
+    },
+    "FIRST_BILATERAL_CONTACT": {
+      "shape": [
+        120,
+        160,
+        3
+      ],
+      "dtype": "uint8",
+      "finite": true,
+      "in_range_0_255": true,
+      "not_blank": true,
+      "red_cube_px": 1072,
+      "blue_target_px": 18
+    },
+    "LIFT": {
+      "shape": [
+        120,
+        160,
+        3
+      ],
+      "dtype": "uint8",
+      "finite": true,
+      "in_range_0_255": true,
+      "not_blank": true,
+      "red_cube_px": 1076,
+      "blue_target_px": 18
+    },
+    "HOLD": {
+      "shape": [
+        120,
+        160,
+        3
+      ],
+      "dtype": "uint8",
+      "finite": true,
+      "in_range_0_255": true,
+      "not_blank": true,
+      "red_cube_px": 1034,
+      "blue_target_px": 23
+    },
+    "TRANSPORT_ABOVE_TARGET": {
+      "shape": [
+        120,
+        160,
+        3
+      ],
+      "dtype": "uint8",
+      "finite": true,
+      "in_range_0_255": true,
+      "not_blank": true,
+      "red_cube_px": 1020,
+      "blue_target_px": 23
+    },
+    "LOWER_TO_TARGET": {
+      "shape": [
+        120,
+        160,
+        3
+      ],
+      "dtype": "uint8",
+      "finite": true,
+      "in_range_0_255": true,
+      "not_blank": true,
+      "red_cube_px": 1448,
+      "blue_target_px": 10
+    },
+    "OPEN": {
+      "shape": [
+        120,
+        160,
+        3
+      ],
+      "dtype": "uint8",
+      "finite": true,
+      "in_range_0_255": true,
+      "not_blank": true,
+      "red_cube_px": 1584,
+      "blue_target_px": 2
+    },
+    "VERIFY_TASK_SUCCESS": {
+      "shape": [
+        120,
+        160,
+        3
+      ],
+      "dtype": "uint8",
+      "finite": true,
+      "in_range_0_255": true,
+      "not_blank": true,
+      "red_cube_px": 1449,
+      "blue_target_px": 6
+    }
+  },
+  "cube_visible_at_all_required_phases": true,
+  "target_visible_at_all_required_pre_placement_phases": true,
+  "missing_required_phases": [],
+  "temporal_variance_nonzero": true,
+  "no_two_consecutive_frames_identical": true,
+  "n_identical_consecutive_pairs": 0,
+  "n_video_frames_checked": 390,
+  "frame_to_frame_mean_abs_diff_stats": {
+    "min": 0.010572916666666666,
+    "max": 5.783697916666667,
+    "mean": 0.3941497518566124
+  },
+  "camera_pose_constant_under_fixed_base": true,
+  "camera_pose_max_deviation_m": 0.0001875865475207799,
+  "camera_pose_note": "torso_link is rigidly welded to the world via a MuJoCo equality constraint in this fixed-base configuration. That constraint is soft (finite stiffness), not infinitely rigid, so the onboard camera position is constant to within solver precision (max deviation 0.1876 mm across the whole episode), not bit-exact zero. This is the correct, expected behavior for a rigid head mount on a fixed trunk -- the camera moves consistently with (i.e. negligibly, matching) its parent body, not independently of it.",
+  "rendering_does_not_alter_physics": true,
+  "task_still_completes_with_unchanged_controller": true,
+  "performance": {
+    "sim_only_wall_s": 4.970214379020035,
+    "sim_plus_render_wall_s": 20.985369572998025,
+    "episode_sim_time_s": 13.244,
+    "n_render_calls_in_stride_loop": 389,
+    "achieved_combined_fps": 18.53672381831808,
+    "per_frame_bytes_raw_uint8": 57600,
+    "storage_estimate_per_15s_episode": {
+      "5hz": {
+        "raw_uint8_mb": 4.12,
+        "jpeg_est_mb_at_8x": 0.515
+      },
+      "10hz": {
+        "raw_uint8_mb": 8.24,
+        "jpeg_est_mb_at_8x": 1.03
+      },
+      "20hz": {
+        "raw_uint8_mb": 16.479,
+        "jpeg_est_mb_at_8x": 2.06
+      },
+      "30hz": {
+        "raw_uint8_mb": 24.719,
+        "jpeg_est_mb_at_8x": 3.09
+      }
+    },
+    "recommended_observation_rate_hz": 10,
+    "recommendation_reason": "Achieved combined sim+render throughput was 18.54 fps in this trial (sim-only: 1332.3 steps/s equivalent episode-time ratio 2.66x realtime; sim+render: 0.63x realtime). 10 Hz leaves close to 2x headroom under the measured ~19 fps combined ceiling for a real-time onboard capture loop (leaving margin for compression/disk I/O/multi-camera setups later), while 20 Hz would consume nearly all of the measured budget and is only safely usable for OFFLINE (non-real-time) dataset generation, where rendering can be decoupled from live stepping."
+  }
+}

@@ -81,6 +81,7 @@ package versions used so far.
 .venv/bin/python -m unittest tests/test_phase4d_physics_integrity.py -v  # Phase 4D (physics-integrity audit; now fully green post-4E fix)
 .venv/bin/python -m unittest tests/test_phase4e_gripper_integrity.py -v  # Phase 4E (visual/collision fix + grasp-stability repair; honest partial result)
 .venv/bin/python -m unittest tests/test_phase4f_orientation_grasp.py -v  # Phase 4F (orientation-constrained IK + pad-mount fix; strict 10mm slip bar honestly still failing as a diagnostic, not project breakage)
+.venv/bin/python -m unittest tests/test_phase5a_onboard_camera.py -v  # Phase 5A (onboard RGB observation camera smoke test)
 ```
 
 `test_max_slip_while_grasped_still_exceeds_tightened_bar` and
@@ -222,9 +223,29 @@ passing diagnostic, not a broken build.
   complete task is what passes. No log, threshold, test, or historical
   report was changed to reach this decision — see
   `reports/phase4f-human-acceptance-decision.md`.
-- **Task 2 (cameras, dataset collection, language-conditioned variants,
-  policy integration)**: not started; requires new, explicit authorization
-  per `HANDOFF.md`.
+- **Phase 5A — Onboard RGB observation smoke test**: adds one task-local
+  onboard RGB camera (`head_cam`, rigidly mounted on `torso_link` -- the
+  vendor model has no separate head/neck body), as a future VLA policy
+  observation source. Purely additive: does not touch Task 1's controller,
+  gains, thresholds, or any historical file (confirmed: zero diff on
+  `controller.py`/`controller_3c.py`/`run_pick_place.py`/`gripper_scene.py`
+  and every prior scene/report/artifact). Verified across a **full fresh
+  nominal Task 1 episode** (not just the reset frame): the red cube and
+  blue target are both visible at every required phase (RESET, PREGRASP,
+  APPROACH, first bilateral contact, LIFT, HOLD, TRANSPORT_ABOVE_TARGET,
+  LOWER, OPEN, VERIFY_TASK_SUCCESS); rendering is confirmed read-only with
+  respect to physics (bit-identical trial outcome with vs. without the
+  camera active); camera pose tracks its fixed parent body to solver
+  precision (~0.19mm over a 13.2s episode). Measured performance: ~18.5
+  fps combined sim+render throughput; **10 Hz recommended** for a future
+  policy observation rate (~2x headroom under the measured ceiling). See
+  `reports/phase5a-onboard-camera.md` for the full camera specification,
+  the camera-placement iteration record (an early pose was accidentally
+  placed inside the robot's own head mesh -- documented, not hidden), and
+  storage estimates.
+- **Task 2 (cameras as a data-collection *feature*, HDF5 dataset pipeline,
+  language-conditioned variants, policy integration)**: not started;
+  requires new, explicit authorization per `HANDOFF.md`.
 
 ## Ground rules (all phases)
 

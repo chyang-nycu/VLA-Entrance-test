@@ -878,3 +878,71 @@ Per this phase's instructions: no controller retuning was performed, no
 prior test/threshold/log/report/video was altered, and Task 2 (cameras as
 a data-collection feature, dataset pipeline, language-conditioned variants,
 policy integration) remains unimplemented and unauthorized.
+
+## Phase 5A — onboard RGB observation smoke test
+
+Full record: `reports/phase5a-onboard-camera.md`.
+
+Adds one task-local onboard RGB camera (`head_cam`), rigidly mounted on
+`torso_link` (the vendor G1 model has no separate head/neck body -- the
+head mesh is a static geom on `torso_link`; confirmed by direct
+inspection). Purely additive: `write_grasp_scene_5a()` is a new function
+that re-parses `write_grasp_scene_4b()`'s own written output and adds one
+`<camera>` element -- `write_grasp_scene_4b()` itself, every other scene
+generator, `controller.py`, `controller_3c.py`, and `run_pick_place.py`
+are all confirmed unchanged (zero diff against commit `c9352ac`). The
+existing third-person evidence camera (`mujoco.MjvCamera`, constructed at
+render time, no MJCF element at all) is untouched and unrelated.
+
+**Configuration used, and why (a documented decision):** Phase 4F's
+orientation-IK configuration does not reach `OPEN`/`VERIFY_TASK_SUCCESS`
+in its own logged behavior (fails at `SETTLE_LOWER`) -- confirmed by
+re-running it here. Since HANDOFF.md requires onboard visibility evidence
+at exactly those two states, this smoke test uses Phase 4B/4C's
+originally-completing configuration (`use_oriented_ik=False`) instead,
+sharing every physical constant (cube, target, gripper, arm gains) with
+Phase 4F's configuration. This does not retune or re-authorize either
+configuration.
+
+**Camera pose iteration (documented, not hidden):** the first candidate
+position, designed in world coordinates, was written into the MJCF's
+`pos` attribute without converting to the parent body's local frame (a
+`<camera>` child's `pos` is local, not world) -- this placed the camera
+~0.85m too high, looking down at the whole scene from well above the
+robot. Fixed by explicit frame conversion. The corrected position then sat
+*inside* the head mesh's own bounding volume, causing visible self-
+occlusion; the final pose moves forward of the mesh's own front-face
+extent (computed from the actual STL bounding box, not guessed).
+
+**Full-episode visibility (not just the reset frame)**: verified against a
+fresh nominal Task 1 trial -- red cube visible at all 11 required
+checkpoints (RESET, PREGRASP, APPROACH, CLOSE, first bilateral contact,
+LIFT, HOLD, TRANSPORT_ABOVE_TARGET, LOWER_TO_TARGET, OPEN,
+VERIFY_TASK_SUCCESS); blue target visible at all 8 required pre-placement
+checkpoints (its near-disappearance at OPEN/VERIFY_TASK_SUCCESS is the
+cube physically covering the pad after a successful placement -- expected,
+not a defect). Rendering confirmed read-only w.r.t. physics (bit-identical
+trial outcome with/without the camera active). Camera pose confirmed
+constant to solver precision (~0.19mm over 13.24s) under the current
+fixed-base weld, which is soft/finite-stiffness, not bit-exact rigid --
+documented rather than assumed.
+
+**Performance**: ~18.5 fps combined sim+render throughput measured
+directly; 10 Hz recommended for a future policy observation rate (~2x
+headroom under the measured ceiling), with 20 Hz noted as viable only for
+offline (non-real-time) dataset generation.
+
+**Evidence**: `tasks/g1_pick_place/camera_observation.py`,
+`tasks/g1_pick_place/record_onboard_camera_episode.py`,
+`tests/test_phase5a_onboard_camera.py` (19 tests),
+`logs/phase5a_camera_smoke.json`, `artifacts/phase5a_head_camera.mp4`
+(onboard view only, 160x120, 29.41fps, 390 frames, 13.26s, decode-verified),
+`artifacts/phase5a_head_camera_frames/` (11 PNGs).
+
+Full regression this session: **178 tests, 0 unexpected failures** (159
+pre-existing unchanged + 19 new). Vendor pin unchanged at
+`4134cb5dc7ff1ba7f484deda48b5274b58694519`; vendor XML confirmed to not
+contain the string `head_cam` anywhere. No Task 1 controller parameter,
+gain, threshold, or historical report/log/video was touched. Per this
+phase's instructions, the HDF5 dataset pipeline, Task 2, model training,
+and any Task 1 retuning remain out of scope and unimplemented.
