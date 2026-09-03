@@ -1,0 +1,352 @@
+{
+  "scope": "Phase 4F orientation-constrained grasp stabilization -- final configuration evidence",
+  "orientation_ik_design": {
+    "required_axis_local": "wrist local Z (finger-pad 'tall' axis)",
+    "desired_axis_world": "+Z (vertical)",
+    "orient_tol_rad": 0.12225553903978155,
+    "orient_tol_deg": 7.004726409076352,
+    "orient_weight_final": 0.6,
+    "finger_contact_y_m": 0.041,
+    "priority": "position solved via unweighted primary Jacobian pinv (unchanged from Phase 3C); orientation is a null-space secondary objective, so it can only consume redundancy the position task does not need -- position accuracy is never traded for orientation."
+  },
+  "attempts": [
+    {
+      "attempt": 1,
+      "change": "Added solve_ik_waypoint_oriented(): null-space orientation objective, orient_weight=0.6, aligning wrist local Z to world vertical.",
+      "evidence": {
+        "orientation_residual_at_approach_deg_before": 47.39,
+        "orientation_residual_at_approach_deg_after": 44.48,
+        "max_slip_while_grasped_m": 0.02193,
+        "result": "Real full-trial rerun: FAILED at SETTLE_LOWER. Orientation residual improved only marginally (47.4 -> 44.5 deg); measured slip did not improve over Phase 4E's 0.0205 m baseline."
+      }
+    },
+    {
+      "attempt": 2,
+      "change": "Increased orient_weight from 0.6 to 2.0 (same null-space mechanism).",
+      "evidence": {
+        "isolated_ik_sweep": {
+          "orient_weight_0.6": {
+            "pos_resid_mm": 7.44,
+            "orient_resid_deg": 44.45
+          },
+          "orient_weight_2.0": {
+            "pos_resid_mm": 8.3,
+            "orient_resid_deg": 41.19
+          },
+          "orient_weight_5.0": {
+            "pos_resid_mm": 10.48,
+            "orient_resid_deg": 36.71
+          },
+          "orient_weight_10.0": {
+            "pos_resid_mm": 13.68,
+            "orient_resid_deg": 32.8
+          }
+        },
+        "co_primary_stacked_dls_sweep": {
+          "note": "Separate diagnostic: orientation stacked as a CO-PRIMARY task (not null-space-secondary) at increasing relative weight, to test whether more aggressive weighting could reach the ORIENT_TOL_RAD bar at all.",
+          "worient_0.1": {
+            "pos_resid_mm": 32.15,
+            "orient_resid_deg": 17.87
+          },
+          "worient_0.3": {
+            "pos_resid_mm": 57.8,
+            "orient_resid_deg": 4.57
+          },
+          "worient_1.0": {
+            "pos_resid_mm": 66.72,
+            "orient_resid_deg": 0.53
+          }
+        },
+        "real_full_trial_at_orient_weight_2.0": "FAILED at SETTLE_APPROACH -- TCP never settled within tolerance before CLOSE (task_pass=False, height_gain_m=0.0, no grasp attempted at all).",
+        "result": "Increasing orientation weight in EITHER form (null-space or co-primary) only reduces orientation residual by sacrificing position accuracy -- reaching ORIENT_TOL_RAD (~7 deg) requires 30-70 mm of TCP position error, i.e. missing the cube. This is a genuine kinematic reachability conflict at the APPROACH waypoint (consistent with Phase 3C's own documented wrist singularity there), not a tuning problem. REVERTED to orient_weight=0.6 (Attempt 1's value) for Attempt 3."
+      }
+    },
+    {
+      "attempt": 3,
+      "change": "Measured finger-pad mounting correction: rotate each finger BODY (not its position) by a fixed, measured quaternion about the wrist's own local Y (jaw) axis, so the pad's local Z ('tall') axis is levelled to within ~4 deg of world vertical at the real, converged nominal APPROACH configuration -- see gripper_scene.py's FINGER_MOUNT_FIX_QUAT for the full derivation. Root-cause refinement over Attempts 1-2: the wrist's local Y (jaw) axis was ALREADY well-aligned to world Y (~4-5 deg off) at APPROACH -- left/right finger height symmetry was never the actual defect. The wrist's local Z axis was ~47 deg off vertical because the arm reaches down to the cube at a steep diagonal; a pad box tilted that much contacts the cube's vertical face at a CORNER, not flush across its face -- a small, unstable contact patch that explains the reported near-drop better than a simple height mismatch.",
+      "evidence": {
+        "max_abs_contact_z_offset_from_cube_center_m_before": 0.04376,
+        "max_abs_contact_z_offset_from_cube_center_m_after": 0.03654,
+        "max_slip_while_grasped_m_before": 0.0205,
+        "max_slip_while_grasped_m_after": 0.02592,
+        "result": "Real full-trial rerun: the pad-mount fix reduced the targeted contact z-offset metric by ~17% (43.8mm -> 36.5mm), consistent with the corner-vs-flush-face hypothesis, but did NOT reduce overall measured slip (which rose slightly, 25.9mm vs 20.5mm) -- slip during this grasp is evidently also driven by dynamic effects during CLOSE/LIFT (impact, settling, friction transients), not solely by static contact-patch geometry. FAILED at SETTLE_LOWER, same state as Attempt 1."
+      }
+    }
+  ],
+  "attempt_budget_exhausted": true,
+  "final_configuration": {
+    "orient_weight": 0.6,
+    "pad_mount_fix_applied": true,
+    "note": "Attempt 3's configuration is carried forward as final: it is the only attempt that improved a real physical measurement (contact z-offset) without regressing the trial to an earlier failure point than Attempt 1's baseline, even though it does not clear the tightened acceptance bar."
+  },
+  "final_configuration_nominal_5x": [
+    {
+      "task_pass": false,
+      "grasp_pass": false,
+      "placement_pass": false,
+      "failure_state": "SETTLE_LOWER",
+      "failure_reason": "TCP did not settle at target before OPEN",
+      "height_gain_m": 0.11549095702212764,
+      "max_slip_while_grasped_m": 0.02591759542068572,
+      "downward_slip_during_hold_m": 0.004432721495014613,
+      "downward_slip_during_transport_m": 0.0,
+      "orientation_residual_at_approach_deg": 44.48271105558243,
+      "lateral_centering_error_at_approach_m": 0.009499943013833478,
+      "max_abs_contact_z_offset_from_cube_center_m": 0.03653941617775813,
+      "min_bilateral_normal_force_n": 0.09894067799698371,
+      "opposing_face_contact_left": true,
+      "opposing_face_contact_right": true,
+      "criteria_grasp_stability_4f": {
+        "both_fingers_on_opposing_faces": true,
+        "bilateral_contact_persists_lift_and_hold": true,
+        "max_slip_while_grasped_le_10mm": false,
+        "downward_slip_during_hold_le_5mm": true,
+        "downward_slip_through_transport_le_10mm": true,
+        "cube_center_within_pad_vertical_overlap": false,
+        "height_gain_ge_0_08m": true,
+        "continuous_off_table_hold_ge_2s": true,
+        "physical_release_and_settled_placement": false,
+        "normal_forces_positive_and_finite": true,
+        "no_cube_state_manipulation_after_init": true
+      },
+      "grasp_stability_pass_4f": false,
+      "final_xy_target_error_m": null,
+      "task_success_dwell_achieved_s": 0.0
+    },
+    {
+      "task_pass": false,
+      "grasp_pass": false,
+      "placement_pass": false,
+      "failure_state": "SETTLE_LOWER",
+      "failure_reason": "TCP did not settle at target before OPEN",
+      "height_gain_m": 0.11549095702212764,
+      "max_slip_while_grasped_m": 0.02591759542068572,
+      "downward_slip_during_hold_m": 0.004432721495014613,
+      "downward_slip_during_transport_m": 0.0,
+      "orientation_residual_at_approach_deg": 44.48271105558243,
+      "lateral_centering_error_at_approach_m": 0.009499943013833478,
+      "max_abs_contact_z_offset_from_cube_center_m": 0.03653941617775813,
+      "min_bilateral_normal_force_n": 0.09894067799698371,
+      "opposing_face_contact_left": true,
+      "opposing_face_contact_right": true,
+      "criteria_grasp_stability_4f": {
+        "both_fingers_on_opposing_faces": true,
+        "bilateral_contact_persists_lift_and_hold": true,
+        "max_slip_while_grasped_le_10mm": false,
+        "downward_slip_during_hold_le_5mm": true,
+        "downward_slip_through_transport_le_10mm": true,
+        "cube_center_within_pad_vertical_overlap": false,
+        "height_gain_ge_0_08m": true,
+        "continuous_off_table_hold_ge_2s": true,
+        "physical_release_and_settled_placement": false,
+        "normal_forces_positive_and_finite": true,
+        "no_cube_state_manipulation_after_init": true
+      },
+      "grasp_stability_pass_4f": false,
+      "final_xy_target_error_m": null,
+      "task_success_dwell_achieved_s": 0.0
+    },
+    {
+      "task_pass": false,
+      "grasp_pass": false,
+      "placement_pass": false,
+      "failure_state": "SETTLE_LOWER",
+      "failure_reason": "TCP did not settle at target before OPEN",
+      "height_gain_m": 0.11549095702212764,
+      "max_slip_while_grasped_m": 0.02591759542068572,
+      "downward_slip_during_hold_m": 0.004432721495014613,
+      "downward_slip_during_transport_m": 0.0,
+      "orientation_residual_at_approach_deg": 44.48271105558243,
+      "lateral_centering_error_at_approach_m": 0.009499943013833478,
+      "max_abs_contact_z_offset_from_cube_center_m": 0.03653941617775813,
+      "min_bilateral_normal_force_n": 0.09894067799698371,
+      "opposing_face_contact_left": true,
+      "opposing_face_contact_right": true,
+      "criteria_grasp_stability_4f": {
+        "both_fingers_on_opposing_faces": true,
+        "bilateral_contact_persists_lift_and_hold": true,
+        "max_slip_while_grasped_le_10mm": false,
+        "downward_slip_during_hold_le_5mm": true,
+        "downward_slip_through_transport_le_10mm": true,
+        "cube_center_within_pad_vertical_overlap": false,
+        "height_gain_ge_0_08m": true,
+        "continuous_off_table_hold_ge_2s": true,
+        "physical_release_and_settled_placement": false,
+        "normal_forces_positive_and_finite": true,
+        "no_cube_state_manipulation_after_init": true
+      },
+      "grasp_stability_pass_4f": false,
+      "final_xy_target_error_m": null,
+      "task_success_dwell_achieved_s": 0.0
+    },
+    {
+      "task_pass": false,
+      "grasp_pass": false,
+      "placement_pass": false,
+      "failure_state": "SETTLE_LOWER",
+      "failure_reason": "TCP did not settle at target before OPEN",
+      "height_gain_m": 0.11549095702212764,
+      "max_slip_while_grasped_m": 0.02591759542068572,
+      "downward_slip_during_hold_m": 0.004432721495014613,
+      "downward_slip_during_transport_m": 0.0,
+      "orientation_residual_at_approach_deg": 44.48271105558243,
+      "lateral_centering_error_at_approach_m": 0.009499943013833478,
+      "max_abs_contact_z_offset_from_cube_center_m": 0.03653941617775813,
+      "min_bilateral_normal_force_n": 0.09894067799698371,
+      "opposing_face_contact_left": true,
+      "opposing_face_contact_right": true,
+      "criteria_grasp_stability_4f": {
+        "both_fingers_on_opposing_faces": true,
+        "bilateral_contact_persists_lift_and_hold": true,
+        "max_slip_while_grasped_le_10mm": false,
+        "downward_slip_during_hold_le_5mm": true,
+        "downward_slip_through_transport_le_10mm": true,
+        "cube_center_within_pad_vertical_overlap": false,
+        "height_gain_ge_0_08m": true,
+        "continuous_off_table_hold_ge_2s": true,
+        "physical_release_and_settled_placement": false,
+        "normal_forces_positive_and_finite": true,
+        "no_cube_state_manipulation_after_init": true
+      },
+      "grasp_stability_pass_4f": false,
+      "final_xy_target_error_m": null,
+      "task_success_dwell_achieved_s": 0.0
+    },
+    {
+      "task_pass": false,
+      "grasp_pass": false,
+      "placement_pass": false,
+      "failure_state": "SETTLE_LOWER",
+      "failure_reason": "TCP did not settle at target before OPEN",
+      "height_gain_m": 0.11549095702212764,
+      "max_slip_while_grasped_m": 0.02591759542068572,
+      "downward_slip_during_hold_m": 0.004432721495014613,
+      "downward_slip_during_transport_m": 0.0,
+      "orientation_residual_at_approach_deg": 44.48271105558243,
+      "lateral_centering_error_at_approach_m": 0.009499943013833478,
+      "max_abs_contact_z_offset_from_cube_center_m": 0.03653941617775813,
+      "min_bilateral_normal_force_n": 0.09894067799698371,
+      "opposing_face_contact_left": true,
+      "opposing_face_contact_right": true,
+      "criteria_grasp_stability_4f": {
+        "both_fingers_on_opposing_faces": true,
+        "bilateral_contact_persists_lift_and_hold": true,
+        "max_slip_while_grasped_le_10mm": false,
+        "downward_slip_during_hold_le_5mm": true,
+        "downward_slip_through_transport_le_10mm": true,
+        "cube_center_within_pad_vertical_overlap": false,
+        "height_gain_ge_0_08m": true,
+        "continuous_off_table_hold_ge_2s": true,
+        "physical_release_and_settled_placement": false,
+        "normal_forces_positive_and_finite": true,
+        "no_cube_state_manipulation_after_init": true
+      },
+      "grasp_stability_pass_4f": false,
+      "final_xy_target_error_m": null,
+      "task_success_dwell_achieved_s": 0.0
+    }
+  ],
+  "deterministic": true,
+  "stage_b_informational_variants": {
+    "nominal": {
+      "task_pass": false,
+      "grasp_pass": false,
+      "placement_pass": false,
+      "failure_state": "SETTLE_LOWER",
+      "failure_reason": "TCP did not settle at target before OPEN",
+      "height_gain_m": 0.11549095702212764,
+      "max_slip_while_grasped_m": 0.02591759542068572,
+      "downward_slip_during_hold_m": 0.004432721495014613,
+      "downward_slip_during_transport_m": 0.0,
+      "orientation_residual_at_approach_deg": 44.48271105558243,
+      "lateral_centering_error_at_approach_m": 0.009499943013833478,
+      "max_abs_contact_z_offset_from_cube_center_m": 0.03653941617775813,
+      "min_bilateral_normal_force_n": 0.09894067799698371,
+      "opposing_face_contact_left": true,
+      "opposing_face_contact_right": true,
+      "criteria_grasp_stability_4f": {
+        "both_fingers_on_opposing_faces": true,
+        "bilateral_contact_persists_lift_and_hold": true,
+        "max_slip_while_grasped_le_10mm": false,
+        "downward_slip_during_hold_le_5mm": true,
+        "downward_slip_through_transport_le_10mm": true,
+        "cube_center_within_pad_vertical_overlap": false,
+        "height_gain_ge_0_08m": true,
+        "continuous_off_table_hold_ge_2s": true,
+        "physical_release_and_settled_placement": false,
+        "normal_forces_positive_and_finite": true,
+        "no_cube_state_manipulation_after_init": true
+      },
+      "grasp_stability_pass_4f": false,
+      "final_xy_target_error_m": null,
+      "task_success_dwell_achieved_s": 0.0
+    },
+    "x_minus_0.03": {
+      "task_pass": false,
+      "grasp_pass": false,
+      "placement_pass": false,
+      "failure_state": "SETTLE_LOWER",
+      "failure_reason": "TCP did not settle at target before OPEN",
+      "height_gain_m": 0.12017454842608055,
+      "max_slip_while_grasped_m": 0.020183073564259028,
+      "downward_slip_during_hold_m": 0.0018573005899656936,
+      "downward_slip_during_transport_m": 0.0,
+      "orientation_residual_at_approach_deg": 38.21423939244409,
+      "lateral_centering_error_at_approach_m": 0.004603040465006,
+      "max_abs_contact_z_offset_from_cube_center_m": 0.037367432727494876,
+      "min_bilateral_normal_force_n": 0.32858719701727196,
+      "opposing_face_contact_left": true,
+      "opposing_face_contact_right": true,
+      "criteria_grasp_stability_4f": {
+        "both_fingers_on_opposing_faces": true,
+        "bilateral_contact_persists_lift_and_hold": true,
+        "max_slip_while_grasped_le_10mm": false,
+        "downward_slip_during_hold_le_5mm": true,
+        "downward_slip_through_transport_le_10mm": true,
+        "cube_center_within_pad_vertical_overlap": false,
+        "height_gain_ge_0_08m": true,
+        "continuous_off_table_hold_ge_2s": true,
+        "physical_release_and_settled_placement": false,
+        "normal_forces_positive_and_finite": true,
+        "no_cube_state_manipulation_after_init": true
+      },
+      "grasp_stability_pass_4f": false,
+      "final_xy_target_error_m": null,
+      "task_success_dwell_achieved_s": 0.0
+    },
+    "y_plus_0.03": {
+      "task_pass": false,
+      "grasp_pass": false,
+      "placement_pass": false,
+      "failure_state": "SETTLE_LOWER",
+      "failure_reason": "TCP did not settle at target before OPEN",
+      "height_gain_m": 0.1158546982944425,
+      "max_slip_while_grasped_m": 0.02564715057671161,
+      "downward_slip_during_hold_m": 0.004274441345970437,
+      "downward_slip_during_transport_m": 0.0,
+      "orientation_residual_at_approach_deg": 43.669664268410074,
+      "lateral_centering_error_at_approach_m": 0.009493779550674944,
+      "max_abs_contact_z_offset_from_cube_center_m": 0.036725386226669765,
+      "min_bilateral_normal_force_n": 0.13713414912048805,
+      "opposing_face_contact_left": true,
+      "opposing_face_contact_right": true,
+      "criteria_grasp_stability_4f": {
+        "both_fingers_on_opposing_faces": true,
+        "bilateral_contact_persists_lift_and_hold": true,
+        "max_slip_while_grasped_le_10mm": false,
+        "downward_slip_during_hold_le_5mm": true,
+        "downward_slip_through_transport_le_10mm": true,
+        "cube_center_within_pad_vertical_overlap": false,
+        "height_gain_ge_0_08m": true,
+        "continuous_off_table_hold_ge_2s": true,
+        "physical_release_and_settled_placement": false,
+        "normal_forces_positive_and_finite": true,
+        "no_cube_state_manipulation_after_init": true
+      },
+      "grasp_stability_pass_4f": false,
+      "final_xy_target_error_m": null,
+      "task_success_dwell_achieved_s": 0.0
+    }
+  },
+  "stage_b_note": "Informational only, per HANDOFF.md Section D ('Only afterward rerun the three supported Phase 4A variants... First require: nominal stable grasp 5/5... max slip <=10mm in every run') -- Stage A's gate was NOT met (max slip while grasped exceeds 10mm on the final configuration), so this Stage B run is diagnostic evidence, not an authorized pass/fail evaluation."
+}

@@ -766,3 +766,61 @@ in overlay of task state/height gain/live slip/contact force) and
 approval of the new videos is required, and even then, the quantitative
 max-slip-while-grasped gap must be closed in a future, separately
 authorized phase before any success claim is reinstated.
+
+## Phase 4F — orientation-constrained grasp stabilization
+
+Authorized after human review of `phase4e_task1_closeup.mp4` did not
+approve Task 1: decorative-hand fix confirmed good and the cube genuinely
+lifts/places, but the cube still slides ~20.5mm downward relative to the
+gripper (above the 10mm requirement), bilateral opposing finger placement
+was not visually clear, and the grasp appeared offset below/away from the
+gripper center. Full evidence, per-attempt log, and honest outcome:
+`reports/phase4f-orientation-grasp-stabilization.md`.
+
+**Section A: `solve_ik_waypoint_oriented()`** (new, additive, in
+`controller_3c.py`) adds a null-space orientation objective to Phase 3C's
+position-priority IK, aligning the wrist's local Z axis to world vertical
+(the axis this project's finger pads treat as "tall"), leaving yaw about
+that axis free. `ORIENT_TOL_RAD ≈ 7.0 deg`, derived the same evidence-based
+way `IK_POS_TOL` was in Phase 3C. **Deliberately opt-in**: `write_grasp_scene_4b()` and `run_trial_pick_place()`'s default (`use_oriented_ik=False`)
+are unchanged, byte/physics-identical to Phase 4E -- confirmed by the full
+139-test pre-existing suite passing unmodified. Phase 4F's own path uses
+the new `write_grasp_scene_4f()` and `use_oriented_ik=True`.
+
+**3-attempt budget, all real, evidence-driven, none forcing a pass:**
+1. Null-space orientation objective (`orient_weight=0.6`): orientation
+   residual at APPROACH improved only marginally (47.4 -> 44.5 deg); slip
+   did not improve.
+2. Increased weighting (0.6 -> 2.0, plus a co-primary-stacked diagnostic):
+   found a genuine kinematic reachability conflict -- reaching the 7 deg
+   orientation tolerance at this Cartesian point requires 30-70mm of
+   position error (missing the cube). Real full trial FAILED even earlier
+   (at SETTLE_APPROACH, no grasp attempted). Reverted to `orient_weight=0.6`.
+3. Measured finger-pad mounting correction (`FINGER_MOUNT_FIX_QUAT` in
+   `gripper_scene.py`): a fixed, measured rotation of each finger body
+   (not its position) about the wrist's local Y (jaw) axis, calibrated to
+   the real converged nominal APPROACH configuration. Reduced the targeted
+   contact-z-offset metric by ~17% (43.8mm -> 36.5mm) but did **not**
+   reduce overall slip (rose slightly to 25.9mm) -- slip is evidently also
+   driven by dynamic effects (impact/settling), not solely static contact
+   geometry.
+
+**Result: 7 of 11 tightened acceptance criteria pass; the grasp-quality-
+critical ones (max 3D slip <=10mm, cube-center-within-pad-vertical-overlap,
+physical release/placement) fail.** Deterministic across 5 reruns (bit-
+identical). Stage B (3 Phase-4A-reachable variants) run informationally
+only, per HANDOFF.md's own Stage-A-gate requirement -- all 3 fail the same
+gate, consistently.
+
+New evidence: `artifacts/phase4f_task1_full.mp4` (full episode, overlay of
+state/position-residual/orientation-residual/slip/vertical-slip/contact-
+force) and `artifacts/phase4f_bilateral_contact_view.mp4` (diagnostic view
+perpendicular to the measured jaw axis, camera azimuth chosen from an
+8-way sweep specifically so neither finger pad is fully hidden behind the
+cube). Neither overwrites any earlier phase's artifacts.
+
+**Task 1 success is NOT restored.** Per the authorization, this phase
+stops after producing the videos; Task 1 remains under review pending
+human visual approval, and the documented ~26mm slip gap most likely
+requires a further, separately-authorized phase (trajectory/waypoint
+redesign, not another tuning attempt within this exhausted budget).

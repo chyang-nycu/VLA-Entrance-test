@@ -21,6 +21,8 @@ datasets/
 !artifacts/phase4d_failure_reproduction.mp4
 !artifacts/phase4e_task1_corrected.mp4
 !artifacts/phase4e_task1_closeup.mp4
+!artifacts/phase4f_task1_full.mp4
+!artifacts/phase4f_bilateral_contact_view.mp4
 
 # Temporary MuJoCo outputs
 *.mjb

@@ -70,6 +70,48 @@ FINGER_PAD_HALF = (0.012, 0.006, 0.030)
 FINGER_REACH_X = 0.10
 FINGER_OPEN_Y = 0.075
 FINGER_CONTACT_Y = CUBE_HALF + FINGER_PAD_HALF[1]  # pad face just touches cube
+
+# Phase 4F, Attempt 3 (Section D: "adjust grasp waypoint/pad-center
+# alignment using measured contact locations", NOT a gain/friction change):
+# a fixed, measured mechanical mounting correction for the two finger pads.
+#
+# Evidence: at the real, converged nominal APPROACH joint configuration
+# (reports/phase4f-orientation-grasp-stabilization.md, Section A/D), the
+# wrist's local Y axis (the jaw axis the fingers are offset along and slide
+# on) is already very well aligned with world Y (measured misalignment
+# ~4-5 deg) -- so left/right finger height symmetry was never the actual
+# problem. The wrist's local Z axis -- the axis this project's own finger
+# pad geometry treats as "tall"/vertical (FINGER_PAD_HALF[2] = 30 mm, by
+# far the pad's largest half-extent) -- was measured at ~47 deg from world
+# vertical at that same configuration, because the arm reaches down to the
+# cube at a steep diagonal, not horizontally. A pad box tilted 47 deg
+# contacts a vertical cube face at a CORNER/EDGE, not flush across its
+# face -- a small, unstable contact patch that explains the reported
+# near-drop far better than a simple height mismatch would (the height-
+# mismatch contribution from the local-Y misalignment above is only ~3 mm).
+#
+# Fix: a fixed rotation of each finger BODY (not its position -- pos stays
+# exactly (FINGER_REACH_X, +/-y_ref, 0), so the finger's origin still
+# brackets the TCP/cube target exactly as before) about the wrist's own
+# local Y axis (the jaw axis, deliberately left untouched by this
+# rotation, since it was already correct) by the angle that levels local Z
+# to within its own residual (~4 deg, well inside ORIENT_TOL_RAD) at this
+# specific, deterministic (no RNG in this pipeline) nominal configuration.
+# This is a mechanical "wrist bracket" calibration, exactly analogous to
+# choosing a fixed mounting angle for a real gripper based on its known,
+# repeatable working pose -- not a per-trial adaptive term, and it does not
+# touch the joint's own slide axis ("0 1 0" in the finger's local frame,
+# which is invariant under a rotation about that same axis).
+#
+# Limitation, reported honestly rather than hidden: this angle is
+# calibrated to the NOMINAL cube position specifically. Phase 4A/4B found
+# the wrist's configuration (and therefore this tilt) does shift somewhat
+# for the other reachable cube offsets (x-0.03, y+0.03) -- Stage B (Section
+# D) evaluates this shared, non-per-variant-tuned mounting against those
+# variants as-is, exactly as HANDOFF.md requires, and reports where it does
+# or does not generalize.
+FINGER_MOUNT_FIX_QUAT = (0.916030512778581, 0.0, -0.40110858836306396, 0.0)  # (w, x, y, z);
+# rotation of -47.295 deg about the finger body's own local Y (jaw) axis.
 # Joints are allowed to travel a little past the nominal contact point so a
 # "closed" command keeps pressing (real squeeze force via contact, robust to
 # a few mm of arm/IK misalignment) instead of stopping exactly at first
@@ -92,6 +134,7 @@ def _build_grasp_tree(
     extra_trunk_weld: bool = False,
     finger_pad_half: tuple[float, float, float] = LEGACY_FINGER_PAD_HALF,
     apply_phase4e_gripper_visuals: bool = False,
+    apply_phase4f_pad_mount_fix: bool = False,
 ) -> ET.ElementTree:
     """Shared builder: fixed pelvis + gripper + table + cube on a fresh copy
     of the vendor model. Used by write_grasp_scene() (Phase 3/3B,
@@ -258,10 +301,17 @@ def _build_grasp_tree(
         ("left", FINGER_OPEN_Y, f"{-(FINGER_OPEN_Y - FINGER_CLOSED_Y):.4f} 0"),
         ("right", -FINGER_OPEN_Y, f"0 {(FINGER_OPEN_Y - FINGER_CLOSED_Y):.4f}"),
     ):
-        finger = _sub(
-            wrist, "body", name=f"{side}_finger",
-            pos=f"{FINGER_REACH_X} {y_ref} 0",
-        )
+        finger_body_kwargs = {"pos": f"{FINGER_REACH_X} {y_ref} 0"}
+        if apply_phase4f_pad_mount_fix:
+            # Phase 4F Attempt 3: rotate the finger BODY's own local frame
+            # only (pos above is unchanged, so the finger's origin still
+            # brackets the TCP/cube target exactly as before) -- see
+            # FINGER_MOUNT_FIX_QUAT's definition for the measured evidence
+            # and derivation. The joint axis and geom below are defined in
+            # this same local frame, so both rotate consistently with it.
+            w, x, y, z = FINGER_MOUNT_FIX_QUAT
+            finger_body_kwargs["quat"] = f"{w} {x} {y} {z}"
+        finger = _sub(wrist, "body", name=f"{side}_finger", **finger_body_kwargs)
         _sub(
             finger, "joint", name=f"{side}_finger_joint", type="slide",
             axis="0 1 0", range=jrange, damping="2.0", frictionloss="0.05",
@@ -494,10 +544,41 @@ def write_grasp_scene_4b(
     finger_pad_half=FINGER_PAD_HALF (taller pads) and
     apply_phase4e_gripper_visuals=True (decorative-mesh removal, palm,
     per-side finger coloring) -- see _build_grasp_tree()'s docstring.
+
+    Deliberately UNCHANGED by Phase 4F: apply_phase4f_pad_mount_fix stays at
+    its default (False) here, so every Phase 4B/4C/4D/4E test that already
+    asserts specific numeric outcomes against this exact scene continues to
+    do so unperturbed. Phase 4F's own evidence uses write_grasp_scene_4f()
+    below instead of modifying this function in place -- the same
+    "add a new versioned scene function, do not retrofit an old one"
+    convention already used for write_grasp_scene -> write_grasp_scene_3c.
     """
     scene = TASK_DIR / scene_name
     tree = _build_grasp_tree(
         extra_trunk_weld=True, finger_pad_half=FINGER_PAD_HALF, apply_phase4e_gripper_visuals=True,
+    )
+    _add_target_pad(tree)
+    _apply_position_servo_arm(tree, arm_kp, arm_kv)
+    tree.write(scene, encoding="utf-8", xml_declaration=False)
+    return scene
+
+
+def write_grasp_scene_4f(
+    arm_kp: dict[str, float] | float,
+    arm_kv: dict[str, float] | float,
+    scene_name: str = "g1_grasp_scene_4f.xml",
+) -> Path:
+    """Phase 4F variant: identical to write_grasp_scene_4b() except
+    apply_phase4f_pad_mount_fix=True (the measured finger-pad mounting
+    correction -- see FINGER_MOUNT_FIX_QUAT). Kept as its own function,
+    writing its own scene file, so write_grasp_scene_4b()'s output and every
+    test that depends on it (Phase 4B/4C/4D/4E) are byte-for-byte/physics-
+    identical to before this phase.
+    """
+    scene = TASK_DIR / scene_name
+    tree = _build_grasp_tree(
+        extra_trunk_weld=True, finger_pad_half=FINGER_PAD_HALF, apply_phase4e_gripper_visuals=True,
+        apply_phase4f_pad_mount_fix=True,
     )
     _add_target_pad(tree)
     _apply_position_servo_arm(tree, arm_kp, arm_kv)

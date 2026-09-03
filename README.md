@@ -14,14 +14,19 @@ currently claimed** — see the notice below.
 
 > **Previous Task 1 success results are under review following visual
 > detection of collision/support inconsistencies.** Phase 4D confirmed a
-> visual/collision defect (fixed in Phase 4E) and Phase 4E's grasp-stability
+> visual/collision defect (fixed in Phase 4E). Phase 4E's grasp-stability
 > repair substantially reduced, but did not eliminate, a real grasp
-> instability found by human video review. Task 1 is not considered valid
-> again until a human visually approves `artifacts/phase4e_task1_corrected.mp4`
-> AND the remaining ~2x max-slip-while-grasped gap is closed in a future,
-> separately authorized phase. See "Phase 4D"/"Phase 4E" below,
-> `reports/phase4d-physics-integrity-audit.md`, and
-> `reports/phase4e-gripper-integrity-repair.md`.
+> instability found by human video review. Phase 4F added an orientation-
+> constrained IK objective and a measured finger-pad mounting correction,
+> diagnosed the root cause as a genuine kinematic reachability conflict at
+> the grasp waypoint, and still did not close the gap (max slip while
+> grasped: ~26mm vs. a 10mm requirement). Task 1 is not considered valid
+> again until a human visually approves `artifacts/phase4f_task1_full.mp4`
+> and `artifacts/phase4f_bilateral_contact_view.mp4` AND the remaining slip
+> gap is closed in a future, separately authorized phase. See "Phase
+> 4D"/"Phase 4E"/"Phase 4F" below, `reports/phase4d-physics-integrity-audit.md`,
+> `reports/phase4e-gripper-integrity-repair.md`, and
+> `reports/phase4f-orientation-grasp-stabilization.md`.
 
 ## Layout
 
@@ -74,6 +79,7 @@ package versions used so far.
 .venv/bin/python -m unittest tests/test_phase4c_slip_audit.py -v  # Phase 4C (slip-metric audit + video capture)
 .venv/bin/python -m unittest tests/test_phase4d_physics_integrity.py -v  # Phase 4D (physics-integrity audit; now fully green post-4E fix)
 .venv/bin/python -m unittest tests/test_phase4e_gripper_integrity.py -v  # Phase 4E (visual/collision fix + grasp-stability repair; honest partial result)
+.venv/bin/python -m unittest tests/test_phase4f_orientation_grasp.py -v  # Phase 4F (orientation-constrained IK + pad-mount fix; honest partial result)
 ```
 
 ## Phase status
@@ -167,6 +173,32 @@ package versions used so far.
   task state/height gain/live slip/contact force. **Task 1 success remains
   NOT restored, pending human video review and a future phase closing the
   remaining slip gap.**
+- **Phase 4F — Orientation-constrained grasp stabilization**: authorized
+  after human review of `phase4e_task1_closeup.mp4` did not approve Task 1
+  (grasp still slides ~20.5mm during HOLD). Added `solve_ik_waypoint_oriented()`
+  (opt-in, `controller_3c.py`) — a null-space orientation objective aligning
+  the wrist's local Z axis to vertical, with an evidence-derived
+  `ORIENT_TOL_RAD ≈ 7 deg`. 3 evidence-driven attempts: (1) the orientation
+  objective alone barely helped (47.4 -> 44.5 deg, slip unchanged); (2)
+  increasing its weight found a genuine kinematic reachability conflict at
+  the grasp waypoint (leveling the wrist there requires 30-70mm of position
+  error — reverted); (3) a measured finger-pad mounting correction
+  (`FINGER_MOUNT_FIX_QUAT`, `gripper_scene.py`) reduced the targeted
+  contact-z-offset metric by ~17% but did not reduce overall slip (25.9mm
+  final). **7 of 11 tightened acceptance criteria pass; the grasp-quality-
+  critical ones (max slip <=10mm, pad-vertical-overlap, release/placement)
+  fail.** Deliberately isolated from Phase 4B/4C/4D/4E's shared pipeline —
+  `write_grasp_scene_4b()`/`run_trial_pick_place()`'s defaults are
+  byte/physics-unchanged (confirmed: the full 139-test pre-existing suite
+  passes unmodified); Phase 4F uses its own opt-in `write_grasp_scene_4f()`
+  and `use_oriented_ik=True`. New evidence videos:
+  `artifacts/phase4f_task1_full.mp4` and
+  `artifacts/phase4f_bilateral_contact_view.mp4` (diagnostic view
+  perpendicular to the measured jaw axis). See
+  `reports/phase4f-orientation-grasp-stabilization.md` for the full
+  per-attempt evidence and 11-criteria table. **Task 1 success remains NOT
+  restored**, pending human video review and a further, separately
+  authorized phase.
 - **Task 2 (cameras, dataset collection, language-conditioned variants,
   policy integration)**: not started; requires new, explicit authorization
   per `HANDOFF.md`.
