@@ -25,6 +25,13 @@ datasets/
 !artifacts/phase4f_bilateral_contact_view.mp4
 !artifacts/phase5a_head_camera.mp4
 
+# Exception: Phase 5B's 3-episode VLA demonstration dataset prototype is
+# small (~1.7MB) and explicitly committed as a phase deliverable, not a
+# generated-debug-output dump; regenerate via
+# tasks/g1_pick_place/record_demonstrations.py (deterministic, see
+# data/schema.md).
+!data/task1_prototype.hdf5
+
 # Temporary MuJoCo outputs
 *.mjb
 tmp_mujoco*/

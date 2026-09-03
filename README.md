@@ -82,6 +82,7 @@ package versions used so far.
 .venv/bin/python -m unittest tests/test_phase4e_gripper_integrity.py -v  # Phase 4E (visual/collision fix + grasp-stability repair; honest partial result)
 .venv/bin/python -m unittest tests/test_phase4f_orientation_grasp.py -v  # Phase 4F (orientation-constrained IK + pad-mount fix; strict 10mm slip bar honestly still failing as a diagnostic, not project breakage)
 .venv/bin/python -m unittest tests/test_phase5a_onboard_camera.py -v  # Phase 5A (onboard RGB observation camera smoke test)
+.venv/bin/python -m unittest tests/test_phase5b_dataset.py -v  # Phase 5B (VLA demonstration dataset: canonical manifest, HDF5 schema, validator, replay)
 ```
 
 `test_max_slip_while_grasped_still_exceeds_tightened_bar` and
@@ -243,9 +244,31 @@ passing diagnostic, not a broken build.
   the camera-placement iteration record (an early pose was accidentally
   placed inside the robot's own head mesh -- documented, not hidden), and
   storage estimates.
-- **Task 2 (cameras as a data-collection *feature*, HDF5 dataset pipeline,
-  language-conditioned variants, policy integration)**: not started;
-  requires new, explicit authorization per `HANDOFF.md`.
+- **Phase 5B — VLA demonstration dataset prototype**: builds and verifies
+  the full HDF5 data pipeline (canonical config manifest, collector,
+  validator, replay) against exactly **three** episodes — `nominal` and
+  `x_minus_0.03` (both successful Task 1 completions) and `x_plus_0.03` (a
+  labeled, excluded failure episode). Uses the same non-oriented,
+  Phase 4E-lineage pipeline as every prior phase; does not retune Task 1's
+  controller, gains, or success thresholds (cross-checked in
+  `tests/test_phase5b_dataset.py::TestTask1CriteriaUnchanged`). A new
+  `data/task1_canonical_config.json` manifest, hashed and verified at
+  collection/validation/replay time, is the single source of truth for
+  which scene/controller/camera/thresholds are authorized; the collector,
+  validator, and replay tool all fail loudly on any mismatch.
+  **Disclosed deviation**: the originally-planned `y_plus_0.03` failure
+  variant was re-measured under the current (post-4E) config and found to
+  now *pass* deterministically (the gripper-gain/trajectory-smoothing
+  improvements since Phase 4B closed its placement-margin gap); `x_plus_0.03`
+  (a genuine, deterministic grasp-approach/reachability failure) was
+  substituted as the labeled failure episode instead, documented rather
+  than silently forced to match the original plan. See
+  `reports/phase5b-data-pipeline.md` and `data/schema.md` for the full
+  schema, per-episode results, validator/replay output, and this
+  substitution's measured record.
+- **Task 2 (language-conditioned variants, scaled dataset collection,
+  policy integration)**: not started; requires new, explicit authorization
+  per `HANDOFF.md`.
 
 ## Ground rules (all phases)
 

@@ -1,0 +1,18 @@
+{
+  "manifest_hash": "4b864ca7802df1b5042165bc7c2d0539eb08b156327e7b6ca5af3e1dd5986e8b",
+  "check1_corrected_gripper_present": true,
+  "check2_vendor_decorative_hand_absent": true,
+  "check3_task1_completes": true,
+  "check3_failure_state": null,
+  "check4_rgb_shape": [
+    120,
+    160,
+    3
+  ],
+  "check4_rgb_dtype": "uint8",
+  "check4_rgb_nonblank": true,
+  "check5_config_hash_matches_manifest": true,
+  "check5_error": null,
+  "camera_parent_body_live": "torso_link",
+  "all_checks_pass": true
+}

@@ -946,3 +946,87 @@ contain the string `head_cam` anywhere. No Task 1 controller parameter,
 gain, threshold, or historical report/log/video was touched. Per this
 phase's instructions, the HDF5 dataset pipeline, Task 2, model training,
 and any Task 1 retuning remain out of scope and unimplemented.
+
+## Phase 5B — VLA demonstration dataset prototype (authorized 2026-09-02/03)
+
+Full record: `reports/phase5b-data-pipeline.md`, schema reference
+`data/schema.md`.
+
+**Canonical manifest first, as required**: `data/task1_canonical_config.json`
+was authored and its own content SHA-256 stamped
+(`tasks/g1_pick_place/canonical_config.py`) before any collector/validator/
+replay code existed. It pins the scene generator (`write_grasp_scene_5a`,
+built on `write_grasp_scene_4b` — the Phase 4E-lineage visual/collision-
+corrected gripper, never the Phase 4F orientation-IK path, which does not
+complete placement), the non-oriented IK controller (`use_oriented_ik=false`),
+arm/gripper gains, success thresholds, and the camera specification — all
+read from the live code, not asserted. The camera's parent body
+(`torso_link`) was reconfirmed by direct `ElementTree` parse of the
+generated scene, and its true rendered resolution (160x120) was confirmed
+against the actual `mujoco.Renderer` output array shape, resolving the
+Phase 5A video's 160x128 ffprobe report as H.264 encoder padding, not the
+real observation size. The collector, validator, and replay tool all load
+this manifest and fail loudly (`ManifestMismatchError`) on any live
+mismatch — exercised directly with a tampered dataset copy, which was
+correctly rejected.
+
+**Pre-collection baseline** (`logs/phase5b_baseline_check.json`): all 5
+required checks passed on the first run — corrected gripper geometry
+present, vendor decorative hand absent, Task 1 physically completes,
+onboard RGB renders non-blank, live config hash matches manifest.
+
+**Disclosed deviation from the original plan**: `y_plus_0.03` was
+specified as the labeled placement-failure episode, based on Phase 4B/4C
+history (grasp succeeds, placement fails at a 20.4mm margin). Re-measuring
+it under the *current* canonical config (Phase 4E's gripper-gain increase
+and LIFT/TRANSPORT/LOWER trajectory smoothing, both added after Phase 4B)
+found it now **passes** deterministically (xy_err=2.07mm) — those
+controller improvements closed the placement-margin gap that variant used
+to expose. A sweep of nearby/alternate offsets found no remaining
+placement-margin-only failure zone under the current config at all: every
+tested offset either succeeds cleanly or fails at `SETTLE_APPROACH` (a
+grasp-reachability failure, before any grasp is attempted). `x_plus_0.03`
+(a genuine, deterministic `SETTLE_APPROACH` failure, previously documented
+in Phase 4A/4B as IK-unreachable) was substituted as the collection's
+failure episode instead — documented as a grasp/reachability failure, not
+mislabeled as a placement failure to match the original plan. Full
+measured record in `data/task1_canonical_config.json`'s
+`instruction_variants` object.
+
+**Dataset**: `data/task1_prototype.hdf5` (3 episodes: `nominal` and
+`x_minus_0.03` successful, `x_plus_0.03` a labeled/excluded failure),
+1,740,909 bytes, SHA-256 `d30250fac4fc0fb4dcd2bc9972dbc43a600afc73ef70fca386dd89b6c919454f`,
+committed directly (small enough). Schema: `policy_observations/` (RGB,
+joint positions/velocities, TCP pose, gripper state — the declared VLA
+policy-input group, raw frames with no video-text overlay) and
+`privileged/` (cube/target pose, contact, state-machine phase — a
+*separate* top-level group, never nested under `policy_observations/`).
+Transition convention `observation_t -> action_t -> physics_substeps ->
+observation_t+1`, recorded at 10 Hz against 500 Hz physics (50 substeps/
+transition); `len(observations) == len(actions) + 1` is a structural
+invariant of the recording loop, not a runtime coincidence.
+
+**Validator**: all required checks pass, including independently
+*recomputing* each episode's success by rerunning the deterministic
+simulation (not trusting the stored flag) — all three agreed.
+
+**Replay**: action replay (through the same `CubeInitGuard` pre-lock
+boundary, never overwritten again) deviates from the original recording by
+up to 4.9cm TCP / 15.2° max joint on the two successful episodes — expected
+and disclosed, since the 10 Hz recorded action stream is a zero-order-hold
+downsample of the original 500 Hz fine-grained waypoint ramp
+(`run_pick_place._drive_smooth`); the reachability-failure episode deviates
+by <1mm (it never reaches a ramped segment). Observation-only visualization
+replay (no physics stepped) also verified for all three episodes. Replay
+correctly refuses (`ManifestMismatchError`) when pointed at a
+manifest-hash-mismatched dataset copy.
+
+Full regression this session: **214 tests, 0 unexpected failures** (178
+pre-existing unchanged + 36 new). No Task 1 controller parameter, gain,
+threshold, or historical report/log/video was touched (verified: manifest's
+copied success thresholds cross-checked byte-for-byte against
+`run_pick_place.py`'s live constants in
+`tests/test_phase5b_dataset.py::TestTask1CriteriaUnchanged`). Vendor pin
+unchanged. Per this phase's instructions, scaled collection, language-
+conditioned Task 2, and model training remain out of scope and
+unimplemented; stopped after exactly 3 episodes.

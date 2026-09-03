@@ -1,0 +1,118 @@
+{
+  "schema_version": "1.0.0",
+  "description": "Canonical, single-source-of-truth data-generation manifest for Task 1 (\"pick up the red cube and place it in the blue target area\"). The dataset collector, validator, and replay tool all load this file and verify the live environment against it before running; a mismatch on any field listed here raises, it does not warn-and-continue.",
+  "task_id": "g1_task1_pick_place",
+  "task_instruction": "Pick up the red cube and place it in the blue target area.",
+  "project_git_commit_before_phase5b": "03a9b511d3418ddf3efb5f3b1c1809c93b485465",
+  "unitree_mujoco_pinned_commit": "4134cb5dc7ff1ba7f484deda48b5274b58694519",
+  "mujoco_version": "3.3.6",
+  "robot_embodiment": "Unitree G1 (29 DoF vendor model), fixed-base torso-constrained upper-body manipulation baseline: pelvis and torso rigidly welded to the world (equality weld constraints \"pelvis_fixed\"/\"torso_fixed\"). Not a free-standing or full-body capability.",
+  "scene": {
+    "generator_function": "tasks.g1_pick_place.camera_observation.write_grasp_scene_5a",
+    "generator_function_note": "write_grasp_scene_5a() re-parses the file written by tasks.g1_pick_place.gripper_scene.write_grasp_scene_4b() (Phase 4E-lineage: visual/collision-aligned gripper geometry, vendor decorative right_rubber_hand mesh omitted from this task-local scene) and adds only the onboard head_cam <camera> element as a child of torso_link. It never calls write_grasp_scene_4b with different arguments and never modifies that function.",
+    "underlying_functional_scene_function": "tasks.g1_pick_place.gripper_scene.write_grasp_scene_4b",
+    "scene_xml_path": "tasks/g1_pick_place/g1_grasp_scene_5a.xml",
+    "base_scene_xml_path": "tasks/g1_pick_place/g1_grasp_scene_4b.xml",
+    "explicitly_excludes": "tasks/g1_pick_place/g1_grasp_scene_4f.xml (Phase 4F orientation-IK experimental scene) -- NOT used for data collection; see controller.use_oriented_ik below."
+  },
+  "controller": {
+    "trial_function": "tasks.g1_pick_place.run_pick_place.run_trial_pick_place",
+    "ik_function": "tasks.g1_pick_place.controller_3c.solve_ik_waypoint",
+    "ik_function_note": "Position-only, non-oriented IK path. tasks.g1_pick_place.controller_3c.solve_ik_waypoint_oriented (Phase 4F) is explicitly NOT used for data collection: Phase 4F's own logged behavior (logs/phase4f_orientation_grasp.json) shows failure_state=\"SETTLE_LOWER\" -- that path does not reach VERIFY_TASK_SUCCESS/DONE and is preserved only as a documented failed experiment.",
+    "use_oriented_ik": false,
+    "arm_gains": {
+      "kp": 400.0,
+      "kv": 25.0,
+      "source_constants": "ARM_KP_4B, ARM_KV_4B in run_pick_place.py (unchanged from Phase 3C/4A)"
+    },
+    "gripper_gains": {
+      "kp": 320.0,
+      "kd": 20.0,
+      "source_constants": "GRIPPER_KP_4E, GRIPPER_KD_4E in run_pick_place.py"
+    },
+    "ik_position_tolerance_m": 0.008,
+    "orientation_tolerance_rad": "computed at import time as arcsin(min(1, ORIENT_MAX_PAD_HEIGHT_ERROR_M / FINGER_CONTACT_Y)) in controller_3c.py -- recorded as telemetry only when use_oriented_ik is exercised, not applied as a control objective on this (non-oriented) data-collection path."
+  },
+  "success_thresholds": {
+    "cube_half_extent_m": 0.035,
+    "target_pad_half_xy_m": 0.05,
+    "target_xy_success_margin_m": 0.015,
+    "target_release_height_m": 0.74,
+    "cube_linear_speed_tol_mps": 0.02,
+    "cube_angular_speed_tol_radps": 0.05,
+    "cube_supported_height_tol_m": 0.01,
+    "retreat_disturbance_tol_m": 0.005,
+    "task_success_dwell_s": 0.5,
+    "task_success_max_wait_s": 1.5,
+    "criteria_source": "tasks.g1_pick_place.run_pick_place._finalize (criteria_grasp: 5 conditions, criteria_placement: 8 conditions -- task_pass requires both groups plus the dwell-gated VERIFY_TASK_SUCCESS check)"
+  },
+  "camera": {
+    "name": "head_cam",
+    "description": "Torso-mounted onboard RGB camera positioned near head height. It is parented to torso_link -- the vendor G1 model has no separate head/neck body; the visual head mesh is itself a static geom on torso_link. Do not describe this camera as parented to a head body.",
+    "parent_body": "torso_link",
+    "parent_body_verified_by": "xml.etree.ElementTree parse of the generated g1_grasp_scene_5a.xml, confirming the <camera name=\"head_cam\"> element is a direct child of <body name=\"torso_link\">",
+    "local_pos_m": [
+      0.1139635,
+      0.0,
+      0.34299999999999997
+    ],
+    "local_quat_wxyz": [
+      -0.44421302511375477,
+      -0.09964693370649927,
+      0.19488506252102808,
+      0.8687721734311904
+    ],
+    "fovy_deg": 90.0,
+    "resolution_wh": [
+      160,
+      120
+    ],
+    "resolution_note": "160x120 is the true rendered array shape, taken directly from mujoco.Renderer(model, height=CAM_HEIGHT, width=CAM_WIDTH) in record_onboard_camera_episode.py (CAM_HEIGHT=120, CAM_WIDTH=160, tasks/g1_pick_place/camera_observation.py). The Phase 5A evidence mp4 reports 160x128 via ffprobe -- that is H.264 encoder macroblock-alignment padding introduced only in the video export step, not the observation resolution. The HDF5 dataset stores raw 160x120 frames, matching this manifest, not the padded video dimensions.",
+    "channel_order": "RGB, uint8, HWC",
+    "world_frame_camera_pos_used_for_design_m": [
+      0.11,
+      0.0,
+      1.19
+    ],
+    "torso_world_pos_at_reset_m": [
+      -0.0039635,
+      0.0,
+      0.847
+    ]
+  },
+  "instruction_variants": {
+    "nominal": {
+      "cube_xy_offset": [
+        0.0,
+        0.0
+      ],
+      "known_outcome": "Task 1 success (grasp + placement)"
+    },
+    "x_minus_0.03": {
+      "cube_xy_offset": [
+        -0.03,
+        0.0
+      ],
+      "known_outcome": "Task 1 success (grasp + placement), per Phase 4B Stage B"
+    },
+    "y_plus_0.03": {
+      "cube_xy_offset": [
+        0.0,
+        0.03
+      ],
+      "known_outcome": "Phase 4B Stage B (pre-Phase-4E/4F gains) recorded: grasp succeeds, placement fails (final XY margin 20.4mm > 15mm). Phase 5B RE-MEASURED this under the CURRENT canonical config (post-4E gripper gains 320/20 + LIFT/TRANSPORT/LOWER trajectory smoothing) and found it now PASSES task_pass=True deterministically (final xy_err=2.07mm) -- the controller improvements made since Phase 4B closed the placement-margin gap that variant used to expose. NOT used as the Phase 5B failure episode; retained here only as a historical/measurement note, not a collection target."
+    },
+    "x_plus_0.03": {
+      "cube_xy_offset": [
+        0.03,
+        0.0
+      ],
+      "known_outcome": "Deterministic grasp-approach (IK reachability) failure under the current canonical config: fails at SETTLE_APPROACH (\"TCP did not settle within tolerance before CLOSE\"), confirmed reproducible across reruns. Phase 4A/4B history recorded this offset as unreachable by a pre-run IK residual check (27.1mm > 8mm tolerance) and excluded it from Stage B; Phase 5B re-verified the same failure still occurs in simulation under the current config and uses it as the Phase 5B collection's labeled-failure episode, in place of y_plus_0.03 (see that entry's note) -- this is a grasp/reachability failure, not a placement-margin failure, and is documented as such rather than mislabeled to match the original plan."
+    }
+  },
+  "hash": {
+    "algorithm": "sha256",
+    "method": "sha256 over the UTF-8 bytes of json.dumps(canonical_subset, sort_keys=True, separators=(',', ':')), where canonical_subset is this manifest with the top-level \"hash\" key itself removed (computed by tasks.g1_pick_place.canonical_config.compute_manifest_hash).",
+    "value": "f7375efc18d00fd83b2c75228bac76a7c23922913e104d6970e9b8241b9c290b"
+  }
+}
