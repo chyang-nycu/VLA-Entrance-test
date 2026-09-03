@@ -1,0 +1,81 @@
+{
+  "schema_version": "1.0.0",
+  "description": "Machine-readable headline metrics for the G1 MuJoCo entrance-test submission. Every entry is tagged with a status distinguishing how it was established.",
+  "status_legend": {
+    "measured": "a number computed directly from simulation/replay output",
+    "derived": "computed from other measured numbers (e.g. a ratio or count)",
+    "human_reviewed": "a human directly viewed evidence (video/frames) and made an acceptance judgment",
+    "passed": "met the stated numeric target/gate",
+    "failed": "did not meet the stated numeric target/gate, reported honestly",
+    "not_attempted": "explicitly out of scope / never started in any phase"
+  },
+  "environment": {
+    "host": {"value": "Intel Mac, macOS 12.7.6, x86_64", "status": "measured"},
+    "isaac_lab_used": {"value": false, "status": "not_attempted", "note": "no macOS support"},
+    "simulator": {"value": "unitree_mujoco / MuJoCo (official allowed fallback)", "status": "measured"},
+    "pinned_unitree_mujoco_commit": {"value": "4134cb5dc7ff1ba7f484deda48b5274b58694519", "status": "measured"},
+    "mujoco_version": {"value": "3.3.6", "status": "measured"},
+    "python_version": {"value": "3.12.14", "status": "measured"}
+  },
+  "task1": {
+    "instruction_canonical": {"value": "Pick up the red cube and place it in the blue target area.", "status": "measured"},
+    "fixed_base_torso_constrained": {"value": true, "status": "measured"},
+    "task_local_physical_gripper": {"value": true, "status": "measured"},
+    "no_weld_attachment_teleport_or_post_reset_cube_manipulation": {"value": true, "status": "passed", "note": "enforced in code by CubeInitGuard, tested every dataset-collection phase"},
+    "nominal_success": {"value": true, "status": "passed", "note": "deterministic 5/5 identical reruns since Phase 3C; re-confirmed live in Phase 6"},
+    "setup_variant_reachable_envelope_success_rate": {"value": "3/3 (100%)", "status": "passed", "note": "re-confirmed live in Phase 6; was 2/3 at Phase 4B due to a since-closed placement-margin gap"},
+    "setup_variant_original_five_position_coverage": {"value": "3/5 (60%)", "status": "measured", "note": "x+0.03 and y-0.03 excluded as grasp-unreachable, confirmed by pre-run IK filter and live trial agreement"},
+    "human_visual_acceptance": {"value": "prototype task completed with a documented grasp-slip limitation", "status": "human_reviewed", "note": "Phase 4F human acceptance decision, videos artifacts/phase4f_task1_full.mp4 and artifacts/phase4f_bilateral_contact_view.mp4"},
+    "strict_10mm_grasp_slip_target": {"value": 0.02592, "unit": "m", "target_m": 0.010, "status": "failed", "note": "max 3D slip while grasped, unchanged since Phase 4F, not claimed to pass"},
+    "corrected_genuine_grasp_phase_slip_range_m": {"value": [0.033, 0.054], "status": "measured", "note": "lift/transport/lower/release on the nominal trial, Phase 4C corrected metric"}
+  },
+  "test_suite": {
+    "total_tests": {"value": 288, "status": "measured", "note": "re-run independently in Phase 6; see logs referenced in entrance_test_report.md Section 9"},
+    "unexpected_failures": {"value": 0, "status": "passed"},
+    "intentional_diagnostic_tests": {"value": 3, "status": "measured", "note": "assert documented, honestly-reported failing conditions (Phase4D decorative-hand static-vendor-mesh historical variant + 2 Phase 4F strict-slip-bar diagnostics), not accidental breakage"}
+  },
+  "dataset": {
+    "file": {"value": "data/task1_demonstrations_v1.hdf5", "status": "measured"},
+    "size_bytes": {"value": 62196309, "status": "measured"},
+    "sha256": {"value": "accfe4461e7decc0dac2f7b959496487ba94747a504c534e149b8593c7749f21", "status": "measured"},
+    "canonical_manifest_sha256": {"value": "f7375efc18d00fd83b2c75228bac76a7c23922913e104d6970e9b8241b9c290b", "status": "measured", "note": "byte-identical from Phase 5B through Phase 5E"},
+    "decoder_configuration_hash": {"value": "9ef9bd49fc376f125c10be5b46d21a45148a79a2057f32d28afc849629a81d86", "status": "measured"},
+    "collection_spec_sha256": {"value": "3e007e1fab0fca8ff5916ab42803470396f753b31e0fb89430564a5b56807d1d", "status": "measured"},
+    "configurations_attempted": {"value": 32, "status": "measured"},
+    "task_successes": {"value": 28, "status": "measured"},
+    "diagnostic_episodes": {"value": 4, "status": "measured", "note": "1 failed_interaction + 3 rejected_by_reachability"},
+    "matches_intended_24_8_split": {"value": false, "status": "measured", "note": "reported honestly per Phase 5E Section I, not resampled to force the intended split; the 24-episode BC pool itself is exactly as intended"},
+    "split_counts": {"train": 16, "val": 4, "test": 4, "diagnostics": 8, "status": "measured"},
+    "bc_training_pool_size": {"value": 24, "status": "measured"},
+    "onboard_rgb_rate_hz": {"value": 10, "status": "measured"},
+    "action_chunk_h": {"value": 5, "status": "measured"},
+    "sub_action_rate_hz": {"value": 50, "status": "measured"},
+    "execution_trace_rate_hz": {"value": 500, "status": "measured"},
+    "privileged_state_separated_from_policy_inputs": {"value": true, "status": "passed"},
+    "dataset_description_qualifier": {"value": "VLA-oriented demonstration dataset prototype with validated schema and replay instrumentation", "status": "measured", "note": "not described as model-ready"}
+  },
+  "replay_fidelity": {
+    "exact_execution_max_tcp_error_m": {"value": 3.31e-05, "target_m": 0.001, "status": "passed", "note": "max across all 29 Phase 5E episodes; mean 1.25e-6m"},
+    "policy_replay_prototype_nominal_m": {"value": 0.00809, "target_m": 0.010, "status": "passed", "note": "Phase 5D, H=5/50Hz shipped decoder"},
+    "policy_replay_prototype_x_minus_0_03_m": {"value": 0.00599, "target_m": 0.010, "status": "passed"},
+    "policy_replay_scaled_bc_pool_pass_count": {"value": "18/24", "status": "derived", "note": "computed from data/task1_demonstrations_v1_quality.json"},
+    "policy_replay_scaled_dataset_wide_pass_count": {"value": "22/29", "status": "derived"},
+    "policy_replay_scaled_max_error_m": {"value": 0.0223, "status": "measured", "note": "seed_1009, train split"},
+    "policy_replay_offenders_first_divergence_phase": {"value": "RETREAT (100% of the 7 offenders)", "status": "measured"},
+    "retreat_divergence_affects_placement_or_success": {"value": false, "status": "derived", "note": "RETREAT occurs strictly after cube release in the state machine; offenders' final placement error (1.5-4.2mm) falls inside the same range as passing episodes' (1.1-4.1mm)"}
+  },
+  "history_of_replay_error": {
+    "v1_zoh_replay_error_m": {"value": 0.0487, "status": "measured", "note": "Phase 5B/5C, 10Hz zero-order-hold of a 500Hz ramp"},
+    "exact_500hz_replay_error_m": {"value": 3.65e-08, "status": "measured", "note": "Phase 5C"},
+    "static_phase_goal_10hz_replay_error_m": {"value": 0.0969, "status": "measured", "note": "Phase 5C, two successful episodes ~97-98mm"},
+    "h5_chunked_replay_error_m": {"value": 0.00809, "status": "measured", "note": "Phase 5D, shipped decoder, nominal episode"}
+  },
+  "not_attempted": {
+    "model_training": {"value": false, "status": "not_attempted"},
+    "model_inference": {"value": false, "status": "not_attempted"},
+    "task2_environment": {"value": false, "status": "not_attempted"},
+    "task3_environment": {"value": false, "status": "not_attempted"},
+    "target_position_variation": {"value": false, "status": "not_attempted", "note": "would require a Task 1 scene-geometry change, proposed for a future phase, not attempted here"},
+    "cube_yaw_variation": {"value": false, "status": "not_attempted", "note": "no pilot evidence yet that the shared controller physically grasps under yaw"}
+  }
+}

@@ -1237,3 +1237,87 @@ canonical manifest's content are byte-identical to Phase 5B/5C/5D
 (verified via `git diff`); vendor pin unchanged; no push. Stopped after
 dataset validation and the report — no Task 2, no model training, no
 further scaling without new authorization.
+
+## Phase 6 — final entrance-test submission package (authorized 2026-09-03)
+
+Documentation/packaging phase only: no Task 2, no controller retuning, no
+dataset recollection, no model integration. All Phase 1-5E code, datasets,
+reports, logs, videos, and commits are preserved unmodified; this phase
+adds only files under `submission/`, the read-only sidecar
+`data/task1_demonstrations_v1_quality.json`, and additive updates to
+`README.md`/`HANDOFF.md`/`docs/work_log.md`.
+
+**Section A (data-quality audit)**: `data/task1_demonstrations_v1_quality.json`
+joins `logs/phase5e_validation.json` and `logs/phase5e_collection_summary.json`
+into one per-episode table (29 rows — the 3 pre-physics reachability
+rejections have no episode group) and answers the four required questions
+directly from that data: **18 of the 24 BC-success episodes pass the
+≤10mm policy-replay gate** (6 exceed it: 5 train + 1 test); **the 7
+dataset-wide offenders span train (5), test (1), and diagnostics (1) —
+zero in val**; **RETREAT-phase divergence does not change cube placement
+or task success**, because the state machine's `OPEN`/`VERIFY_RELEASE`
+(cube release) always precedes `RETREAT`, and the 7 offenders' final
+placement error (1.5-4.2mm) falls inside the same range as the 22 passing
+episodes' (1.1-4.1mm) — cross-checked against zero episodes (of 29)
+showing any divergence before release. **Recommended default training
+mask: `task_execution_through_release`** (24/24 BC pool, 29/29
+dataset-wide — empirically equal to "all episodes," since no episode
+diverges before RETREAT), with `full_episode_high_fidelity` (18/24, 22/29)
+available for consumers that also need the post-release motion itself at
+≤10mm, and `diagnostics_only` (8 episodes) for reachability/failure-mode
+study. The HDF5's own `train_eligible`/`success` labels and episode
+groups were never altered — this is a read-only derived analysis layer.
+
+**Section C (failure narrative)**: reordered from the authorization's
+bullet list into **true chronological order** (recovered directly from
+`HANDOFF.md`/`docs/work_log.md`/the phase reports) — the slip-metric
+audit/correction (Phase 4C) actually predates the decorative-hand
+discovery (Phase 4D) in the real timeline, not after it. All 13 required
+narrative points are covered with real, sourced figures (no invented
+numbers); see `submission/entrance_test_report.md`'s "Failure Narrative"
+section for the full account, including the corrected v1 ZOH figure
+(48.7mm, i.e. Phase 5C's measured 4.87cm) through Phase 5E's RETREAT
+generalization finding.
+
+**Section D (reproduction)**: `submission/REPRODUCE.md` lists 11 command
+groups; every one was actually executed in this environment during this
+phase, with real observed timings recorded (not estimates). Two safety
+findings from this verification pass, both corrected before proceeding:
+(1) `python3 -m tasks.g1_pick_place.run_pick_place` and
+`record_onboard_camera_episode`/`record_demonstrations_v3`/
+`validate_scaled_dataset`/`replay_dataset_episode ... visualize` all
+regenerate fixed output paths that already had committed historical
+versions (`logs/phase4b_pick_place_trials.json`,
+`artifacts/phase5a_head_camera.mp4`, `logs/phase5a_camera_smoke.json`,
+`logs/phase5d_v3_collection_summary.json`,
+`artifacts/phase5e_dataset_summary/*`) — each was backed up before
+testing, the regenerated output was confirmed either byte-identical or
+(for `phase4b_pick_place_trials.json`, whose live numbers have legitimately
+changed since Phase 4E) explicitly restored via `git checkout --` rather
+than left modified, so no historical record was altered by this phase's
+own verification work. (2) An initial attempt to install `pandoc` via
+Homebrew for the optional PDF was aborted after discovering it required
+compiling a full GHC (Haskell) toolchain from source — a 30-60+ minute,
+multi-gigabyte build, not the lightweight install expected; the process
+was killed before completing and nothing was left installed. **No PDF was
+produced** — documented here as "no reliable Markdown→PDF conversion
+available in this environment" rather than fabricated.
+
+**Section F (videos)**: `submission/videos/task1_third_person.mp4` is a
+copy of `artifacts/phase4f_task1_full.mp4` — the video the Phase 4F human
+acceptance decision actually reviewed and accepted (not Phase 4E's, which
+was reviewed and *not* approved). `task1_onboard_rgb.mp4` copies
+`artifacts/phase5a_head_camera.mp4`. `optional_debug_before_after.mp4` is
+a new side-by-side composite (Phase 4D failure left, Phase 4E-corrected
+right, both trimmed to 4.30s at 29.41fps) built with this repo's existing
+`imageio_ffmpeg`-bundled ffmpeg binary — no new video dependency added.
+All three decode-verified via `ffmpeg -f null -`; `submission/video_manifest.json`
+records real ffprobe-derived resolution/fps/duration plus SHA-256 for each.
+
+Full suite re-run this phase: **288 tests, 0 unexpected failures**,
+650.355s. Task 1 controller/gains/geometry/camera and the canonical
+manifest are unchanged (verified via `git diff` — this phase touches no
+file under `tasks/g1_pick_place/` except reading it); vendor pin
+unchanged; the pre-existing Go2w `terrain.STL` case-collision artifact and
+`logs/g1_mujoco_smoke.json`'s timestamp-only drift were left untouched,
+per every prior phase's same practice. No push.

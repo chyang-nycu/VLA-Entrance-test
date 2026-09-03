@@ -333,6 +333,22 @@ passing diagnostic, not a broken build.
   instead) and `data/task1_collection_spec.json` (the locked sampling
   spec, committed). See `reports/phase5e-scaled-data-collection.md` for
   the full pilot, spec, quality-gate, and validation results.
+- **Phase 6 — final entrance-test submission package**: documentation/
+  packaging only, no code/dataset/model changes. Produces
+  `submission/entrance_test_report.md` (full report, failure narrative,
+  reproduction pointer), `submission/REPRODUCE.md` (every command actually
+  executed and timed in this environment), `submission/DATASET_CARD.md`,
+  `submission/results_summary.json` (machine-readable headline metrics,
+  each tagged measured/derived/human_reviewed/passed/failed/not_attempted),
+  `submission/videos/` + `submission/video_manifest.json` (3 decode-verified
+  videos), and `data/task1_demonstrations_v1_quality.json` (a read-only
+  per-episode replay-fidelity audit of the Phase 5E dataset, with three
+  recommended training masks — does not alter the HDF5's own labels).
+  **Key finding**: of the 7 Phase 5E episodes exceeding the 10mm
+  policy-replay target, all 7 first diverge at the post-release RETREAT
+  phase — verified to never affect cube placement or task-success
+  determination. Full suite re-run: 288 tests, 0 unexpected failures. See
+  `submission/entrance_test_report.md` for the complete account.
 - **Task 2 (language-conditioned variants, scaled dataset collection,
   policy integration)**: not started; requires new, explicit authorization
   per `HANDOFF.md`.

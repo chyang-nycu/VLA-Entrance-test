@@ -1,0 +1,39 @@
+{
+  "schema_version": "1.0.0",
+  "generated_by": "ffmpeg (imageio_ffmpeg bundled binary) -i / decode verification, this repo's .venv",
+  "videos": [
+    {
+      "filename": "task1_third_person.mp4",
+      "path": "submission/videos/task1_third_person.mp4",
+      "source_path": "artifacts/phase4f_task1_full.mp4",
+      "description": "Final human-accepted third-person Task 1 evidence (Phase 4F human acceptance decision). Full episode: approach, grasp, lift, transport, lower, release, retreat, with live overlay of state/position-residual/orientation-residual/slip/contact-force. Reviewed and accepted as 'prototype task completed with a documented grasp-slip limitation' (strict <=10mm slip bar not met, measured 25.92mm).",
+      "resolution": "640x480",
+      "fps": 29.41,
+      "duration_s": 11.97,
+      "sha256": "a8e1fd96faef92be30f846a3665ba52669f3a545061139818929f02010fd3aaf",
+      "size_bytes": 320667
+    },
+    {
+      "filename": "task1_onboard_rgb.mp4",
+      "path": "submission/videos/task1_onboard_rgb.mp4",
+      "source_path": "artifacts/phase5a_head_camera.mp4",
+      "description": "Onboard RGB camera view (head_cam, torso-mounted near head height, NOT parented to a head body -- the G1 model has no separate head body). Same nominal Task 1 episode configuration used for the Phase 5B-5E dataset's camera spec. True rendered observation size is 160x120 (this encoded video is padded to 160x128 by the H.264 encoder's macroblock alignment).",
+      "resolution": "160x128",
+      "fps": 29.41,
+      "duration_s": 13.26,
+      "sha256": "037bb5cf5e7a05a7b431f204c65179b65e64e07e4a210bbeda74bee4cbfb0a85",
+      "size_bytes": 76744
+    },
+    {
+      "filename": "optional_debug_before_after.mp4",
+      "path": "submission/videos/optional_debug_before_after.mp4",
+      "source_path": null,
+      "description": "Side-by-side diagnostic comparison: LEFT = Phase 4D failure reproduction (vendor decorative right_rubber_hand mesh visibly penetrating the cube, zero collision force). RIGHT = Phase 4E corrected episode (decorative mesh removed, palm backing plate + distinguishable finger pads added). Explicitly trimmed to 4.30s (the shorter, Phase 4D, clip's duration) via ffmpeg -t 4.30 on both inputs before hstack, both normalized to 29.41fps; both source clips independently decode-verified and are separately archived unmodified at their original paths.",
+      "resolution": "960x360",
+      "fps": 29.41,
+      "duration_s": 4.28,
+      "sha256": "fe79913b61300bda7a8a0faa3c0e87a700fd2bc36a5a21834af90f8a2fb91125",
+      "size_bytes": 137782
+    }
+  ]
+}

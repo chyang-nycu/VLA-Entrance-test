@@ -25,6 +25,17 @@ datasets/
 !artifacts/phase4f_bilateral_contact_view.mp4
 !artifacts/phase5a_head_camera.mp4
 
+# Exception: Phase 6 submission video package -- copies of already-committed,
+# decode-verified evidence videos above (task1_third_person.mp4 =
+# artifacts/phase4f_task1_full.mp4, task1_onboard_rgb.mp4 =
+# artifacts/phase5a_head_camera.mp4) plus one new small diagnostic composite
+# (optional_debug_before_after.mp4, a side-by-side of the Phase 4D/4E videos
+# above, 4.30s/29.41fps). See submission/video_manifest.json for SHA-256/
+# resolution/fps/duration of each.
+!submission/videos/task1_third_person.mp4
+!submission/videos/task1_onboard_rgb.mp4
+!submission/videos/optional_debug_before_after.mp4
+
 # Exception: Phase 5B's 3-episode VLA demonstration dataset prototype is
 # small (~1.7MB) and explicitly committed as a phase deliverable, not a
 # generated-debug-output dump; regenerate via
