@@ -639,6 +639,11 @@ remains unimplemented and unauthorized.
 **Previous Task 1 success results are under review following visual detection
 of collision/support inconsistencies.**
 
+*(Superseded 2026-09-02 by the Phase 4F human acceptance decision below:
+Task 1 is now accepted at the entrance-test-prototype level, with a
+documented grasp-slip limitation. This notice is left in place, unedited,
+as the historical record of why the review began.)*
+
 ## Phase 4D — physics-integrity investigation (diagnosis only, no fix)
 
 Triggered by a user visual GUI inspection of the committed Task 1 pipeline
@@ -824,3 +829,52 @@ stops after producing the videos; Task 1 remains under review pending
 human visual approval, and the documented ~26mm slip gap most likely
 requires a further, separately-authorized phase (trajectory/waypoint
 redesign, not another tuning attempt within this exhausted budget).
+
+## Phase 4F human acceptance decision — Task 1 restored as prototype, with a documented limitation
+
+Full record: `reports/phase4f-human-acceptance-decision.md`.
+
+Human visual review of `artifacts/phase4f_task1_full.mp4` and
+`artifacts/phase4f_bilateral_contact_view.mp4` found the task execution
+(approach/grasp/lift/transport/lower/release/retreat) visually and
+functionally acceptable for this entrance-test prototype, and confirmed
+the decorative-hand visual/collision defect (Phase 4D) remains fixed.
+
+**Decision: Task 1 is restored as "prototype task completed with a
+documented grasp-slip limitation."**
+
+This is an acceptance-**policy** decision, separating two questions Phase
+4E/4F's single <=10mm bar had collapsed together:
+
+- Strict engineering-quality grasp (max 3D slip while grasped <=10mm,
+  cube-center-within-pad-vertical-overlap): **FAIL** — measured 0.02592m,
+  unchanged, not claimed to pass.
+- Entrance-test prototype task completion (physically honest pick-and-
+  place, no scripted assistance, judged acceptable by direct human video
+  review): **PASS, with the slip limitation documented.**
+- Human visual review of the Phase 4F videos: **PASS.**
+
+No log, threshold, test assertion, or historical report (Phase 3 through
+4F) was altered to reach this decision. `tests/test_phase4f_orientation_grasp.py`'s
+`test_max_slip_while_grasped_still_exceeds_tightened_bar` and
+`test_grasp_stability_pass_4f_is_honestly_false` continue to assert, and
+pass by asserting, that the strict bar is not met — this is the same
+regression-diagnostic pattern already used for Phase 3's historical
+failures, not a new mechanism.
+
+**Correction note (this project's own transparency standard, not a
+historical-report edit):** `reports/phase4f-orientation-grasp-stabilization.md`
+states "7 of 11 [criteria] pass." Re-deriving the count from that same
+report's own criteria table (3 named failures: max-slip, pad-vertical-
+overlap, release/placement) and from `logs/phase4f_orientation_grasp.json`'s
+`criteria_grasp_stability_4f` dict gives 8 pass / 3 fail, not 7/11. This is
+an arithmetic slip in the original write-up, not a data discrepancy — the
+underlying measured numbers are unchanged and correct. Per this phase's
+instruction not to alter historical reports, the original file is left as
+written; `reports/phase4f-human-acceptance-decision.md` uses the corrected
+count.
+
+Per this phase's instructions: no controller retuning was performed, no
+prior test/threshold/log/report/video was altered, and Task 2 (cameras as
+a data-collection feature, dataset pipeline, language-conditioned variants,
+policy integration) remains unimplemented and unauthorized.

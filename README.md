@@ -6,27 +6,28 @@ staged in phases; each phase must pass its acceptance test before the next
 begins.
 
 **Current capability, precisely stated: a fixed-base, torso-constrained
-upper-body manipulation baseline attempting Task 1** ("pick up the red
-cube and place it in the blue target area"). The pelvis and torso are
-rigidly welded to the world; only the right arm and gripper move. This is
-not full-body or free-standing manipulation. **Task 1 success is NOT
-currently claimed** — see the notice below.
+upper-body manipulation baseline that completes Task 1** ("pick up the red
+cube and place it in the blue target area") **as an entrance-test
+prototype, with a documented grasp-slip limitation.** The pelvis and torso
+are rigidly welded to the world; only the right arm and gripper move. This
+is not full-body or free-standing manipulation.
 
-> **Previous Task 1 success results are under review following visual
-> detection of collision/support inconsistencies.** Phase 4D confirmed a
-> visual/collision defect (fixed in Phase 4E). Phase 4E's grasp-stability
-> repair substantially reduced, but did not eliminate, a real grasp
-> instability found by human video review. Phase 4F added an orientation-
-> constrained IK objective and a measured finger-pad mounting correction,
-> diagnosed the root cause as a genuine kinematic reachability conflict at
-> the grasp waypoint, and still did not close the gap (max slip while
-> grasped: ~26mm vs. a 10mm requirement). Task 1 is not considered valid
-> again until a human visually approves `artifacts/phase4f_task1_full.mp4`
-> and `artifacts/phase4f_bilateral_contact_view.mp4` AND the remaining slip
-> gap is closed in a future, separately authorized phase. See "Phase
-> 4D"/"Phase 4E"/"Phase 4F" below, `reports/phase4d-physics-integrity-audit.md`,
+> **Task 1 acceptance status (Phase 4F human decision, 2026-09-02):**
+> human visual review of `artifacts/phase4f_task1_full.mp4` and
+> `artifacts/phase4f_bilateral_contact_view.mp4` found the task-level
+> execution (approach, grasp, lift, transport, placement) visually and
+> functionally acceptable for this entrance-test prototype, and confirmed
+> the earlier decorative-hand visual/collision defect (Phase 4D) remains
+> fixed. **The stricter internal engineering-quality bar introduced in
+> Phase 4E/4F — max 3D grasp slip <=10mm — is NOT met** (measured: ~25.9mm,
+> a real, unresolved kinematic limitation, not a faked or hidden result).
+> This is a change in acceptance **policy** (prototype-level pass with a
+> documented limitation), not a change to any measured data, log,
+> threshold, or test. See `reports/phase4f-human-acceptance-decision.md`
+> for the full decision record, and `reports/phase4d-physics-integrity-audit.md`,
 > `reports/phase4e-gripper-integrity-repair.md`, and
-> `reports/phase4f-orientation-grasp-stabilization.md`.
+> `reports/phase4f-orientation-grasp-stabilization.md` for the underlying
+> investigation/repair history.
 
 ## Layout
 
@@ -79,8 +80,19 @@ package versions used so far.
 .venv/bin/python -m unittest tests/test_phase4c_slip_audit.py -v  # Phase 4C (slip-metric audit + video capture)
 .venv/bin/python -m unittest tests/test_phase4d_physics_integrity.py -v  # Phase 4D (physics-integrity audit; now fully green post-4E fix)
 .venv/bin/python -m unittest tests/test_phase4e_gripper_integrity.py -v  # Phase 4E (visual/collision fix + grasp-stability repair; honest partial result)
-.venv/bin/python -m unittest tests/test_phase4f_orientation_grasp.py -v  # Phase 4F (orientation-constrained IK + pad-mount fix; honest partial result)
+.venv/bin/python -m unittest tests/test_phase4f_orientation_grasp.py -v  # Phase 4F (orientation-constrained IK + pad-mount fix; strict 10mm slip bar honestly still failing as a diagnostic, not project breakage)
 ```
+
+`test_max_slip_while_grasped_still_exceeds_tightened_bar` and
+`test_grasp_stability_pass_4f_is_honestly_false` in
+`tests/test_phase4f_orientation_grasp.py` are diagnostic tests: they assert,
+and pass by asserting, that the strict internal 10mm engineering-quality
+slip bar is not met (locked to the measured value, `assertAlmostEqual` to
+4 places) — the same regression-diagnostic pattern used for Phase 3's
+historical failures in `tests/test_phase3_grasp.py`. The default test
+command (`python -m unittest discover -s tests`) exits clean with zero
+unexpected failures; this strict-bar limitation is a documented, honestly-
+passing diagnostic, not a broken build.
 
 ## Phase status
 
@@ -196,9 +208,20 @@ package versions used so far.
   `artifacts/phase4f_bilateral_contact_view.mp4` (diagnostic view
   perpendicular to the measured jaw axis). See
   `reports/phase4f-orientation-grasp-stabilization.md` for the full
-  per-attempt evidence and 11-criteria table. **Task 1 success remains NOT
-  restored**, pending human video review and a further, separately
-  authorized phase.
+  per-attempt evidence and 11-criteria table (note: that report's own "7 of
+  11 pass" summary line is an arithmetic slip — the correct count from its
+  own criteria table and the raw JSON is 8 of 11; see
+  `reports/phase4f-human-acceptance-decision.md`, which uses the corrected
+  count and does not edit the original report).
+- **Phase 4F human acceptance decision**: after reviewing
+  `artifacts/phase4f_task1_full.mp4` and
+  `artifacts/phase4f_bilateral_contact_view.mp4`, **Task 1 is accepted as
+  "prototype task completed with a documented grasp-slip limitation."** The
+  strict <=10mm engineering-quality slip bar is explicitly **not** claimed
+  to pass (measured ~25.9mm); human visual/functional review of the
+  complete task is what passes. No log, threshold, test, or historical
+  report was changed to reach this decision — see
+  `reports/phase4f-human-acceptance-decision.md`.
 - **Task 2 (cameras, dataset collection, language-conditioned variants,
   policy integration)**: not started; requires new, explicit authorization
   per `HANDOFF.md`.
