@@ -312,6 +312,10 @@ def run_trial_pick_place(
     lift_n_waypoints: int = LIFT_N_WAYPOINTS_4E,
     frame_callback: "Callable[[str, mujoco.MjModel, mujoco.MjData], None] | None" = None,
     use_oriented_ik: bool = False,
+    cube_body_name: str = "cube",
+    cube_geom_name: str = "cube_geom",
+    cube_joint_name: str = "cube_joint",
+    distractor: dict | None = None,
 ) -> dict:
     """One Task 1 pick-and-place trial through the full state machine.
 
@@ -329,6 +333,29 @@ def run_trial_pick_place(
     cube_angular_speed_ok, held_continuously_full_dwell,
     retreated_without_disturbing_cube) -- grasp success and placement
     success are reported separately, and `task_pass` requires both groups.
+
+    `cube_body_name`/`cube_geom_name`/`cube_joint_name` (Task 2, Phase 6.1):
+    identify which body/geom/joint in `model_path`'s scene is the cube this
+    trial grasps and places -- default to the literal Task-1 names ("cube"/
+    "cube_geom"/"cube_joint"), so every existing caller (every Phase 4B-5E
+    call site) is byte-for-byte unaffected. Passing a different name lets
+    the same, otherwise-unmodified controller act on a *different* object in
+    a scene that contains more than one (e.g. Task 2's second, green cube),
+    with waypoints still computed from that object's own live pose, never a
+    hardcoded position.
+
+    `distractor` (Task 2, Phase 6.1), if given, is
+    `{"body_name": str, "geom_name": str, "joint_name": str,
+    "xy_offset": (float, float)}` for a second object present in the same
+    scene but never targeted by this trial. It is initialized once at RESET
+    (through its own `CubeInitGuard`, identical physical-integrity rule as
+    the primary cube -- no weld/teleport/direct write after the first
+    physics step) and its live pose is tracked every step purely for
+    telemetry (`distractor_max_displacement_m`, `distractor_final_xy`,
+    `distractor_in_target_xy`) -- it never affects control, IK targets, or
+    any pass/fail decision computed in this function. Default `None`
+    reproduces the exact pre-Task-2 code path (no second body looked up, no
+    extra guard, telemetry keys simply absent).
     """
     model = mujoco.MjModel.from_xml_path(str(model_path))
     data = mujoco.MjData(model)
@@ -339,13 +366,22 @@ def run_trial_pick_place(
     ik_scratch = mujoco.MjData(model)
     nominal_q = np.zeros(len(RIGHT_ARM_JOINTS))
 
-    cube_body_id = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_BODY, "cube")
-    cube_geom_id = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_GEOM, "cube_geom")
+    cube_body_id = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_BODY, cube_body_name)
+    cube_geom_id = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_GEOM, cube_geom_name)
     left_pad_id = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_GEOM, "left_finger_pad")
     right_pad_id = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_GEOM, "right_finger_pad")
-    cube_joint_id = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_JOINT, "cube_joint")
+    cube_joint_id = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_JOINT, cube_joint_name)
     cube_qpos_adr = int(model.jnt_qposadr[cube_joint_id])
     cube_dof_adr = int(model.jnt_dofadr[cube_joint_id])
+
+    distractor_body_id = distractor_qpos_adr = distractor_dof_adr = None
+    distractor_guard = None
+    distractor_state = {"max_displacement_m": 0.0, "initial_xy": None}
+    if distractor is not None:
+        distractor_body_id = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_BODY, distractor["body_name"])
+        distractor_joint_id = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_JOINT, distractor["joint_name"])
+        distractor_qpos_adr = int(model.jnt_qposadr[distractor_joint_id])
+        distractor_dof_adr = int(model.jnt_dofadr[distractor_joint_id])
 
     # --- RESET ---
     mujoco.mj_resetData(model, data)
@@ -354,6 +390,13 @@ def run_trial_pick_place(
     cube_z = CUBE_POS[2]
     guard = CubeInitGuard(data, cube_qpos_adr, cube_dof_adr)
     guard.set_initial_pose([cube_x, cube_y, cube_z])
+    if distractor is not None:
+        d_x = CUBE_POS[0] + distractor["xy_offset"][0]
+        d_y = CUBE_POS[1] + distractor["xy_offset"][1]
+        d_z = CUBE_POS[2]
+        distractor_guard = CubeInitGuard(data, distractor_qpos_adr, distractor_dof_adr)
+        distractor_guard.set_initial_pose([d_x, d_y, d_z])
+        distractor_state["initial_xy"] = [d_x, d_y]
     mujoco.mj_forward(model, data)
     steps_run = [0]
 
@@ -434,9 +477,18 @@ def run_trial_pick_place(
         steps_run[0] += 1
         if steps_run[0] == 1:
             guard.lock()
+            if distractor_guard is not None:
+                distractor_guard.lock()
 
         if not np.all(np.isfinite(data.qpos)) or not np.all(np.isfinite(data.qvel)):
             telemetry["finite_and_bounded"] = False
+
+        if distractor_body_id is not None:
+            d_xy_now = data.xpos[distractor_body_id][:2].copy()
+            d_disp = float(np.linalg.norm(d_xy_now - np.array(distractor_state["initial_xy"])))
+            distractor_state["max_displacement_m"] = max(distractor_state["max_displacement_m"], d_disp)
+            distractor_state["final_xy"] = d_xy_now.tolist()
+            distractor_state["final_z"] = float(data.xpos[distractor_body_id][2])
 
         cube_xyz = data.xpos[cube_body_id].copy()
         cube_z_now = float(cube_xyz[2])
@@ -794,8 +846,22 @@ def run_trial_pick_place(
             # ran at all satisfies this by construction, not by a runtime measurement here.
         }
         grasp_stability_pass_4f = all(criteria_grasp_stability_4f.values())
+        distractor_result = None
+        if distractor is not None:
+            d_final_xy = distractor_state.get("final_xy")
+            distractor_result = {
+                "initial_xy": distractor_state["initial_xy"],
+                "final_xy": d_final_xy,
+                "max_displacement_m": distractor_state["max_displacement_m"],
+                "displacement_within_10mm": distractor_state["max_displacement_m"] <= 0.010,
+                "in_target_xy": bool(
+                    d_final_xy is not None
+                    and float(np.linalg.norm(np.array(d_final_xy) - np.array(TARGET_XY))) <= TARGET_XY_SUCCESS_MARGIN_M
+                ),
+            }
         return {
             "cube_xy_offset": list(cube_xy_offset),
+            "distractor": distractor_result,
             "cube_spawn_pos": [cube_x, cube_y, cube_z],
             "cube_rest_z": rest_z,
             "height_gain_m": height_gain,

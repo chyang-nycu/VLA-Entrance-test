@@ -349,9 +349,25 @@ passing diagnostic, not a broken build.
   phase — verified to never affect cube placement or task-success
   determination. Full suite re-run: 288 tests, 0 unexpected failures. See
   `submission/entrance_test_report.md` for the complete account.
-- **Task 2 (language-conditioned variants, scaled dataset collection,
-  policy integration)**: not started; requires new, explicit authorization
-  per `HANDOFF.md`.
+- **Task 2 — language-conditioned two-object selection** (optional,
+  time-boxed; branch `task2-language-selection`, not merged to `main`):
+  extends the Task 1 scene with a second, physically-identical green cube
+  (`tasks/g1_pick_place/task2_language_selection.py`) and reuses Task 1's
+  own unmodified scripted controller, now able to act on a caller-specified
+  cube (an additive, default-preserving parameter added to
+  `run_trial_pick_place`) driven by an oracle-supplied object identity —
+  never visual recognition or learned language understanding. All 4
+  required configurations (red/green x nominal/swapped) x 3 deterministic
+  trials each (12/12) pass: the selected cube is grasped and placed, the
+  distractor never moves more than 1.73mm or enters the target, and the
+  onboard camera confirms both objects and the target are visible at reset.
+  See `reports/task2-language-selection.md` for the full evidence,
+  including the empirical slot-placement search (an 8cm-separated
+  candidate that looked geometrically safe was measured to disturb the
+  distractor by 48.7mm via an uncontrolled RETREAT joint-space sweep — not
+  guessed, found by instrumenting the actual trial). Scaled dataset
+  collection and policy integration for this task remain not started;
+  require new, explicit authorization per `HANDOFF.md`.
 
 ## Ground rules (all phases)
 
