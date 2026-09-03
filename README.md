@@ -308,6 +308,31 @@ passing diagnostic, not a broken build.
   preserved unmodified as historical evidence). See
   `reports/phase5d-policy-action-redesign.md` and `data/schema_v3.md` for
   the full three-attempt history and per-episode numbers.
+- **Phase 5E — scaled Task 1 demonstration collection**: collects 32
+  episodes (24 sampled from a pilot-calibrated continuous cube-position
+  envelope, all 24 successful, split 16/4/4 train/val/test by disjoint
+  `cube_dx` bands; 8 fixed diagnostic probes, of which 3 were rejected
+  pre-physics by IK reachability and 1 failed physically, with the
+  remaining 4 turning out to succeed) using the Phase 5D v3 action
+  schema/decoder completely unchanged. **Deviation disclosed up front**:
+  target position is NOT varied — the rendered blue target pad is fixed
+  scene geometry with no offset parameter, and varying only the
+  controller's internal target while leaving the pad fixed would produce
+  physically dishonest episodes, while moving the pad itself would be a
+  Task 1 geometry change the authorization prohibits (a first
+  implementation attempt was caught and fully reverted before use — see
+  `git diff --stat tasks/g1_pick_place/run_pick_place.py` = empty).
+  **Honest replay-fidelity finding**: scaling beyond Phase 5D's original 3
+  validated configs shows the ≤10mm policy-action-replay target holds for
+  22/29 episodes (76%) but not uniformly — 7 episodes reach up to 22.3mm,
+  attributed to large single-transition reference jumps at some sampled
+  cube positions exceeding what H=5/50Hz chunking can track within 10mm
+  (decoder held unchanged per authorization, not redesigned this phase).
+  New `data/task1_demonstrations_v1.hdf5` (62MB, left untracked — exceeds
+  the commit-size threshold; checksum/regeneration command recorded
+  instead) and `data/task1_collection_spec.json` (the locked sampling
+  spec, committed). See `reports/phase5e-scaled-data-collection.md` for
+  the full pilot, spec, quality-gate, and validation results.
 - **Task 2 (language-conditioned variants, scaled dataset collection,
   policy integration)**: not started; requires new, explicit authorization
   per `HANDOFF.md`.

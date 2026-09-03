@@ -1161,3 +1161,79 @@ success-thresholds/camera and the canonical manifest's content are
 byte-identical to Phase 5B/5C (verified via `git diff`); vendor pin
 unchanged; no push. Per this phase's instructions, scaled collection
 remains out of scope and unimplemented.
+
+## Phase 5E — scaled Task 1 demonstration collection (authorized 2026-09-03)
+
+Full record: `reports/phase5e-scaled-data-collection.md`, locked spec
+`data/task1_collection_spec.json`, raw numbers
+`logs/phase5e_collection_summary.json` / `logs/phase5e_validation.json`.
+`data/task1_prototype*.hdf5` (v1/v2/v3), their reports/schemas, and
+commits `67ccf89`/`965b947`/`621a63a` are preserved unmodified — this
+phase is entirely new/additive files. Uses the Phase 5D v3 action
+schema/decoder completely UNCHANGED.
+
+**Deviation disclosed up front, before collection**: the authorization
+asked for a target-position distribution alongside cube position. This
+conflicts with a second instruction in the same authorization ("do not
+modify Task 1 geometry") — the blue target pad is fixed MJCF geometry
+with no offset parameter, so varying only the controller's internal
+target while leaving the rendered pad fixed would make RGB frames show
+the pad in the wrong place relative to the true placement target. A first
+implementation attempt (`target_xy_offset` parameter on
+`run_trial_pick_place`) was caught before use and fully reverted (`git
+checkout -- tasks/g1_pick_place/run_pick_place.py`, confirmed via empty
+`git diff`). Target position is fixed at `(0,0)` for all 32 episodes;
+only cube position is varied. A version-2 spec enabling a scene-geometry
+change to properly support target variation is proposed for later
+authorization.
+
+**Pilot** (12 full trials + 2 IK-only reachability grids, kept separate,
+`logs/phase5e_pilot_*.json`): calibrated a continuous `cube_dx ∈
+[-0.035,-0.005]`, `cube_dy ∈ [-0.01,0.035]` envelope — IK-reachable and
+physically confirmed at all 4 corners + center. Found `cube_dx=0.0` is
+IK-reachable only for `cube_dy≥0.0` (asymmetric boundary, empirically
+discovered).
+
+**Locked spec** (`data/task1_collection_spec.json`, SHA-256
+`3e007e1fab...`): 24 configs sampled continuously from the envelope above
+via `numpy.random.default_rng(seed)` (deterministic per-seed, no ambient
+RNG), split 16/4/4 train/val/test by disjoint `cube_dx` bands (genuine
+spatial held-out cells, not random frame splitting); 8 fixed diagnostic
+probes (3 reachability-reject, 2 reachability-boundary, 3
+physical-failure) with deliberately uncertain outcomes. 3 instruction
+paraphrase templates selected deterministically per seed.
+
+**Actual outcome (honestly reported, not forced to match 24/8 — see
+report Section I)**: all 24 success-envelope configs succeeded (100% hit
+rate, exactly the intended BC-training pool); of the 8 diagnostic probes,
+3 were rejected pre-physics by IK reachability and 1 failed physically
+(`SETTLE_APPROACH`), but the other 4 turned out to succeed (their outcomes
+were genuinely uncertain by design). **32 attempted, 28 successes, 4
+diagnostic** (not 24/8) — no episode discarded to force a different count;
+all 8 diagnostics-split episodes keep `train_eligible=False` regardless of
+individual outcome, so the 24-episode BC-training pool is unaffected.
+
+**Honest replay-fidelity finding**: exact execution replay: 29/29 within
+1mm (max 3.31e-5m). Policy-action replay (Phase 5D's decoder, unchanged):
+only 22/29 (76%) meet the ≤10mm target that held for both of Phase 5D's
+original successful configs — 7 episodes reach up to 22.3mm. Diagnosed
+(not fixed, decoder held unchanged per authorization) as large
+single-transition reference jumps at some sampled cube positions
+exceeding what H=5/50Hz chunking can track; action-magnitude distribution
+shows sub-action deltas up to 149mm against a typical ~1mm mean.
+
+`data/task1_demonstrations_v1.hdf5`: 29 episodes, 62,196,309 bytes, SHA-256
+`accfe4461e7dec...` — left untracked (exceeds the 20MB commit threshold);
+checksum/regeneration command recorded instead. Regenerate:
+`python3 -m tasks.g1_pick_place.collect_dataset`.
+
+New tools: `tasks/g1_pick_place/collect_dataset.py`,
+`tasks/g1_pick_place/validate_scaled_dataset.py`,
+`tasks/g1_pick_place/replay_dataset_episode.py`. New tests:
+`tests/test_phase5e_scaled_collection.py`.
+
+Task 1 controller/gains/geometry/success-thresholds/camera and the
+canonical manifest's content are byte-identical to Phase 5B/5C/5D
+(verified via `git diff`); vendor pin unchanged; no push. Stopped after
+dataset validation and the report — no Task 2, no model training, no
+further scaling without new authorization.

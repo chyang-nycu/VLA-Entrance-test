@@ -48,6 +48,16 @@ datasets/
 # phases' evidence.
 !data/task1_prototype_v3.hdf5
 
+# Phase 5E's scaled-collection dataset (data/task1_demonstrations_v1.hdf5,
+# ~62MB, 29 episodes) is deliberately NOT exempted here, unlike the small
+# task1_prototype*.hdf5 files above -- it exceeds the phase's own 20MB
+# commit-size threshold, so it stays covered by the *.hdf5 rule above.
+# Checksum/size/regeneration command are recorded in
+# reports/phase5e-scaled-data-collection.md and
+# logs/phase5e_collection_summary.json instead; regenerate via
+# tasks/g1_pick_place/collect_dataset.py (deterministic per
+# data/task1_collection_spec.json's locked seed list).
+
 # Temporary MuJoCo outputs
 *.mjb
 tmp_mujoco*/

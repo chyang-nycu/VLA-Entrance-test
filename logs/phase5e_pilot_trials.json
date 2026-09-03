@@ -1,0 +1,206 @@
+[
+  {
+    "id": "P1_box_corner_a",
+    "cube_xy_offset": [
+      -0.035,
+      -0.01
+    ],
+    "target_xy_offset": [
+      0.0,
+      0.0
+    ],
+    "all_reachable": true,
+    "task_pass": true,
+    "failure_state": null,
+    "failure_reason": null,
+    "final_xy_target_error_m": 0.005036914300698335,
+    "wall_s": 5.090883800992742
+  },
+  {
+    "id": "P2_box_corner_b",
+    "cube_xy_offset": [
+      -0.035,
+      0.035
+    ],
+    "target_xy_offset": [
+      0.0,
+      0.0
+    ],
+    "all_reachable": true,
+    "task_pass": true,
+    "failure_state": null,
+    "failure_reason": null,
+    "final_xy_target_error_m": 0.0033535703162712047,
+    "wall_s": 3.813624163973145
+  },
+  {
+    "id": "P3_box_corner_c",
+    "cube_xy_offset": [
+      -0.005,
+      -0.01
+    ],
+    "target_xy_offset": [
+      0.0,
+      0.0
+    ],
+    "all_reachable": true,
+    "task_pass": true,
+    "failure_state": null,
+    "failure_reason": null,
+    "final_xy_target_error_m": 0.0004942768189641201,
+    "wall_s": 3.753036742040422
+  },
+  {
+    "id": "P4_box_corner_d",
+    "cube_xy_offset": [
+      -0.005,
+      0.035
+    ],
+    "target_xy_offset": [
+      0.0,
+      0.0
+    ],
+    "all_reachable": true,
+    "task_pass": true,
+    "failure_state": null,
+    "failure_reason": null,
+    "final_xy_target_error_m": 0.001260596848204348,
+    "wall_s": 3.732985930982977
+  },
+  {
+    "id": "P5_box_center",
+    "cube_xy_offset": [
+      -0.02,
+      0.01
+    ],
+    "target_xy_offset": [
+      0.0,
+      0.0
+    ],
+    "all_reachable": true,
+    "task_pass": true,
+    "failure_state": null,
+    "failure_reason": null,
+    "final_xy_target_error_m": 0.003129037341118573,
+    "wall_s": 3.60258279601112
+  },
+  {
+    "id": "P6_reject_probe",
+    "cube_xy_offset": [
+      0.005,
+      0.0
+    ],
+    "target_xy_offset": [
+      0.0,
+      0.0
+    ],
+    "all_reachable": false,
+    "task_pass": false,
+    "failure_state": "SETTLE_APPROACH",
+    "failure_reason": "TCP did not settle within tolerance before CLOSE",
+    "final_xy_target_error_m": null,
+    "wall_s": 0.8335621870355681
+  },
+  {
+    "id": "P7_dy_stress",
+    "cube_xy_offset": [
+      0.0,
+      0.045
+    ],
+    "target_xy_offset": [
+      0.0,
+      0.0
+    ],
+    "all_reachable": false,
+    "task_pass": false,
+    "failure_state": "SETTLE_APPROACH",
+    "failure_reason": "TCP did not settle within tolerance before CLOSE",
+    "final_xy_target_error_m": null,
+    "wall_s": 0.8096948500024155
+  },
+  {
+    "id": "P8_combo_a",
+    "cube_xy_offset": [
+      -0.02,
+      0.01
+    ],
+    "target_xy_offset": [
+      0.03,
+      -0.03
+    ],
+    "all_reachable": true,
+    "task_pass": true,
+    "failure_state": null,
+    "failure_reason": null,
+    "final_xy_target_error_m": 0.0022379088197895403,
+    "wall_s": 3.8500757120200433
+  },
+  {
+    "id": "P9_combo_b",
+    "cube_xy_offset": [
+      -0.02,
+      0.01
+    ],
+    "target_xy_offset": [
+      -0.03,
+      0.03
+    ],
+    "all_reachable": true,
+    "task_pass": true,
+    "failure_state": null,
+    "failure_reason": null,
+    "final_xy_target_error_m": 0.003930159292044395,
+    "wall_s": 4.711366311006714
+  },
+  {
+    "id": "P10_dy_boundary",
+    "cube_xy_offset": [
+      -0.01,
+      -0.015
+    ],
+    "target_xy_offset": [
+      0.0,
+      0.0
+    ],
+    "all_reachable": true,
+    "task_pass": true,
+    "failure_state": null,
+    "failure_reason": null,
+    "final_xy_target_error_m": 0.0014257744343085263,
+    "wall_s": 3.7328075109981
+  },
+  {
+    "id": "P11_target_far_x",
+    "cube_xy_offset": [
+      0.0,
+      0.0
+    ],
+    "target_xy_offset": [
+      0.04,
+      0.0
+    ],
+    "all_reachable": true,
+    "task_pass": false,
+    "failure_state": "SETTLE_LOWER",
+    "failure_reason": "TCP did not settle at target before OPEN",
+    "final_xy_target_error_m": null,
+    "wall_s": 3.527018681052141
+  },
+  {
+    "id": "P12_target_far_neg_x",
+    "cube_xy_offset": [
+      0.0,
+      0.0
+    ],
+    "target_xy_offset": [
+      -0.04,
+      0.0
+    ],
+    "all_reachable": true,
+    "task_pass": true,
+    "failure_state": null,
+    "failure_reason": null,
+    "final_xy_target_error_m": 0.005701987824351393,
+    "wall_s": 3.6222173819551244
+  }
+]

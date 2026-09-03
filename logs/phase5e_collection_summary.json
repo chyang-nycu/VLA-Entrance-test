@@ -1,0 +1,785 @@
+{
+  "collection_spec_sha256": "3e007e1fab0fca8ff5916ab42803470396f753b31e0fb89430564a5b56807d1d",
+  "canonical_manifest_sha256": "f7375efc18d00fd83b2c75228bac76a7c23922913e104d6970e9b8241b9c290b",
+  "decoder_configuration_hash": "9ef9bd49fc376f125c10be5b46d21a45148a79a2057f32d28afc849629a81d86",
+  "n_configs_attempted": 32,
+  "n_success": 28,
+  "n_failed_interaction": 1,
+  "n_rejected_by_reachability": 3,
+  "n_diagnostic_total": 4,
+  "intended_n_success": 24,
+  "intended_n_diagnostic": 8,
+  "matches_intended_split": false,
+  "attempted_configs": [
+    {
+      "seed": 1000,
+      "split": "train",
+      "cube_xy_offset": [
+        -0.02718,
+        0.01717
+      ],
+      "target_xy_offset": [
+        0.0,
+        0.0
+      ],
+      "instruction_utterance": "Place the red block on the blue pad.",
+      "instruction_template_id": 2,
+      "all_reachable": true,
+      "probe_kind": "success_envelope_sample",
+      "outcome": "success",
+      "task_pass": true,
+      "failure_stage": "",
+      "failure_reason": "",
+      "n_transitions": 132,
+      "wall_s": 12.424879661004525,
+      "sim_time_s": 13.200000000000001,
+      "final_xy_target_error_m": 0.001997077452134774
+    },
+    {
+      "seed": 1001,
+      "split": "train",
+      "cube_xy_offset": [
+        -0.02581,
+        -0.00929
+      ],
+      "target_xy_offset": [
+        0.0,
+        0.0
+      ],
+      "instruction_utterance": "Move the red cube to the blue target.",
+      "instruction_template_id": 1,
+      "all_reachable": true,
+      "probe_kind": "success_envelope_sample",
+      "outcome": "success",
+      "task_pass": true,
+      "failure_stage": "",
+      "failure_reason": "",
+      "n_transitions": 132,
+      "wall_s": 13.530286637018435,
+      "sim_time_s": 13.200000000000001,
+      "final_xy_target_error_m": 0.0027097440513486966
+    },
+    {
+      "seed": 1002,
+      "split": "train",
+      "cube_xy_offset": [
+        -0.02929,
+        0.00607
+      ],
+      "target_xy_offset": [
+        0.0,
+        0.0
+      ],
+      "instruction_utterance": "Place the red block on the blue pad.",
+      "instruction_template_id": 2,
+      "all_reachable": true,
+      "probe_kind": "success_envelope_sample",
+      "outcome": "success",
+      "task_pass": true,
+      "failure_stage": "",
+      "failure_reason": "",
+      "n_transitions": 132,
+      "wall_s": 12.463998854975216,
+      "sim_time_s": 13.200000000000001,
+      "final_xy_target_error_m": 0.002053738968963856
+    },
+    {
+      "seed": 1003,
+      "split": "train",
+      "cube_xy_offset": [
+        -0.03218,
+        0.00155
+      ],
+      "target_xy_offset": [
+        0.0,
+        0.0
+      ],
+      "instruction_utterance": "Pick up the red cube and place it in the blue target area.",
+      "instruction_template_id": 0,
+      "all_reachable": true,
+      "probe_kind": "success_envelope_sample",
+      "outcome": "success",
+      "task_pass": true,
+      "failure_stage": "",
+      "failure_reason": "",
+      "n_transitions": 132,
+      "wall_s": 14.796990620030556,
+      "sim_time_s": 13.200000000000001,
+      "final_xy_target_error_m": 0.0036337340371712834
+    },
+    {
+      "seed": 1004,
+      "split": "train",
+      "cube_xy_offset": [
+        -0.03499,
+        -0.00414
+      ],
+      "target_xy_offset": [
+        0.0,
+        0.0
+      ],
+      "instruction_utterance": "Pick up the red cube and place it in the blue target area.",
+      "instruction_template_id": 0,
+      "all_reachable": true,
+      "probe_kind": "success_envelope_sample",
+      "outcome": "success",
+      "task_pass": true,
+      "failure_stage": "",
+      "failure_reason": "",
+      "n_transitions": 132,
+      "wall_s": 10.152733219030779,
+      "sim_time_s": 13.200000000000001,
+      "final_xy_target_error_m": 0.003994874911335212
+    },
+    {
+      "seed": 1005,
+      "split": "train",
+      "cube_xy_offset": [
+        -0.03377,
+        0.03188
+      ],
+      "target_xy_offset": [
+        0.0,
+        0.0
+      ],
+      "instruction_utterance": "Move the red cube to the blue target.",
+      "instruction_template_id": 1,
+      "all_reachable": true,
+      "probe_kind": "success_envelope_sample",
+      "outcome": "success",
+      "task_pass": true,
+      "failure_stage": "",
+      "failure_reason": "",
+      "n_transitions": 132,
+      "wall_s": 9.784238254011143,
+      "sim_time_s": 13.200000000000001,
+      "final_xy_target_error_m": 0.0038078532940378444
+    },
+    {
+      "seed": 1006,
+      "split": "train",
+      "cube_xy_offset": [
+        -0.02995,
+        0.01704
+      ],
+      "target_xy_offset": [
+        0.0,
+        0.0
+      ],
+      "instruction_utterance": "Place the red block on the blue pad.",
+      "instruction_template_id": 2,
+      "all_reachable": true,
+      "probe_kind": "success_envelope_sample",
+      "outcome": "success",
+      "task_pass": true,
+      "failure_stage": "",
+      "failure_reason": "",
+      "n_transitions": 132,
+      "wall_s": 9.835021884005982,
+      "sim_time_s": 13.200000000000001,
+      "final_xy_target_error_m": 0.0019933442894174707
+    },
+    {
+      "seed": 1007,
+      "split": "train",
+      "cube_xy_offset": [
+        -0.03393,
+        0.02672
+      ],
+      "target_xy_offset": [
+        0.0,
+        0.0
+      ],
+      "instruction_utterance": "Move the red cube to the blue target.",
+      "instruction_template_id": 1,
+      "all_reachable": true,
+      "probe_kind": "success_envelope_sample",
+      "outcome": "success",
+      "task_pass": true,
+      "failure_stage": "",
+      "failure_reason": "",
+      "n_transitions": 132,
+      "wall_s": 10.218979755009059,
+      "sim_time_s": 13.200000000000001,
+      "final_xy_target_error_m": 0.003340736939255599
+    },
+    {
+      "seed": 1008,
+      "split": "train",
+      "cube_xy_offset": [
+        -0.03249,
+        0.02659
+      ],
+      "target_xy_offset": [
+        0.0,
+        0.0
+      ],
+      "instruction_utterance": "Move the red cube to the blue target.",
+      "instruction_template_id": 1,
+      "all_reachable": true,
+      "probe_kind": "success_envelope_sample",
+      "outcome": "success",
+      "task_pass": true,
+      "failure_stage": "",
+      "failure_reason": "",
+      "n_transitions": 132,
+      "wall_s": 9.937976279994473,
+      "sim_time_s": 13.200000000000001,
+      "final_xy_target_error_m": 0.0036659969057770696
+    },
+    {
+      "seed": 1009,
+      "split": "train",
+      "cube_xy_offset": [
+        -0.03415,
+        0.00471
+      ],
+      "target_xy_offset": [
+        0.0,
+        0.0
+      ],
+      "instruction_utterance": "Pick up the red cube and place it in the blue target area.",
+      "instruction_template_id": 0,
+      "all_reachable": true,
+      "probe_kind": "success_envelope_sample",
+      "outcome": "success",
+      "task_pass": true,
+      "failure_stage": "",
+      "failure_reason": "",
+      "n_transitions": 132,
+      "wall_s": 9.888560198945925,
+      "sim_time_s": 13.200000000000001,
+      "final_xy_target_error_m": 0.004231729884793536
+    },
+    {
+      "seed": 1010,
+      "split": "train",
+      "cube_xy_offset": [
+        -0.03358,
+        0.01411
+      ],
+      "target_xy_offset": [
+        0.0,
+        0.0
+      ],
+      "instruction_utterance": "Pick up the red cube and place it in the blue target area.",
+      "instruction_template_id": 0,
+      "all_reachable": true,
+      "probe_kind": "success_envelope_sample",
+      "outcome": "success",
+      "task_pass": true,
+      "failure_stage": "",
+      "failure_reason": "",
+      "n_transitions": 132,
+      "wall_s": 10.78427402296802,
+      "sim_time_s": 13.200000000000001,
+      "final_xy_target_error_m": 0.003374708313943585
+    },
+    {
+      "seed": 1011,
+      "split": "train",
+      "cube_xy_offset": [
+        -0.03074,
+        0.01535
+      ],
+      "target_xy_offset": [
+        0.0,
+        0.0
+      ],
+      "instruction_utterance": "Move the red cube to the blue target.",
+      "instruction_template_id": 1,
+      "all_reachable": true,
+      "probe_kind": "success_envelope_sample",
+      "outcome": "success",
+      "task_pass": true,
+      "failure_stage": "",
+      "failure_reason": "",
+      "n_transitions": 132,
+      "wall_s": 10.355682500987314,
+      "sim_time_s": 13.200000000000001,
+      "final_xy_target_error_m": 0.0030862039973163467
+    },
+    {
+      "seed": 1012,
+      "split": "train",
+      "cube_xy_offset": [
+        -0.03041,
+        0.02513
+      ],
+      "target_xy_offset": [
+        0.0,
+        0.0
+      ],
+      "instruction_utterance": "Pick up the red cube and place it in the blue target area.",
+      "instruction_template_id": 0,
+      "all_reachable": true,
+      "probe_kind": "success_envelope_sample",
+      "outcome": "success",
+      "task_pass": true,
+      "failure_stage": "",
+      "failure_reason": "",
+      "n_transitions": 132,
+      "wall_s": 10.08093405602267,
+      "sim_time_s": 13.200000000000001,
+      "final_xy_target_error_m": 0.00407828276906267
+    },
+    {
+      "seed": 1013,
+      "split": "train",
+      "cube_xy_offset": [
+        -0.02308,
+        -0.00645
+      ],
+      "target_xy_offset": [
+        0.0,
+        0.0
+      ],
+      "instruction_utterance": "Place the red block on the blue pad.",
+      "instruction_template_id": 2,
+      "all_reachable": true,
+      "probe_kind": "success_envelope_sample",
+      "outcome": "success",
+      "task_pass": true,
+      "failure_stage": "",
+      "failure_reason": "",
+      "n_transitions": 132,
+      "wall_s": 10.353722006024327,
+      "sim_time_s": 13.200000000000001,
+      "final_xy_target_error_m": 0.003362455418636745
+    },
+    {
+      "seed": 1014,
+      "split": "train",
+      "cube_xy_offset": [
+        -0.02847,
+        0.01636
+      ],
+      "target_xy_offset": [
+        0.0,
+        0.0
+      ],
+      "instruction_utterance": "Place the red block on the blue pad.",
+      "instruction_template_id": 2,
+      "all_reachable": true,
+      "probe_kind": "success_envelope_sample",
+      "outcome": "success",
+      "task_pass": true,
+      "failure_stage": "",
+      "failure_reason": "",
+      "n_transitions": 132,
+      "wall_s": 10.457754939969163,
+      "sim_time_s": 13.200000000000001,
+      "final_xy_target_error_m": 0.0020446851696898512
+    },
+    {
+      "seed": 1015,
+      "split": "train",
+      "cube_xy_offset": [
+        -0.0296,
+        0.01732
+      ],
+      "target_xy_offset": [
+        0.0,
+        0.0
+      ],
+      "instruction_utterance": "Move the red cube to the blue target.",
+      "instruction_template_id": 1,
+      "all_reachable": true,
+      "probe_kind": "success_envelope_sample",
+      "outcome": "success",
+      "task_pass": true,
+      "failure_stage": "",
+      "failure_reason": "",
+      "n_transitions": 132,
+      "wall_s": 9.622759110992774,
+      "sim_time_s": 13.200000000000001,
+      "final_xy_target_error_m": 0.002260069774317166
+    },
+    {
+      "seed": 2000,
+      "split": "val",
+      "cube_xy_offset": [
+        -0.01597,
+        0.01954
+      ],
+      "target_xy_offset": [
+        0.0,
+        0.0
+      ],
+      "instruction_utterance": "Pick up the red cube and place it in the blue target area.",
+      "instruction_template_id": 0,
+      "all_reachable": true,
+      "probe_kind": "success_envelope_sample",
+      "outcome": "success",
+      "task_pass": true,
+      "failure_stage": "",
+      "failure_reason": "",
+      "n_transitions": 132,
+      "wall_s": 9.619523029017728,
+      "sim_time_s": 13.200000000000001,
+      "final_xy_target_error_m": 0.0021454639906835415
+    },
+    {
+      "seed": 2001,
+      "split": "val",
+      "cube_xy_offset": [
+        -0.01703,
+        -0.00083
+      ],
+      "target_xy_offset": [
+        0.0,
+        0.0
+      ],
+      "instruction_utterance": "Move the red cube to the blue target.",
+      "instruction_template_id": 1,
+      "all_reachable": true,
+      "probe_kind": "success_envelope_sample",
+      "outcome": "success",
+      "task_pass": true,
+      "failure_stage": "",
+      "failure_reason": "",
+      "n_transitions": 132,
+      "wall_s": 9.494521120970603,
+      "sim_time_s": 13.200000000000001,
+      "final_xy_target_error_m": 0.0028027247438903837
+    },
+    {
+      "seed": 2002,
+      "split": "val",
+      "cube_xy_offset": [
+        -0.01378,
+        0.03323
+      ],
+      "target_xy_offset": [
+        0.0,
+        0.0
+      ],
+      "instruction_utterance": "Place the red block on the blue pad.",
+      "instruction_template_id": 2,
+      "all_reachable": true,
+      "probe_kind": "success_envelope_sample",
+      "outcome": "success",
+      "task_pass": true,
+      "failure_stage": "",
+      "failure_reason": "",
+      "n_transitions": 132,
+      "wall_s": 9.988998621003702,
+      "sim_time_s": 13.200000000000001,
+      "final_xy_target_error_m": 0.0018987719075871888
+    },
+    {
+      "seed": 2003,
+      "split": "val",
+      "cube_xy_offset": [
+        -0.01794,
+        0.02965
+      ],
+      "target_xy_offset": [
+        0.0,
+        0.0
+      ],
+      "instruction_utterance": "Move the red cube to the blue target.",
+      "instruction_template_id": 1,
+      "all_reachable": true,
+      "probe_kind": "success_envelope_sample",
+      "outcome": "success",
+      "task_pass": true,
+      "failure_stage": "",
+      "failure_reason": "",
+      "n_transitions": 132,
+      "wall_s": 10.195247011026368,
+      "sim_time_s": 13.200000000000001,
+      "final_xy_target_error_m": 0.0023950796033092524
+    },
+    {
+      "seed": 3000,
+      "split": "test",
+      "cube_xy_offset": [
+        -0.00951,
+        0.00476
+      ],
+      "target_xy_offset": [
+        0.0,
+        0.0
+      ],
+      "instruction_utterance": "Pick up the red cube and place it in the blue target area.",
+      "instruction_template_id": 0,
+      "all_reachable": true,
+      "probe_kind": "success_envelope_sample",
+      "outcome": "success",
+      "task_pass": true,
+      "failure_stage": "",
+      "failure_reason": "",
+      "n_transitions": 132,
+      "wall_s": 9.3714687449974,
+      "sim_time_s": 13.200000000000001,
+      "final_xy_target_error_m": 0.001548316273639127
+    },
+    {
+      "seed": 3001,
+      "split": "test",
+      "cube_xy_offset": [
+        -0.00566,
+        0.02735
+      ],
+      "target_xy_offset": [
+        0.0,
+        0.0
+      ],
+      "instruction_utterance": "Move the red cube to the blue target.",
+      "instruction_template_id": 1,
+      "all_reachable": true,
+      "probe_kind": "success_envelope_sample",
+      "outcome": "success",
+      "task_pass": true,
+      "failure_stage": "",
+      "failure_reason": "",
+      "n_transitions": 132,
+      "wall_s": 9.61929164204048,
+      "sim_time_s": 13.200000000000001,
+      "final_xy_target_error_m": 0.0011132817440008798
+    },
+    {
+      "seed": 3002,
+      "split": "test",
+      "cube_xy_offset": [
+        -0.01181,
+        0.01391
+      ],
+      "target_xy_offset": [
+        0.0,
+        0.0
+      ],
+      "instruction_utterance": "Place the red block on the blue pad.",
+      "instruction_template_id": 2,
+      "all_reachable": true,
+      "probe_kind": "success_envelope_sample",
+      "outcome": "success",
+      "task_pass": true,
+      "failure_stage": "",
+      "failure_reason": "",
+      "n_transitions": 132,
+      "wall_s": 10.692655488965102,
+      "sim_time_s": 13.200000000000001,
+      "final_xy_target_error_m": 0.001773950646669189
+    },
+    {
+      "seed": 3003,
+      "split": "test",
+      "cube_xy_offset": [
+        -0.0125,
+        0.02989
+      ],
+      "target_xy_offset": [
+        0.0,
+        0.0
+      ],
+      "instruction_utterance": "Move the red cube to the blue target.",
+      "instruction_template_id": 1,
+      "all_reachable": true,
+      "probe_kind": "success_envelope_sample",
+      "outcome": "success",
+      "task_pass": true,
+      "failure_stage": "",
+      "failure_reason": "",
+      "n_transitions": 132,
+      "wall_s": 10.912794048024807,
+      "sim_time_s": 13.200000000000001,
+      "final_xy_target_error_m": 0.001344744116918889
+    },
+    {
+      "seed": 9000,
+      "split": "diagnostics",
+      "cube_xy_offset": [
+        0.008,
+        0.0
+      ],
+      "target_xy_offset": [
+        0.0,
+        0.0
+      ],
+      "instruction_utterance": "Pick up the red cube and place it in the blue target area.",
+      "instruction_template_id": 0,
+      "all_reachable": false,
+      "probe_kind": "reachability_reject_probe",
+      "outcome": "rejected_by_reachability",
+      "task_pass": false,
+      "failure_stage": "REACHABILITY_PREFILTER",
+      "failure_reason": "position-only IK reachability failed before any physics step was run",
+      "wall_s": 0.0,
+      "sim_time_s": 0.0
+    },
+    {
+      "seed": 9001,
+      "split": "diagnostics",
+      "cube_xy_offset": [
+        0.018,
+        0.0
+      ],
+      "target_xy_offset": [
+        0.0,
+        0.0
+      ],
+      "instruction_utterance": "Move the red cube to the blue target.",
+      "instruction_template_id": 1,
+      "all_reachable": false,
+      "probe_kind": "reachability_reject_probe",
+      "outcome": "rejected_by_reachability",
+      "task_pass": false,
+      "failure_stage": "REACHABILITY_PREFILTER",
+      "failure_reason": "position-only IK reachability failed before any physics step was run",
+      "wall_s": 0.0,
+      "sim_time_s": 0.0
+    },
+    {
+      "seed": 9002,
+      "split": "diagnostics",
+      "cube_xy_offset": [
+        0.03,
+        0.0
+      ],
+      "target_xy_offset": [
+        0.0,
+        0.0
+      ],
+      "instruction_utterance": "Place the red block on the blue pad.",
+      "instruction_template_id": 2,
+      "all_reachable": false,
+      "probe_kind": "reachability_reject_probe",
+      "outcome": "rejected_by_reachability",
+      "task_pass": false,
+      "failure_stage": "REACHABILITY_PREFILTER",
+      "failure_reason": "position-only IK reachability failed before any physics step was run",
+      "wall_s": 0.0,
+      "sim_time_s": 0.0
+    },
+    {
+      "seed": 9003,
+      "split": "diagnostics",
+      "cube_xy_offset": [
+        -0.002,
+        -0.012
+      ],
+      "target_xy_offset": [
+        0.0,
+        0.0
+      ],
+      "instruction_utterance": "Pick up the red cube and place it in the blue target area.",
+      "instruction_template_id": 0,
+      "all_reachable": true,
+      "probe_kind": "reachability_boundary_probe",
+      "outcome": "success",
+      "task_pass": true,
+      "failure_stage": "",
+      "failure_reason": "",
+      "n_transitions": 132,
+      "wall_s": 9.56813922704896,
+      "sim_time_s": 13.200000000000001,
+      "final_xy_target_error_m": 0.0006307325741749936
+    },
+    {
+      "seed": 9004,
+      "split": "diagnostics",
+      "cube_xy_offset": [
+        -0.001,
+        -0.008
+      ],
+      "target_xy_offset": [
+        0.0,
+        0.0
+      ],
+      "instruction_utterance": "Move the red cube to the blue target.",
+      "instruction_template_id": 1,
+      "all_reachable": true,
+      "probe_kind": "reachability_boundary_probe",
+      "outcome": "success",
+      "task_pass": true,
+      "failure_stage": "",
+      "failure_reason": "",
+      "n_transitions": 132,
+      "wall_s": 9.657978511007968,
+      "sim_time_s": 13.200000000000001,
+      "final_xy_target_error_m": 0.0012351969963211105
+    },
+    {
+      "seed": 9005,
+      "split": "diagnostics",
+      "cube_xy_offset": [
+        -0.028,
+        0.042
+      ],
+      "target_xy_offset": [
+        0.0,
+        0.0
+      ],
+      "instruction_utterance": "Place the red block on the blue pad.",
+      "instruction_template_id": 2,
+      "all_reachable": true,
+      "probe_kind": "physical_failure_probe",
+      "outcome": "success",
+      "task_pass": true,
+      "failure_stage": "",
+      "failure_reason": "",
+      "n_transitions": 132,
+      "wall_s": 10.918444694019854,
+      "sim_time_s": 13.200000000000001,
+      "final_xy_target_error_m": 0.002328606390028933
+    },
+    {
+      "seed": 9006,
+      "split": "diagnostics",
+      "cube_xy_offset": [
+        0.0,
+        0.04
+      ],
+      "target_xy_offset": [
+        0.0,
+        0.0
+      ],
+      "instruction_utterance": "Pick up the red cube and place it in the blue target area.",
+      "instruction_template_id": 0,
+      "all_reachable": true,
+      "probe_kind": "physical_failure_probe",
+      "outcome": "failed_interaction",
+      "task_pass": false,
+      "failure_stage": "SETTLE_APPROACH",
+      "failure_reason": "TCP did not settle within tolerance before CLOSE",
+      "n_transitions": 31,
+      "wall_s": 2.8822166559984908,
+      "sim_time_s": 3.1,
+      "final_xy_target_error_m": null
+    },
+    {
+      "seed": 9007,
+      "split": "diagnostics",
+      "cube_xy_offset": [
+        -0.005,
+        0.04
+      ],
+      "target_xy_offset": [
+        0.0,
+        0.0
+      ],
+      "instruction_utterance": "Move the red cube to the blue target.",
+      "instruction_template_id": 1,
+      "all_reachable": true,
+      "probe_kind": "physical_failure_probe",
+      "outcome": "success",
+      "task_pass": true,
+      "failure_stage": "",
+      "failure_reason": "",
+      "n_transitions": 132,
+      "wall_s": 9.614273701969068,
+      "sim_time_s": 13.200000000000001,
+      "final_xy_target_error_m": 0.0019356323765994654
+    }
+  ],
+  "hdf5_path": "data/task1_demonstrations_v1.hdf5",
+  "hdf5_size_bytes": 62196309,
+  "hdf5_sha256": "accfe4461e7decc0dac2f7b959496487ba94747a504c534e149b8593c7749f21",
+  "collection_wall_time_s": 322.24047896201955,
+  "sim_time_total_s": 372.6999999999998,
+  "wall_time_physics_trials_only_s": 297.2243444970809,
+  "hdf5_exceeds_commit_size_threshold": true,
+  "hdf5_regeneration_command": "python3 -m tasks.g1_pick_place.collect_dataset"
+}

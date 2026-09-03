@@ -1,0 +1,662 @@
+{
+  "schema_version": "1.0.0",
+  "spec_version": "v1",
+  "description": "Phase 5E locked scaled-collection sampling specification for Task 1 (\"pick up the red cube and place it in the blue target area\"). Locked BEFORE the final collection run and not edited after seeing final results (see reports/phase5e-scaled-data-collection.md Section I for the actual outcome and any honest deviation from the intended 24 success / 8 diagnostic split). Reuses the Phase 5D v3 action schema/decoder and the unchanged canonical manifest below.",
+  "canonical_manifest_sha256": "f7375efc18d00fd83b2c75228bac76a7c23922913e104d6970e9b8241b9c290b",
+  "canonical_manifest_path": "data/task1_canonical_config.json",
+  "decoder_reused_from": "Phase 5D tasks.g1_pick_place.policy_action_codec (UNCHANGED)",
+  "DEVIATION_DISCLOSURE_target_position_not_varied": "Section A/B of this phase's authorization asked for a 'target XY distribution' to be varied. This was investigated and NOT implemented, for a hard, structural reason discovered during implementation: the blue target pad is a fixed visual/collision geometry element baked into the MJCF scene at generation time (tasks.g1_pick_place.gripper_scene.write_grasp_scene_4b, 'target_pad' geom placed at the module-level TARGET_POS constant, with no offset parameter). A first implementation attempt added a target_xy_offset parameter to run_trial_pick_place's CONTROLLER waypoints only (transport/lower/retreat targets) while leaving the rendered pad geometry fixed -- this was caught before use and reverted (git checkout -- tasks/g1_pick_place/run_pick_place.py, confirmed via empty git diff) because it would have produced episodes whose RGB frames show the blue pad in one location while the actual/correct placement target silently differs -- a physically dishonest mismatch between visual ground truth and the true task goal, which this project's standing rules exist to prevent. Moving the rendered pad itself would be a Task 1 GEOMETRY change, explicitly prohibited by this phase's own authorization ('Do not modify task physics, controller gains, geometry, camera, success thresholds, or setup variants'). Given this direct conflict between two explicit instructions in the same authorization, this phase preserves Task 1 geometry unchanged (no modification to run_pick_place.py or gripper_scene.py) and does NOT vary target position -- every one of the 32 episodes uses target_xy_offset = (0.0, 0.0), the single fixed nominal target location, matching the rendered pad exactly. cube_xy_distribution below is varied continuously instead, which is unaffected by this constraint (the red cube's spawn geometry IS parameterized correctly through CubeInitGuard, matching Phase 5B-5D precedent). A future phase could authorize a scene-geometry change (moving the rendered pad together with the controller target) to properly support target-position variation; that is proposed here for later authorization, not attempted in this phase.",
+  "pilot": {
+    "performed": true,
+    "purpose": "Calibrate a physically-supported continuous sampling envelope for cube_xy_offset before locking this spec, using cheap position-only IK reachability diagnostics (tasks.g1_pick_place.run_pick_place.diagnose_pick_place_reachability) followed by a small number of full physics trials to confirm IK-reachable configs are ALSO physically achievable end to end. The pilot ALSO included several target_xy_offset probes (P8, P9, P11, P12 in the pilot log) run through the since-reverted controller-only parameterization described in the deviation disclosure above; these directly caused the decision to exclude target-position variation from this phase's locked spec (P11 found target_xy_offset=(0.04,0.0) fails at SETTLE_LOWER despite passing IK reachability -- had target variation been kept, this asymmetry would have shaped the safe envelope, but since it is excluded entirely, these 4 pilot results are retained only as the evidence for that exclusion decision, not as calibration data for any distribution used in the final collection).",
+    "kept_separate_from_final_dataset": true,
+    "pilot_ik_grid_log": "logs/phase5e_pilot_ik_grid.json",
+    "pilot_trial_log": "logs/phase5e_pilot_trials.json",
+    "pilot_trial_count": 12,
+    "key_findings": [
+      "Position-only IK reachability (all_reachable) correctly predicts the known x_plus_0.03 grasp-reachability failure (cube_xy_offset=(0.03,0.0): all_reachable=False, real trial fails at SETTLE_APPROACH) -- used as a genuine pre-run reject filter, not merely descriptive.",
+      "Cube offset region cube_dx in [-0.035,-0.005], cube_dy in [-0.01,0.035] is IK-reachable at all 4 corners plus center AND physically succeeds in full trials (5/5 pilot points: P1,P2,P3,P4,P5).",
+      "cube_dx=0.0 is IK-reachable only for cube_dy>=0.0 (not for cube_dy<0.0 in the range tested) -- an asymmetric boundary discovered empirically, not assumed; this is why the locked cube_dx envelope stops at -0.005, not 0.0, and why 2 of the 8 diagnostic probes (9003, 9004) target this exact boundary.",
+      "cube_dy=0.045 (dx=0.0) and cube_dx=+0.005 (dy=0.0) are both IK-unreachable AND fail the real trial at SETTLE_APPROACH (pilot P6, P7) -- consistent double confirmation of the reachability filter.",
+      "target_xy_offset probes (P8,P9,P11,P12, using the since-reverted controller-only parameterization) found IK reachability across a wide +-0.05m grid, but a genuine PHYSICAL-only failure at target_xy_offset=(0.04,0.0) (SETTLE_LOWER) -- this result is why target-position variation is excluded from this phase's locked spec rather than pursued further (see deviation disclosure above), not because it was infeasible to sample, but because the rendered pad geometry cannot honestly follow it without a geometry change outside this phase's authorization."
+    ]
+  },
+  "sampling_distribution": {
+    "cube_xy_distribution": {
+      "kind": "uniform_continuous",
+      "cube_dx_range_m": [
+        -0.035,
+        -0.005
+      ],
+      "cube_dy_range_m": [
+        -0.01,
+        0.035
+      ],
+      "base_pos": "tasks.g1_pick_place.gripper_scene.CUBE_POS (0.33, -0.15, table_top+cube_half)",
+      "rationale": "Locked from pilot findings above -- fully IK-reachable and physically confirmed at both corners and center of this box (pilot P1-P5). Does not re-sample the exact nominal (0,0) point (already covered by Phase 5B/5C/5D) as part of the 24 success-intended configs."
+    },
+    "cube_yaw_distribution": {
+      "kind": "fixed",
+      "value_rad": 0.0,
+      "rationale": "NOT enabled this round. Section B explicitly gates cube-yaw variation on 'a pilot that proves the shared controller can physically grasp it' -- this phase's pilot (12 trials, see above) did not include any yaw perturbation, so there is no evidence to support enabling it yet. Left at the same fixed yaw=0 used by every prior phase (5A-5D)."
+    },
+    "target_xy_distribution": {
+      "kind": "fixed",
+      "value_m": [
+        0.0,
+        0.0
+      ],
+      "rationale": "See DEVIATION_DISCLOSURE_target_position_not_varied above -- the rendered target pad geometry cannot be moved without a Task 1 geometry change outside this phase's authorization."
+    },
+    "initial_arm_pose_perturbation": {
+      "kind": "none",
+      "rationale": "NOT enabled ('if safely supported' -- Section A). The arm always resets to the same canonical zero joint-space pose (mujoco.mj_resetData default qpos, identical to every prior phase back through Phase 3B) before each trial. No pilot evidence exists yet that perturbing the reset arm pose is safe, so this phase does not attempt it."
+    },
+    "instruction_variants": {
+      "instruction_canonical": "Pick up the red cube and place it in the blue target area.",
+      "instruction_utterance_templates": [
+        {
+          "template_id": 0,
+          "text": "Pick up the red cube and place it in the blue target area."
+        },
+        {
+          "template_id": 1,
+          "text": "Move the red cube to the blue target."
+        },
+        {
+          "template_id": 2,
+          "text": "Place the red block on the blue pad."
+        }
+      ],
+      "selection_rule": "deterministic: template_id = int(numpy.random.default_rng(seed).integers(0, 3)), drawn from the SAME seeded RNG stream as that episode's spatial config (cube_dx, cube_dy), after those 2 float draws -- see tasks/g1_pick_place/collect_dataset.py:sample_success_config. Diagnostic probes assign template_id by fixed round-robin (0,1,2,0,1,2,0,1) since they are hand-specified, not RNG-sampled.",
+      "note": "Paraphrase choice never changes the physical task (cube pose, target pose, controller, gains, thresholds) -- template_id only selects which instruction_utterance string is stored; the underlying trial is identical for any template_id at a given seed."
+    },
+    "random_seed_list": [
+      1000,
+      1001,
+      1002,
+      1003,
+      1004,
+      1005,
+      1006,
+      1007,
+      1008,
+      1009,
+      1010,
+      1011,
+      1012,
+      1013,
+      1014,
+      1015,
+      2000,
+      2001,
+      2002,
+      2003,
+      3000,
+      3001,
+      3002,
+      3003,
+      9000,
+      9001,
+      9002,
+      9003,
+      9004,
+      9005,
+      9006,
+      9007
+    ],
+    "seed_to_config": [
+      {
+        "seed": 1000,
+        "split": "train",
+        "cube_xy_offset": [
+          -0.02718,
+          0.01717
+        ],
+        "target_xy_offset": [
+          0.0,
+          0.0
+        ],
+        "instruction_template_id": 2,
+        "instruction_utterance": "Place the red block on the blue pad."
+      },
+      {
+        "seed": 1001,
+        "split": "train",
+        "cube_xy_offset": [
+          -0.02581,
+          -0.00929
+        ],
+        "target_xy_offset": [
+          0.0,
+          0.0
+        ],
+        "instruction_template_id": 1,
+        "instruction_utterance": "Move the red cube to the blue target."
+      },
+      {
+        "seed": 1002,
+        "split": "train",
+        "cube_xy_offset": [
+          -0.02929,
+          0.00607
+        ],
+        "target_xy_offset": [
+          0.0,
+          0.0
+        ],
+        "instruction_template_id": 2,
+        "instruction_utterance": "Place the red block on the blue pad."
+      },
+      {
+        "seed": 1003,
+        "split": "train",
+        "cube_xy_offset": [
+          -0.03218,
+          0.00155
+        ],
+        "target_xy_offset": [
+          0.0,
+          0.0
+        ],
+        "instruction_template_id": 0,
+        "instruction_utterance": "Pick up the red cube and place it in the blue target area."
+      },
+      {
+        "seed": 1004,
+        "split": "train",
+        "cube_xy_offset": [
+          -0.03499,
+          -0.00414
+        ],
+        "target_xy_offset": [
+          0.0,
+          0.0
+        ],
+        "instruction_template_id": 0,
+        "instruction_utterance": "Pick up the red cube and place it in the blue target area."
+      },
+      {
+        "seed": 1005,
+        "split": "train",
+        "cube_xy_offset": [
+          -0.03377,
+          0.03188
+        ],
+        "target_xy_offset": [
+          0.0,
+          0.0
+        ],
+        "instruction_template_id": 1,
+        "instruction_utterance": "Move the red cube to the blue target."
+      },
+      {
+        "seed": 1006,
+        "split": "train",
+        "cube_xy_offset": [
+          -0.02995,
+          0.01704
+        ],
+        "target_xy_offset": [
+          0.0,
+          0.0
+        ],
+        "instruction_template_id": 2,
+        "instruction_utterance": "Place the red block on the blue pad."
+      },
+      {
+        "seed": 1007,
+        "split": "train",
+        "cube_xy_offset": [
+          -0.03393,
+          0.02672
+        ],
+        "target_xy_offset": [
+          0.0,
+          0.0
+        ],
+        "instruction_template_id": 1,
+        "instruction_utterance": "Move the red cube to the blue target."
+      },
+      {
+        "seed": 1008,
+        "split": "train",
+        "cube_xy_offset": [
+          -0.03249,
+          0.02659
+        ],
+        "target_xy_offset": [
+          0.0,
+          0.0
+        ],
+        "instruction_template_id": 1,
+        "instruction_utterance": "Move the red cube to the blue target."
+      },
+      {
+        "seed": 1009,
+        "split": "train",
+        "cube_xy_offset": [
+          -0.03415,
+          0.00471
+        ],
+        "target_xy_offset": [
+          0.0,
+          0.0
+        ],
+        "instruction_template_id": 0,
+        "instruction_utterance": "Pick up the red cube and place it in the blue target area."
+      },
+      {
+        "seed": 1010,
+        "split": "train",
+        "cube_xy_offset": [
+          -0.03358,
+          0.01411
+        ],
+        "target_xy_offset": [
+          0.0,
+          0.0
+        ],
+        "instruction_template_id": 0,
+        "instruction_utterance": "Pick up the red cube and place it in the blue target area."
+      },
+      {
+        "seed": 1011,
+        "split": "train",
+        "cube_xy_offset": [
+          -0.03074,
+          0.01535
+        ],
+        "target_xy_offset": [
+          0.0,
+          0.0
+        ],
+        "instruction_template_id": 1,
+        "instruction_utterance": "Move the red cube to the blue target."
+      },
+      {
+        "seed": 1012,
+        "split": "train",
+        "cube_xy_offset": [
+          -0.03041,
+          0.02513
+        ],
+        "target_xy_offset": [
+          0.0,
+          0.0
+        ],
+        "instruction_template_id": 0,
+        "instruction_utterance": "Pick up the red cube and place it in the blue target area."
+      },
+      {
+        "seed": 1013,
+        "split": "train",
+        "cube_xy_offset": [
+          -0.02308,
+          -0.00645
+        ],
+        "target_xy_offset": [
+          0.0,
+          0.0
+        ],
+        "instruction_template_id": 2,
+        "instruction_utterance": "Place the red block on the blue pad."
+      },
+      {
+        "seed": 1014,
+        "split": "train",
+        "cube_xy_offset": [
+          -0.02847,
+          0.01636
+        ],
+        "target_xy_offset": [
+          0.0,
+          0.0
+        ],
+        "instruction_template_id": 2,
+        "instruction_utterance": "Place the red block on the blue pad."
+      },
+      {
+        "seed": 1015,
+        "split": "train",
+        "cube_xy_offset": [
+          -0.0296,
+          0.01732
+        ],
+        "target_xy_offset": [
+          0.0,
+          0.0
+        ],
+        "instruction_template_id": 1,
+        "instruction_utterance": "Move the red cube to the blue target."
+      },
+      {
+        "seed": 2000,
+        "split": "val",
+        "cube_xy_offset": [
+          -0.01597,
+          0.01954
+        ],
+        "target_xy_offset": [
+          0.0,
+          0.0
+        ],
+        "instruction_template_id": 0,
+        "instruction_utterance": "Pick up the red cube and place it in the blue target area."
+      },
+      {
+        "seed": 2001,
+        "split": "val",
+        "cube_xy_offset": [
+          -0.01703,
+          -0.00083
+        ],
+        "target_xy_offset": [
+          0.0,
+          0.0
+        ],
+        "instruction_template_id": 1,
+        "instruction_utterance": "Move the red cube to the blue target."
+      },
+      {
+        "seed": 2002,
+        "split": "val",
+        "cube_xy_offset": [
+          -0.01378,
+          0.03323
+        ],
+        "target_xy_offset": [
+          0.0,
+          0.0
+        ],
+        "instruction_template_id": 2,
+        "instruction_utterance": "Place the red block on the blue pad."
+      },
+      {
+        "seed": 2003,
+        "split": "val",
+        "cube_xy_offset": [
+          -0.01794,
+          0.02965
+        ],
+        "target_xy_offset": [
+          0.0,
+          0.0
+        ],
+        "instruction_template_id": 1,
+        "instruction_utterance": "Move the red cube to the blue target."
+      },
+      {
+        "seed": 3000,
+        "split": "test",
+        "cube_xy_offset": [
+          -0.00951,
+          0.00476
+        ],
+        "target_xy_offset": [
+          0.0,
+          0.0
+        ],
+        "instruction_template_id": 0,
+        "instruction_utterance": "Pick up the red cube and place it in the blue target area."
+      },
+      {
+        "seed": 3001,
+        "split": "test",
+        "cube_xy_offset": [
+          -0.00566,
+          0.02735
+        ],
+        "target_xy_offset": [
+          0.0,
+          0.0
+        ],
+        "instruction_template_id": 1,
+        "instruction_utterance": "Move the red cube to the blue target."
+      },
+      {
+        "seed": 3002,
+        "split": "test",
+        "cube_xy_offset": [
+          -0.01181,
+          0.01391
+        ],
+        "target_xy_offset": [
+          0.0,
+          0.0
+        ],
+        "instruction_template_id": 2,
+        "instruction_utterance": "Place the red block on the blue pad."
+      },
+      {
+        "seed": 3003,
+        "split": "test",
+        "cube_xy_offset": [
+          -0.0125,
+          0.02989
+        ],
+        "target_xy_offset": [
+          0.0,
+          0.0
+        ],
+        "instruction_template_id": 1,
+        "instruction_utterance": "Move the red cube to the blue target."
+      },
+      {
+        "seed": 9000,
+        "split": "diagnostics",
+        "cube_xy_offset": [
+          0.008,
+          0.0
+        ],
+        "target_xy_offset": [
+          0.0,
+          0.0
+        ],
+        "instruction_template_id": 0,
+        "probe_kind": "reachability_reject_probe",
+        "instruction_utterance": "Pick up the red cube and place it in the blue target area."
+      },
+      {
+        "seed": 9001,
+        "split": "diagnostics",
+        "cube_xy_offset": [
+          0.018,
+          0.0
+        ],
+        "target_xy_offset": [
+          0.0,
+          0.0
+        ],
+        "instruction_template_id": 1,
+        "probe_kind": "reachability_reject_probe",
+        "instruction_utterance": "Move the red cube to the blue target."
+      },
+      {
+        "seed": 9002,
+        "split": "diagnostics",
+        "cube_xy_offset": [
+          0.03,
+          0.0
+        ],
+        "target_xy_offset": [
+          0.0,
+          0.0
+        ],
+        "instruction_template_id": 2,
+        "probe_kind": "reachability_reject_probe",
+        "instruction_utterance": "Place the red block on the blue pad."
+      },
+      {
+        "seed": 9003,
+        "split": "diagnostics",
+        "cube_xy_offset": [
+          -0.002,
+          -0.012
+        ],
+        "target_xy_offset": [
+          0.0,
+          0.0
+        ],
+        "instruction_template_id": 0,
+        "probe_kind": "reachability_boundary_probe",
+        "instruction_utterance": "Pick up the red cube and place it in the blue target area."
+      },
+      {
+        "seed": 9004,
+        "split": "diagnostics",
+        "cube_xy_offset": [
+          -0.001,
+          -0.008
+        ],
+        "target_xy_offset": [
+          0.0,
+          0.0
+        ],
+        "instruction_template_id": 1,
+        "probe_kind": "reachability_boundary_probe",
+        "instruction_utterance": "Move the red cube to the blue target."
+      },
+      {
+        "seed": 9005,
+        "split": "diagnostics",
+        "cube_xy_offset": [
+          -0.028,
+          0.042
+        ],
+        "target_xy_offset": [
+          0.0,
+          0.0
+        ],
+        "instruction_template_id": 2,
+        "probe_kind": "physical_failure_probe",
+        "instruction_utterance": "Place the red block on the blue pad."
+      },
+      {
+        "seed": 9006,
+        "split": "diagnostics",
+        "cube_xy_offset": [
+          0.0,
+          0.04
+        ],
+        "target_xy_offset": [
+          0.0,
+          0.0
+        ],
+        "instruction_template_id": 0,
+        "probe_kind": "physical_failure_probe",
+        "instruction_utterance": "Pick up the red cube and place it in the blue target area."
+      },
+      {
+        "seed": 9007,
+        "split": "diagnostics",
+        "cube_xy_offset": [
+          -0.005,
+          0.04
+        ],
+        "target_xy_offset": [
+          0.0,
+          0.0
+        ],
+        "instruction_template_id": 1,
+        "probe_kind": "physical_failure_probe",
+        "instruction_utterance": "Move the red cube to the blue target."
+      }
+    ],
+    "maximum_episode_duration_s": 30.0,
+    "maximum_episode_duration_rationale": "Task 1's own per-phase drive/settle timing budgets (DRIVE_S dict, TRANSPORT_DRIVE_S=2.0s, LOWER_DRIVE_S=2.0s, LIFT_DRIVE_S_4E=1.5s, RETREAT_DRIVE_S=0.8s, SETTLE_MAX_EXTRA_S per settle phase, TASK_SUCCESS_MAX_WAIT_S=1.5s) sum to well under 30s for the longest real path through the state machine (Phase 5B-5D nominal episodes: ~13.2s sim time / 132 transitions; this phase's pilot's 12 trials: longest ~13-14s). This ceiling is a collector-side sanity bound (abort and record as a timeout failure if ever exceeded), not a new physics/controller parameter.",
+    "excluded_from_success_envelope": [
+      "cube_xy_offset positive-x direction entirely (established unreachable since Phase 4A; re-confirmed by this phase's own pilot at +0.005)"
+    ]
+  },
+  "reachability_checks": {
+    "method": "tasks.g1_pick_place.run_pick_place.diagnose_pick_place_reachability(model, arm_map, site_id, base_qpos, cube_pos, target_xy=TARGET_XY)['all_reachable']",
+    "criterion": "position-only IK residual < IK_POS_TOL (8mm, tasks.g1_pick_place.controller_3c.IK_POS_TOL) at every one of the 7 chained waypoints (PREGRASP, APPROACH, CLOSED_LIFT, HOLD, TRANSPORT_ABOVE_TARGET, LOWER_TO_TARGET, RETREAT)",
+    "applied": "BEFORE running any full physics trial for every one of the 32 locked configs. A config that fails this check is recorded with outcome='rejected_by_reachability' and NO physics trial is run for it (0 simulated seconds, near-instant IK-only cost).",
+    "orientation_note": "diagnose_pick_place_reachability also reports all_position_and_orientation_reachable, which is False for essentially every config including the long-validated nominal one (documented Phase 4F limitation). This spec's reachability gate uses the POSITION-ONLY signal (all_reachable), consistent with Task 1's own success criteria, which are position-based, not orientation-based."
+  },
+  "success_criteria": {
+    "source": "tasks.g1_pick_place.run_pick_place.run_trial_pick_place's own returned 'task_pass' (grasp_pass AND placement_pass AND task_success AND no failure_state) -- UNCHANGED from Phase 3C/4E/4F/5B-5D. This phase does not add, remove, or loosen any criterion.",
+    "train_eligible_rule": "train_eligible = task_pass (identical rule to Phase 5B/5C/5D) -- all 8 diagnostic-split episodes have train_eligible=False regardless of task_pass, per Section D ('Keep all eight failure/rejection episodes in a separate diagnostics split by default')."
+  },
+  "split_assignment_rule": {
+    "assigned_before_collection": true,
+    "method": "By seed and disjoint cube_dx spatial band, fixed in this file before the collection run.",
+    "bands": {
+      "train": {
+        "cube_dx_range_m": [
+          -0.035,
+          -0.02
+        ],
+        "seeds": [
+          1000,
+          1001,
+          1002,
+          1003,
+          1004,
+          1005,
+          1006,
+          1007,
+          1008,
+          1009,
+          1010,
+          1011,
+          1012,
+          1013,
+          1014,
+          1015
+        ],
+        "target_count": 16
+      },
+      "val": {
+        "cube_dx_range_m": [
+          -0.02,
+          -0.013
+        ],
+        "seeds": [
+          2000,
+          2001,
+          2002,
+          2003
+        ],
+        "target_count": 4
+      },
+      "test": {
+        "cube_dx_range_m": [
+          -0.013,
+          -0.005
+        ],
+        "seeds": [
+          3000,
+          3001,
+          3002,
+          3003
+        ],
+        "target_count": 4
+      },
+      "diagnostics": {
+        "cube_dx_range_m": "N/A (8 fixed hand-specified probes, see seed_to_config seeds 9000-9007)",
+        "seeds": [
+          9000,
+          9001,
+          9002,
+          9003,
+          9004,
+          9005,
+          9006,
+          9007
+        ],
+        "target_count": 8
+      }
+    },
+    "out_of_distribution_definition": "val's cube_dx band [-0.020,-0.013) and test's cube_dx band [-0.013,-0.005] are BOTH disjoint from train's cube_dx band [-0.035,-0.020) -- no train seed's cube_dx falls in the val or test range and vice versa (verified numerically against the actual sampled values in seed_to_config above). This is the out-of-distribution axis for this dataset: val/test probe a contiguous cube_dx sub-range never seen in training, NOT a random resample of the same range. cube_dy and instruction_template_id are drawn from the SAME full ranges/set for all three splits (no OOD claim is made along those axes).",
+    "near_duplicate_avoidance": "Spatial bands are non-overlapping by construction (see bands above); within a band, seeds are drawn from disjoint integer ranges (1000s/2000s/3000s/9000s) so no seed is reused across splits."
+  },
+  "attempt_and_stop_policy": {
+    "pilot_count": 1,
+    "final_sampling_plans_locked": 1,
+    "collection_runs": 1,
+    "resampling_after_seeing_results": false,
+    "rule": "Exactly one pilot (12 trials, kept separate, documented above), one locked final sampling plan (this file, all 32 seed/config pairs fixed before the final run), one collection run over all 32 locked configs. If the actual result does not contain exactly 24 successes and 8 failures/rejections, the true counts are reported and preserved as-is in reports/phase5e-scaled-data-collection.md and logs/phase5e_collection_summary.json -- no seed is silently replaced, and no additional collection run is performed under this authorization. A version-2 spec may be proposed for a future phase if the actual yield falls short."
+  }
+}

@@ -1,0 +1,477 @@
+{
+  "hdf5_path": "data/task1_demonstrations_v1.hdf5",
+  "n_attempted": 32,
+  "n_success": 28,
+  "n_failed_interaction": 1,
+  "n_rejected_by_reachability": 3,
+  "n_diagnostic_total": 4,
+  "split_counts": {
+    "train": 16,
+    "val": 4,
+    "test": 4,
+    "diagnostics": 8
+  },
+  "instruction_distribution": {
+    "Place the red block on the blue pad.": 9,
+    "Move the red cube to the blue target.": 13,
+    "Pick up the red cube and place it in the blue target area.": 10
+  },
+  "spatial_coverage_by_split": {
+    "train": {
+      "n": 16,
+      "cube_dx_min": -0.03499,
+      "cube_dx_max": -0.02308,
+      "cube_dy_min": -0.00929,
+      "cube_dy_max": 0.03188
+    },
+    "val": {
+      "n": 4,
+      "cube_dx_min": -0.01794,
+      "cube_dx_max": -0.01378,
+      "cube_dy_min": -0.00083,
+      "cube_dy_max": 0.03323
+    },
+    "test": {
+      "n": 4,
+      "cube_dx_min": -0.0125,
+      "cube_dx_max": -0.00566,
+      "cube_dy_min": 0.00476,
+      "cube_dy_max": 0.02989
+    },
+    "diagnostics": {
+      "n": 8,
+      "cube_dx_min": -0.028,
+      "cube_dx_max": 0.03,
+      "cube_dy_min": -0.012,
+      "cube_dy_max": 0.042
+    }
+  },
+  "episode_duration_transitions": {
+    "min": 31,
+    "max": 132,
+    "mean": 128.51724137931035,
+    "median": 132.0
+  },
+  "rgb_statistics": {
+    "mean_pixel_value_avg": 134.22482868548326,
+    "std_pixel_value_avg": 56.31826732742595,
+    "blank_or_near_blank_frames_episodes": 0
+  },
+  "action_distribution": {
+    "tcp_delta_position_magnitude_m": {
+      "min": 0.0,
+      "max": 0.14909513294696808,
+      "mean": 0.0011693534906953573,
+      "p99": 0.005251774564385414
+    },
+    "tcp_delta_orientation_magnitude_rad": {
+      "min": 0.0,
+      "max": 0.688543975353241,
+      "mean": 0.005183626897633076,
+      "p99": 0.024289842694997787
+    },
+    "saturation_threshold_m": 0.05,
+    "n_sub_actions_exceeding_saturation_threshold": 82
+  },
+  "success_rate_over_all_attempted_configs": 0.875,
+  "success_rate_excluding_reachability_rejections": 0.9655172413793104,
+  "replay_fidelity": {
+    "exact_execution_max_tcp_error_m": {
+      "min": 3.3894637049289866e-08,
+      "max": 3.3137588765307434e-05,
+      "mean": 1.2516265554150257e-06
+    },
+    "policy_action_max_tcp_error_m": {
+      "min": 0.0059456507601112875,
+      "max": 0.02229953162839616,
+      "mean": 0.009201796141979766,
+      "median": 0.006578785546155395
+    },
+    "n_episodes_replayed": 29,
+    "n_episodes_policy_replay_within_10mm": 22,
+    "per_episode": [
+      {
+        "episode_id": "seed_1000",
+        "seed": 1000,
+        "split": "train",
+        "stored_success": true,
+        "exact_max_tcp_error_m": 3.850911863345595e-08,
+        "exact_within_tolerance": true,
+        "policy_max_tcp_error_m": 0.018717816692289453,
+        "policy_final_tcp_error_m": 0.005234625117446266,
+        "policy_within_10mm": false,
+        "policy_first_divergence_transition": 119,
+        "policy_first_divergence_phase": "RETREAT"
+      },
+      {
+        "episode_id": "seed_1001",
+        "seed": 1001,
+        "split": "train",
+        "stored_success": true,
+        "exact_max_tcp_error_m": 3.5340528102202235e-08,
+        "exact_within_tolerance": true,
+        "policy_max_tcp_error_m": 0.0065534320418377786,
+        "policy_final_tcp_error_m": 0.004300209283932798,
+        "policy_within_10mm": true,
+        "policy_first_divergence_transition": null,
+        "policy_first_divergence_phase": null
+      },
+      {
+        "episode_id": "seed_1002",
+        "seed": 1002,
+        "split": "train",
+        "stored_success": true,
+        "exact_max_tcp_error_m": 4.422990912599087e-08,
+        "exact_within_tolerance": true,
+        "policy_max_tcp_error_m": 0.005958090179308523,
+        "policy_final_tcp_error_m": 0.004314453220177639,
+        "policy_within_10mm": true,
+        "policy_first_divergence_transition": null,
+        "policy_first_divergence_phase": null
+      },
+      {
+        "episode_id": "seed_1003",
+        "seed": 1003,
+        "split": "train",
+        "stored_success": true,
+        "exact_max_tcp_error_m": 4.1306840677575135e-08,
+        "exact_within_tolerance": true,
+        "policy_max_tcp_error_m": 0.013428486590642004,
+        "policy_final_tcp_error_m": 0.005395145853643722,
+        "policy_within_10mm": false,
+        "policy_first_divergence_transition": 119,
+        "policy_first_divergence_phase": "RETREAT"
+      },
+      {
+        "episode_id": "seed_1004",
+        "seed": 1004,
+        "split": "train",
+        "stored_success": true,
+        "exact_max_tcp_error_m": 4.0385229567337564e-08,
+        "exact_within_tolerance": true,
+        "policy_max_tcp_error_m": 0.0064801485624659885,
+        "policy_final_tcp_error_m": 0.004858676085846261,
+        "policy_within_10mm": true,
+        "policy_first_divergence_transition": null,
+        "policy_first_divergence_phase": null
+      },
+      {
+        "episode_id": "seed_1005",
+        "seed": 1005,
+        "split": "train",
+        "stored_success": true,
+        "exact_max_tcp_error_m": 3.3137588765307434e-05,
+        "exact_within_tolerance": true,
+        "policy_max_tcp_error_m": 0.006397064887237431,
+        "policy_final_tcp_error_m": 0.005573240788296983,
+        "policy_within_10mm": true,
+        "policy_first_divergence_transition": null,
+        "policy_first_divergence_phase": null
+      },
+      {
+        "episode_id": "seed_1006",
+        "seed": 1006,
+        "split": "train",
+        "stored_success": true,
+        "exact_max_tcp_error_m": 3.6073651790997046e-08,
+        "exact_within_tolerance": true,
+        "policy_max_tcp_error_m": 0.010516116198778205,
+        "policy_final_tcp_error_m": 0.004870633994794458,
+        "policy_within_10mm": false,
+        "policy_first_divergence_transition": 119,
+        "policy_first_divergence_phase": "RETREAT"
+      },
+      {
+        "episode_id": "seed_1007",
+        "seed": 1007,
+        "split": "train",
+        "stored_success": true,
+        "exact_max_tcp_error_m": 3.5861349787821104e-08,
+        "exact_within_tolerance": true,
+        "policy_max_tcp_error_m": 0.013689132409678307,
+        "policy_final_tcp_error_m": 0.005117848360201413,
+        "policy_within_10mm": false,
+        "policy_first_divergence_transition": 119,
+        "policy_first_divergence_phase": "RETREAT"
+      },
+      {
+        "episode_id": "seed_1008",
+        "seed": 1008,
+        "split": "train",
+        "stored_success": true,
+        "exact_max_tcp_error_m": 3.525885370125086e-08,
+        "exact_within_tolerance": true,
+        "policy_max_tcp_error_m": 0.0063303585110561665,
+        "policy_final_tcp_error_m": 0.005427704913061035,
+        "policy_within_10mm": true,
+        "policy_first_divergence_transition": null,
+        "policy_first_divergence_phase": null
+      },
+      {
+        "episode_id": "seed_1009",
+        "seed": 1009,
+        "split": "train",
+        "stored_success": true,
+        "exact_max_tcp_error_m": 3.400000945224004e-08,
+        "exact_within_tolerance": true,
+        "policy_max_tcp_error_m": 0.02229953162839616,
+        "policy_final_tcp_error_m": 0.005517458116183105,
+        "policy_within_10mm": false,
+        "policy_first_divergence_transition": 119,
+        "policy_first_divergence_phase": "RETREAT"
+      },
+      {
+        "episode_id": "seed_1010",
+        "seed": 1010,
+        "split": "train",
+        "stored_success": true,
+        "exact_max_tcp_error_m": 3.5388255860338363e-08,
+        "exact_within_tolerance": true,
+        "policy_max_tcp_error_m": 0.0063470545909373455,
+        "policy_final_tcp_error_m": 0.0051088284286115474,
+        "policy_within_10mm": true,
+        "policy_first_divergence_transition": null,
+        "policy_first_divergence_phase": null
+      },
+      {
+        "episode_id": "seed_1011",
+        "seed": 1011,
+        "split": "train",
+        "stored_success": true,
+        "exact_max_tcp_error_m": 3.539075706836803e-08,
+        "exact_within_tolerance": true,
+        "policy_max_tcp_error_m": 0.006312780170334836,
+        "policy_final_tcp_error_m": 0.004304731754865725,
+        "policy_within_10mm": true,
+        "policy_first_divergence_transition": null,
+        "policy_first_divergence_phase": null
+      },
+      {
+        "episode_id": "seed_1012",
+        "seed": 1012,
+        "split": "train",
+        "stored_success": true,
+        "exact_max_tcp_error_m": 3.738538620605712e-08,
+        "exact_within_tolerance": true,
+        "policy_max_tcp_error_m": 0.005966109002907876,
+        "policy_final_tcp_error_m": 0.004300229563143161,
+        "policy_within_10mm": true,
+        "policy_first_divergence_transition": null,
+        "policy_first_divergence_phase": null
+      },
+      {
+        "episode_id": "seed_1013",
+        "seed": 1013,
+        "split": "train",
+        "stored_success": true,
+        "exact_max_tcp_error_m": 3.583297264467303e-08,
+        "exact_within_tolerance": true,
+        "policy_max_tcp_error_m": 0.006810670762479104,
+        "policy_final_tcp_error_m": 0.004304320327512581,
+        "policy_within_10mm": true,
+        "policy_first_divergence_transition": null,
+        "policy_first_divergence_phase": null
+      },
+      {
+        "episode_id": "seed_1014",
+        "seed": 1014,
+        "split": "train",
+        "stored_success": true,
+        "exact_max_tcp_error_m": 1.6747222589925819e-06,
+        "exact_within_tolerance": true,
+        "policy_max_tcp_error_m": 0.00606153834983546,
+        "policy_final_tcp_error_m": 0.0054243691089724015,
+        "policy_within_10mm": true,
+        "policy_first_divergence_transition": null,
+        "policy_first_divergence_phase": null
+      },
+      {
+        "episode_id": "seed_1015",
+        "seed": 1015,
+        "split": "train",
+        "stored_success": true,
+        "exact_max_tcp_error_m": 3.4711415696777365e-08,
+        "exact_within_tolerance": true,
+        "policy_max_tcp_error_m": 0.0059456507601112875,
+        "policy_final_tcp_error_m": 0.004303355658573995,
+        "policy_within_10mm": true,
+        "policy_first_divergence_transition": null,
+        "policy_first_divergence_phase": null
+      },
+      {
+        "episode_id": "seed_2000",
+        "seed": 2000,
+        "split": "val",
+        "stored_success": true,
+        "exact_max_tcp_error_m": 3.5256952141065e-08,
+        "exact_within_tolerance": true,
+        "policy_max_tcp_error_m": 0.007613807417684182,
+        "policy_final_tcp_error_m": 0.005545118813672448,
+        "policy_within_10mm": true,
+        "policy_first_divergence_transition": null,
+        "policy_first_divergence_phase": null
+      },
+      {
+        "episode_id": "seed_2001",
+        "seed": 2001,
+        "split": "val",
+        "stored_success": true,
+        "exact_max_tcp_error_m": 4.296718744310793e-08,
+        "exact_within_tolerance": true,
+        "policy_max_tcp_error_m": 0.006505514719356525,
+        "policy_final_tcp_error_m": 0.0042986255884740745,
+        "policy_within_10mm": true,
+        "policy_first_divergence_transition": null,
+        "policy_first_divergence_phase": null
+      },
+      {
+        "episode_id": "seed_2002",
+        "seed": 2002,
+        "split": "val",
+        "stored_success": true,
+        "exact_max_tcp_error_m": 3.708873699220377e-08,
+        "exact_within_tolerance": true,
+        "policy_max_tcp_error_m": 0.009977507738840085,
+        "policy_final_tcp_error_m": 0.005031117588813068,
+        "policy_within_10mm": true,
+        "policy_first_divergence_transition": null,
+        "policy_first_divergence_phase": null
+      },
+      {
+        "episode_id": "seed_2003",
+        "seed": 2003,
+        "split": "val",
+        "stored_success": true,
+        "exact_max_tcp_error_m": 3.3894637049289866e-08,
+        "exact_within_tolerance": true,
+        "policy_max_tcp_error_m": 0.006195437043476449,
+        "policy_final_tcp_error_m": 0.005539415727789219,
+        "policy_within_10mm": true,
+        "policy_first_divergence_transition": null,
+        "policy_first_divergence_phase": null
+      },
+      {
+        "episode_id": "seed_3000",
+        "seed": 3000,
+        "split": "test",
+        "stored_success": true,
+        "exact_max_tcp_error_m": 3.8431426708591174e-08,
+        "exact_within_tolerance": true,
+        "policy_max_tcp_error_m": 0.021664685416023313,
+        "policy_final_tcp_error_m": 0.005135276667020002,
+        "policy_within_10mm": false,
+        "policy_first_divergence_transition": 119,
+        "policy_first_divergence_phase": "RETREAT"
+      },
+      {
+        "episode_id": "seed_3001",
+        "seed": 3001,
+        "split": "test",
+        "stored_success": true,
+        "exact_max_tcp_error_m": 5.8774403727502384e-08,
+        "exact_within_tolerance": true,
+        "policy_max_tcp_error_m": 0.006363674960066977,
+        "policy_final_tcp_error_m": 0.005545768073598382,
+        "policy_within_10mm": true,
+        "policy_first_divergence_transition": null,
+        "policy_first_divergence_phase": null
+      },
+      {
+        "episode_id": "seed_3002",
+        "seed": 3002,
+        "split": "test",
+        "stored_success": true,
+        "exact_max_tcp_error_m": 3.920637770954093e-08,
+        "exact_within_tolerance": true,
+        "policy_max_tcp_error_m": 0.007887627890597918,
+        "policy_final_tcp_error_m": 0.005110642269124017,
+        "policy_within_10mm": true,
+        "policy_first_divergence_transition": null,
+        "policy_first_divergence_phase": null
+      },
+      {
+        "episode_id": "seed_3003",
+        "seed": 3003,
+        "split": "test",
+        "stored_success": true,
+        "exact_max_tcp_error_m": 3.625491413802327e-08,
+        "exact_within_tolerance": true,
+        "policy_max_tcp_error_m": 0.006578785546155395,
+        "policy_final_tcp_error_m": 0.0054002109147144655,
+        "policy_within_10mm": true,
+        "policy_first_divergence_transition": null,
+        "policy_first_divergence_phase": null
+      },
+      {
+        "episode_id": "seed_9003",
+        "seed": 9003,
+        "split": "diagnostics",
+        "stored_success": true,
+        "exact_max_tcp_error_m": 4.801825314223023e-07,
+        "exact_within_tolerance": true,
+        "policy_max_tcp_error_m": 0.009867413362792952,
+        "policy_final_tcp_error_m": 0.005322692463168681,
+        "policy_within_10mm": true,
+        "policy_first_divergence_transition": null,
+        "policy_first_divergence_phase": null
+      },
+      {
+        "episode_id": "seed_9004",
+        "seed": 9004,
+        "split": "diagnostics",
+        "stored_success": true,
+        "exact_max_tcp_error_m": 4.7107477678998845e-08,
+        "exact_within_tolerance": true,
+        "policy_max_tcp_error_m": 0.0068847961115757915,
+        "policy_final_tcp_error_m": 0.005526013103782639,
+        "policy_within_10mm": true,
+        "policy_first_divergence_transition": null,
+        "policy_first_divergence_phase": null
+      },
+      {
+        "episode_id": "seed_9005",
+        "seed": 9005,
+        "split": "diagnostics",
+        "stored_success": true,
+        "exact_max_tcp_error_m": 3.487246384195301e-08,
+        "exact_within_tolerance": true,
+        "policy_max_tcp_error_m": 0.006518150323499136,
+        "policy_final_tcp_error_m": 0.005543833577693645,
+        "policy_within_10mm": true,
+        "policy_first_divergence_transition": null,
+        "policy_first_divergence_phase": null
+      },
+      {
+        "episode_id": "seed_9006",
+        "seed": 9006,
+        "split": "diagnostics",
+        "stored_success": false,
+        "exact_max_tcp_error_m": 3.8442734617243e-08,
+        "exact_within_tolerance": true,
+        "policy_max_tcp_error_m": 0.007691093863497165,
+        "policy_final_tcp_error_m": 0.0040836143894423,
+        "policy_within_10mm": true,
+        "policy_first_divergence_transition": null,
+        "policy_first_divergence_phase": null
+      },
+      {
+        "episode_id": "seed_9007",
+        "seed": 9007,
+        "split": "diagnostics",
+        "stored_success": true,
+        "exact_max_tcp_error_m": 4.270496095081138e-08,
+        "exact_within_tolerance": true,
+        "policy_max_tcp_error_m": 0.015289612385551456,
+        "policy_final_tcp_error_m": 0.005384697775314072,
+        "policy_within_10mm": false,
+        "policy_first_divergence_transition": 119,
+        "policy_first_divergence_phase": "RETREAT"
+      }
+    ]
+  },
+  "errors": [],
+  "warnings": [
+    "actual yield (28 success / 4 diagnostic: 1 failed_interaction + 3 rejected) does not match the intended 24/8 split -- reported honestly per Section I, not resampled."
+  ],
+  "PASSED": true
+}
