@@ -1,23 +1,40 @@
 # G1 MuJoCo Entrance-Test Project
 
+## Reviewer Quick Start
+
+**Goal:** Build a Unitree G1 manipulation prototype and explore the interface
+from classical expert control to future VLA training.
+
+### What is completed
+- Task 1: physical single-object pick-and-place
+- Task 2: object-conditioned two-object selection
+- VLA-oriented demonstration collection + replay validation
+- 311 regression tests, 0 unexpected failures
+
+### Key artifacts
+- [Research presentation](slide.pdf)
+- [Entrance-test report](submission/entrance_test_report.md)
+- [Task 2 report](reports/task2-language-selection.md)
+- [Reproduction guide](submission/REPRODUCE.md)
+
+### Demo
+See the videos immediately below.
+
 Task-local manipulation experiments built on top of the official Unitree
 `unitree_mujoco` simulator, targeting the Unitree G1 humanoid. All work is
 staged in phases; each phase must pass its acceptance test before the next
 begins.
 
-**Current capability, precisely stated: a two-task Unitree G1 manipulation
-prototype with classical expert control, language-associated VLA
-demonstration interfaces, physical interaction validation, and replay
-instrumentation.** A fixed-base, torso-constrained upper-body manipulation
-baseline completes **Task 1** ("pick up the red cube and place it in the
-blue target area") as an entrance-test prototype, with a documented
-grasp-slip limitation, and **Task 2** ("language-conditioned two-object
-selection", merged from `task2-language-selection`) adds a second cube
-where the instruction determines which cube a privileged scripted expert
-grasps and places. The pelvis and torso are rigidly welded to the world;
-only the right arm and gripper move. This is not full-body or
-free-standing manipulation, and not a production-ready or universally
-model-ready system.
+**This project builds a physically grounded Unitree G1 manipulation
+baseline, then extends it toward VLA research through demonstration
+collection, replay validation, and object-conditioned Task 2
+experiments.**
+
+Task 1 and Task 2 use a scripted classical expert. No learned VLA policy
+or language grounding is claimed. (Full scope precision: a fixed-base,
+torso-constrained upper-body baseline — not full-body or free-standing
+manipulation, and not a production-ready system; see Phase status below
+for the exact, per-phase evidence.)
 
 > **Task 1 acceptance status (Phase 4F human decision, 2026-09-02):**
 > human visual review of `artifacts/phase4f_task1_full.mp4` and
@@ -437,3 +454,15 @@ passing diagnostic, not a broken build.
 - Never weld, attach, teleport, or directly overwrite object state to fake a
   grasp; grasps must be produced by physical contact and actuation.
 - Task-local additions only, under `tasks/g1_pick_place/`.
+
+## Feedback I am currently looking for
+
+The current implementation prioritizes physical validation, failure analysis,
+and VLA-oriented data infrastructure. Before extending the project further,
+I would especially value feedback on:
+
+1. Which next step would most strengthen this as a robotics/VLA research project?
+2. Whether I should prioritize Isaac Lab migration, learned-policy integration,
+   or broader task/data variation.
+3. Which parts of the current work are most important to emphasize in the
+   entrance-test evaluation.
