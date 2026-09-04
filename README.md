@@ -36,6 +36,47 @@ model-ready system.
 > `reports/phase4f-orientation-grasp-stabilization.md` for the underlying
 > investigation/repair history.
 
+## Demonstration Videos
+
+Playable directly on this page (rendered via GitHub's inline `<video>`
+support — open this file on github.com, not in a local Markdown preview).
+These are the same decode-verified files in `submission/videos/`; the
+slide deck could only show static frames from them.
+
+**Task 1 — pick-and-place** (fixed-base G1, physical gripper, no teleport):
+
+<video src="https://github.com/chyang-nycu/VLA-Entrance-test/raw/main/submission/videos/task1_third_person.mp4" controls width="480">Task 1, third-person view</video>
+
+Third-person, full episode (approach → grasp → lift → transport → lower →
+release → retreat), 640x480, 12.0s — the video reviewed and accepted in the
+Phase 4F human acceptance decision above.
+
+<video src="https://github.com/chyang-nycu/VLA-Entrance-test/raw/main/submission/videos/task1_onboard_rgb.mp4" controls width="240">Task 1, onboard camera</video>
+
+Onboard `head_cam` view (torso-mounted, near head height), 160x120
+(padded to 160x128 by H.264), 13.3s — the same camera stream used as a
+policy-facing observation in the VLA data pipeline.
+
+<video src="https://github.com/chyang-nycu/VLA-Entrance-test/raw/main/submission/videos/optional_debug_before_after.mp4" controls width="480">Before/after: decorative-hand defect vs. corrected gripper</video>
+
+Side-by-side diagnostic: **left** — the vendor's decorative hand mesh
+visibly clipping through the cube (Phase 4D); **right** — the corrected
+gripper after the visual/collision fix (Phase 4E). 960x360, 4.3s.
+
+**Task 2 — object-conditioned selection** (same scene, different task
+specification, different selected object; see `reports/task2-language-selection.md`):
+
+<video src="https://github.com/chyang-nycu/VLA-Entrance-test/raw/main/submission/videos/task2_red_instruction.mp4" controls width="480">Task 2, red instructed</video>
+
+"Pick up the **red** cube..." — red cube grasped and placed; green
+distractor undisturbed throughout. 640x480, 13.2s.
+
+<video src="https://github.com/chyang-nycu/VLA-Entrance-test/raw/main/submission/videos/task2_green_instruction.mp4" controls width="480">Task 2, green instructed</video>
+
+Same physical arrangement, "Pick up the **green** cube..." instead — green
+cube grasped and placed; red distractor undisturbed throughout. 640x480,
+13.2s.
+
 ## Layout
 
 - `vendor/unitree_mujoco/` — pinned upstream simulator (git submodule; see
