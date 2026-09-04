@@ -38,44 +38,49 @@ model-ready system.
 
 ## Demonstration Videos
 
-Playable directly on this page (rendered via GitHub's inline `<video>`
-support — open this file on github.com, not in a local Markdown preview).
-These are the same decode-verified files in `submission/videos/`; the
-slide deck could only show static frames from them.
+Auto-playing previews, rendered directly on this page — no click needed.
+GitHub's Markdown renderer strips `<video src>` tags that point at raw
+repository files (only assets uploaded through its own attachment UI are
+allowed), so these are GIF renders of the same decode-verified `.mp4`
+files in `submission/videos/`; the slide deck could only show static
+frames from them. Full-quality original `.mp4` sources: [task1_third_person](submission/videos/task1_third_person.mp4),
+[task1_onboard_rgb](submission/videos/task1_onboard_rgb.mp4),
+[optional_debug_before_after](submission/videos/optional_debug_before_after.mp4),
+[task2_red_instruction](submission/videos/task2_red_instruction.mp4),
+[task2_green_instruction](submission/videos/task2_green_instruction.mp4).
 
 **Task 1 — pick-and-place** (fixed-base G1, physical gripper, no teleport):
 
-<video src="https://github.com/chyang-nycu/VLA-Entrance-test/raw/main/submission/videos/task1_third_person.mp4" controls width="480">Task 1, third-person view</video>
+![Task 1, third-person view](submission/videos/task1_third_person.gif)
 
 Third-person, full episode (approach → grasp → lift → transport → lower →
-release → retreat), 640x480, 12.0s — the video reviewed and accepted in the
+release → retreat), 12.0s — the video reviewed and accepted in the
 Phase 4F human acceptance decision above.
 
-<video src="https://github.com/chyang-nycu/VLA-Entrance-test/raw/main/submission/videos/task1_onboard_rgb.mp4" controls width="240">Task 1, onboard camera</video>
+![Task 1, onboard camera](submission/videos/task1_onboard_rgb.gif)
 
-Onboard `head_cam` view (torso-mounted, near head height), 160x120
-(padded to 160x128 by H.264), 13.3s — the same camera stream used as a
-policy-facing observation in the VLA data pipeline.
+Onboard `head_cam` view (torso-mounted, near head height), 13.3s — the
+same camera stream used as a policy-facing observation in the VLA data
+pipeline.
 
-<video src="https://github.com/chyang-nycu/VLA-Entrance-test/raw/main/submission/videos/optional_debug_before_after.mp4" controls width="480">Before/after: decorative-hand defect vs. corrected gripper</video>
+![Before/after: decorative-hand defect vs. corrected gripper](submission/videos/optional_debug_before_after.gif)
 
 Side-by-side diagnostic: **left** — the vendor's decorative hand mesh
 visibly clipping through the cube (Phase 4D); **right** — the corrected
-gripper after the visual/collision fix (Phase 4E). 960x360, 4.3s.
+gripper after the visual/collision fix (Phase 4E). 4.3s.
 
 **Task 2 — object-conditioned selection** (same scene, different task
 specification, different selected object; see `reports/task2-language-selection.md`):
 
-<video src="https://github.com/chyang-nycu/VLA-Entrance-test/raw/main/submission/videos/task2_red_instruction.mp4" controls width="480">Task 2, red instructed</video>
+![Task 2, red instructed](submission/videos/task2_red_instruction.gif)
 
 "Pick up the **red** cube..." — red cube grasped and placed; green
-distractor undisturbed throughout. 640x480, 13.2s.
+distractor undisturbed throughout. 13.2s.
 
-<video src="https://github.com/chyang-nycu/VLA-Entrance-test/raw/main/submission/videos/task2_green_instruction.mp4" controls width="480">Task 2, green instructed</video>
+![Task 2, green instructed](submission/videos/task2_green_instruction.gif)
 
 Same physical arrangement, "Pick up the **green** cube..." instead — green
-cube grasped and placed; red distractor undisturbed throughout. 640x480,
-13.2s.
+cube grasped and placed; red distractor undisturbed throughout. 13.2s.
 
 ## Layout
 
