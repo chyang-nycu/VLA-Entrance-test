@@ -282,7 +282,7 @@ class Phase4ETaskSuccessNotClaimedTest(unittest.TestCase):
         lowered = report.lower()
         self.assertNotIn("task 1 restored", lowered)
         self.assertNotIn("task 1 is valid again", lowered)
-        self.assertIn("pending human", lowered)
+        self.assertIn("pending my visual review", lowered)
         self.assertIn("not restored", lowered)
 
 
