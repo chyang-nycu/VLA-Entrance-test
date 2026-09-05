@@ -35,74 +35,19 @@ own scaled dataset collection and policy integration remain not started.
 
 ## 2. Contributions and Role
 
-This project was run as a supervised engineering effort: I set the research
-direction, the phase structure and its acceptance gates, and the
-physical-validity criteria; implementation and report drafting were
-AI-assisted, with the full per-phase authorization record in `HANDOFF.md`.
-The decisions below are mine, and each is traceable to the cited report.
+I drove the project at the level of problem formulation, system architecture, experiment design, and technical decision-making. I used an AI coding agent to accelerate implementation, testing, and documentation, while I remained responsible for defining the system, interpreting failures, and deciding what results were valid.
 
-**1. Replaced the control architecture instead of tuning it further
-(Phase 3C).** After 6 evidence-driven tuning attempts across Phases 3 and
-3B all failed — the best reached 0.5mm of lift against a required 80mm — I
-ended the tuning line and directed an architecture change: bounded
-position servos with waypoint IK, replacing torque-PD with continuous
-resolved-rate IK. That produced the first deterministic grasp (5/5) and is
-the controller every later phase uses.
-→ `reports/phase3c-position-servo-baseline.md`
+My main contributions were:
 
-**2. Caught a physics defect that a green test suite missed (Phase 4D).**
-With 104 tests passing and 0 unexpected failures, I inspected the rendered
-episode directly and reported that the hand visibly passed through the
-cube. The audit confirmed a real defect: the vendor's decorative
-`right_rubber_hand` mesh spatially overlapped the functional gripper. A
-second thing I reported — the cube appearing to fall — was investigated
-and **not** reproduced, and is recorded as not-reproduced rather than
-quietly dropped.
-→ `reports/phase4d-physics-integrity-audit.md`
+1. **Defined the manipulation scope and system boundary.** I reduced the broad humanoid/VLA task into a physically testable fixed-base G1 manipulation setup, including a task-local gripper, explicit physical-validity constraints, and reproducible evaluation criteria.
 
-**3. Rejected a measurement as physically impossible (Phase 4C).** Phase
-4B reported 156mm of cube slip while bilateral contact was never lost — on
-a 70mm cube. I flagged that slip exceeding the object's own footprint
-inside a closed, contact-retaining grip is not physically sensible, and
-required an audit before the number could stand. The metric was conflating
-post-release TCP–cube separation with grasp-phase slip; corrected, genuine
-slip is 33–54mm. No pass/fail outcome depended on it, and none was changed.
-→ `reports/phase4c-task1-evidence.md`
+2. **Redesigned the controller based on measured failure.** After torque-PD and continuous IK remained unstable, I used tracking and actuator measurements to identify an architectural limitation and replaced the controller with bounded position servos and waypoint IK, producing the first deterministic grasp and the baseline used by later tasks.
 
-**4. Specified physical-validity criteria, not just pass/fail thresholds
-(Phase 4E).** I specified the bilateral grasp-force bar as
-`N_min = m·g / (2μ)` — derived from the physics rather than chosen to be
-passable — and directed that boolean contact flags are insufficient
-evidence of a grasp. That directive is what surfaced a real instant of
-exactly 0.0 N contact force on one finger pad which the boolean check
-still reported as "in contact".
-→ `reports/phase4e-gripper-integrity-repair.md`
+3. **Built the interface from classical control to future VLA learning.** I designed the demonstration pipeline, separated learner-facing observations from privileged simulator state, and studied how expert trajectories should be represented for policy replay. This led to a chunked action representation that substantially reduced replay error.
 
-**5. Refused a result on frame-by-frame review (Phase 4F).** After Phase
-4E's genuine, measured improvement, my own frame-by-frame review of the
-close-up video found the cube still sliding ~20.5mm inside the grip during
-HOLD. I called that a near-drop rather than a stable grasp and declined to
-reinstate the Task 1 success claim — which is what authorized the
-orientation-constrained IK phase.
-→ `reports/phase4f-orientation-grasp-stabilization.md`
+4. **Extended the system to multi-object, task-conditioned manipulation.** Task 2 introduced a distractor and object-conditioned selection. The experiment exposed trajectory-level interference that was invisible from endpoint geometry alone, and the final configuration achieved 12/12 deterministic executions with zero wrong-object placements.
 
-**6. Made the acceptance call explicit rather than silent (Phase 4F
-decision).** With the strict ≤10mm slip bar still unmet at 25.9mm, I
-accepted Task 1 as "prototype completed with a documented limitation" and
-recorded that this changed the acceptance **policy**, not any measurement.
-No log, threshold, or test was edited to reach it; the strict bar is still
-asserted as failing by two diagnostic tests that pass by asserting the
-failure.
-→ `reports/phase4f-human-acceptance-decision.md`
-
-**Standing constraints I imposed on every phase**: never modify the vendor
-simulator; never weld, teleport, or overwrite object state to fake a grasp
-(enforced in code by `CubeInitGuard`, not just by convention); fixed
-attempt budgets with a mandatory stop instead of open-ended tuning; and
-disclose deviations from a plan rather than resample to match it — as with
-the Phase 5E target-position variation, which was caught and reverted
-before use because varying the controller's internal target while leaving
-the rendered pad fixed would have produced physically dishonest episodes.
+Overall, my contribution was not simply implementing a working demo, but building an experimental pipeline connecting **robot control, physical interaction, demonstration generation, and future VLA learning**.
 
 ## 3. Scope, Environment, and Task Design
 
