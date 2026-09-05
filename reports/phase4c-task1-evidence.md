@@ -16,7 +16,7 @@ Date: 2026-09-02
 
 ### The reported number and why it looked wrong
 
-Phase 4B reported `max_cube_slip_m = 0.1561555402975266` for the nominal trial (`reports/phase4b-task1-pick-place.md`, section 5/10) -- larger than the cube's own 0.07 m footprint, despite bilateral finger contact never being lost (`contact_lost_during_transport = False` for every recorded trial). That combination is not physically sensible for genuine slip inside a closed, contact-retaining grip, which is exactly what the user's audit request flagged.
+Phase 4B reported `max_cube_slip_m = 0.1561555402975266` for the nominal trial (`reports/phase4b-task1-pick-place.md`, section 5/10) -- larger than the cube's own 0.07 m footprint, despite bilateral finger contact never being lost (`contact_lost_during_transport = False` for every recorded trial). That combination is not physically sensible for genuine slip inside a closed, contact-retaining grip — the inconsistency I flagged when requiring this audit.
 
 ### Root cause (confirmed, not guessed)
 

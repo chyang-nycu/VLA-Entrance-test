@@ -4,11 +4,11 @@ Date: 2026-09-02
 
 **Platform framing (binding, unchanged): this is a fixed-base, torso-constrained upper-body manipulation baseline.** The pelvis and torso remain rigidly welded to the world; only the right arm and gripper move.
 
-**Task 1 success is NOT restored by this phase.** Per the authorizing instruction, this report presents evidence and stops before any success claim; final approval requires human visual review of the two videos linked below.
+**Task 1 success is NOT restored by this phase.** As I required for this phase, this report presents evidence and stops before any success claim; final approval requires my visual review of the two videos linked below.
 
 ## Scope and background
 
-Phase 4E fixed the decorative-hand visual/collision defect and improved grasp stability from a 0.146x worst-instant safety factor to >=1.0x, but the user's own frame-by-frame review of `artifacts/phase4e_task1_closeup.mp4` found the grasp still slides ~20.5mm downward relative to the gripper during HOLD -- a "near-drop," not an acceptable stable grasp, against a 0.07m cube. This phase's primary hypothesis: `solve_ik_waypoint()` (Phase 3C, `controller_3c.py`) is deliberately position-only, so the arm's redundant joints are free to roll the wrist during descent, misaligning the finger-pad contact band from the cube's center.
+Phase 4E fixed the decorative-hand visual/collision defect and improved grasp stability from a 0.146x worst-instant safety factor to >=1.0x, but my own frame-by-frame review of `artifacts/phase4e_task1_closeup.mp4` found the grasp still slides ~20.5mm downward relative to the gripper during HOLD -- a "near-drop," not an acceptable stable grasp, against a 0.07m cube. This phase's primary hypothesis: `solve_ik_waypoint()` (Phase 3C, `controller_3c.py`) is deliberately position-only, so the arm's redundant joints are free to roll the wrist during descent, misaligning the finger-pad contact band from the cube's center.
 
 **Historical preservation**: Phase 3/3B/3C/4A/4B/4C/4D/4E reports, logs, commits, and evidence (including `artifacts/phase4d_failure_reproduction.mp4` and `artifacts/phase4b_task1_nominal.mp4`) are byte-unchanged. `write_grasp_scene_4b()` and its default `run_trial_pick_place(...)` call (no new flags) are **also unchanged in behavior** -- confirmed by the full pre-existing test suite (139 tests through Phase 4E) still passing unmodified. Phase 4F's changes are additive and opt-in: a new `write_grasp_scene_4f()` scene function and a new `use_oriented_ik=True` parameter on `run_trial_pick_place()`, both defaulting off everywhere except Phase 4F's own evidence path.
 
@@ -87,4 +87,4 @@ All three Phase-4A-reachable variants fail the same gate, at the same stage, wit
 
 ## Next step
 
-Per the authorizing instruction, this phase stops here. Task 1 success requires the user's visual review of `artifacts/phase4f_task1_full.mp4` and `artifacts/phase4f_bilateral_contact_view.mp4`, and, given the quantitative gap documented above, most likely a further, separately-authorized phase addressing the trajectory/waypoint-level root cause (not a 4th tuning attempt within this phase's exhausted budget).
+Per the attempt budget I set, this phase stops here. Task 1 success requires my visual review of `artifacts/phase4f_task1_full.mp4` and `artifacts/phase4f_bilateral_contact_view.mp4`, and, given the quantitative gap documented above, most likely a further, separately-authorized phase addressing the trajectory/waypoint-level root cause (not a 4th tuning attempt within this phase's exhausted budget).

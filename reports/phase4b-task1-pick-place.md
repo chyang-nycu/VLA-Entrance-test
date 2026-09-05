@@ -1,5 +1,10 @@
 # Phase 4B: Task 1 Complete Pick-and-Place
 
+> **Evidence record — not reviewer reading.** Exhaustive per-phase audit
+> trail, kept so every number in the submission is traceable. The
+> reviewer-facing account is `README.md` and
+> `submission/entrance_test_report.md`.
+
 Date: 2026-09-02
 
 **Task 1** (verbatim, not Task 2): "Pick up the red cube and place it in the blue target area."

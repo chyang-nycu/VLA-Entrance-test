@@ -1,5 +1,10 @@
 # Phase 2 Manipulation Feasibility Audit
 
+> **Evidence record — not reviewer reading.** Exhaustive per-phase audit
+> trail, kept so every number in the submission is traceable. The
+> reviewer-facing account is `README.md` and
+> `submission/entrance_test_report.md`.
+
 Date: 2026-09-02
 
 ## Scope

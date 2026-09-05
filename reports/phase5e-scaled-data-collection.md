@@ -296,8 +296,8 @@ collection spec with diagnostic probes pushed further past the confirmed-
 safe boundary (e.g. `cube_dy > 0.04`, finer steps between the confirmed
 reject at `cube_dx=+0.005` and the confirmed-pass envelope, or — pending
 separate authorization — a scene-geometry change enabling genuine
-target-position variation per Section A's disclosure) if the user wants
-exactly 8 diagnostic failures/rejections rather than 4.
+target-position variation per Section A's disclosure) if exactly 8
+diagnostic failures/rejections are wanted rather than 4.
 
 ## Section J — verification and commit
 

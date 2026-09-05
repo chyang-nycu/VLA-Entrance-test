@@ -2,7 +2,7 @@
 
 Date: 2026-09-02
 
-**Task 1 success is NOT restored by this phase.** This report documents a genuine repair effort with real, measured improvement, but the outcome is deliberately reported as still incomplete: (1) it is pending human visual review of `artifacts/phase4e_task1_corrected.mp4`, and (2) even independent of that review, the tightened grasp-stability acceptance criterion (max slip while grasped ≤10 mm) is **not met** after exhausting the authorized 3-attempt repair budget. Do not treat anything in this report as reinstating the Phase 4B/4C "Task 1 complete" claim.
+**Task 1 success is NOT restored by this phase.** This report documents a genuine repair effort with real, measured improvement, but the outcome is deliberately reported as still incomplete: (1) it is pending my visual review of `artifacts/phase4e_task1_corrected.mp4`, and (2) even independent of that review, the tightened grasp-stability acceptance criterion (max slip while grasped ≤10 mm) is **not met** after exhausting the authorized 3-attempt repair budget. Do not treat anything in this report as reinstating the Phase 4B/4C "Task 1 complete" claim.
 
 ## Background
 
@@ -45,7 +45,7 @@ All numbers below are measured directly (via `tasks/g1_pick_place/phase4e_diagno
 | Finger pad sliding friction | 1.2 | `left_finger_pad`/`right_finger_pad`'s `friction` XML attribute |
 | Effective μ | 1.2 | MuJoCo's documented default combination rule for equal-priority geoms: element-wise **maximum** |
 | Weight | 0.4905 N | m·g |
-| **N_min (bilateral)** | **0.2044 N** | m·g / (2·μ), the formula the user specified |
+| **N_min (bilateral)** | **0.2044 N** | m·g / (2·μ), the formula I specified |
 
 ### Pre-repair (baseline, commit `dfeec9e`/`e212777`) evidence
 
@@ -86,7 +86,7 @@ Implemented as `criteria_grasp_stability_4e` / `grasp_stability_pass_4e` on `run
 
 Deterministic across 5 reruns (bit-identical `max_slip_while_grasped_m`, identical `grasp_stability_pass_4e=False` every time — this is not a flaky near-miss, it is a consistent, reproducible gap).
 
-Note on the zero-force finding: at least one step during the grasped window shows a real `mj_contactForce` of exactly 0.0 N on one pad even though the boolean geometric-contact check (`_contacts_between`) still reported contact as present. This is exactly the "reported contact alone is insufficient" failure mode the user's Phase 4D directive warned about, now caught by the strengthened criteria's direct force check rather than a boolean.
+Note on the zero-force finding: at least one step during the grasped window shows a real `mj_contactForce` of exactly 0.0 N on one pad even though the boolean geometric-contact check (`_contacts_between`) still reported contact as present. This is exactly the "reported contact alone is insufficient" failure mode my Phase 4D directive warned about, now caught by the strengthened criteria's direct force check rather than a boolean.
 
 ## Section D: honest gate status — Stage B not authorized to run
 
@@ -118,7 +118,7 @@ Because the required gate is not met, **Stage B (the 3 reachable variants) was n
 
 `tests/test_phase4b_pick_place.py` and `tests/test_phase4c_slip_audit.py` test `write_grasp_scene_4b()`/`run_trial_pick_place()` directly — the same functions this phase legitimately changed (gains, LIFT trajectory, finger geometry) as part of an authorized grasp-stability repair. Their frozen-value assertions were updated to the new, current, freshly-measured numbers (documented inline in each test with the old value and why it changed); this is different from a historical-failure preservation case (like Phase 3's separate, never-touched torque-PD controller) because `write_grasp_scene_4b`/`run_trial_pick_place` are the *active* Task 1 pipeline, not a frozen architecture kept around as a documented past failure. The historical `.md` reports and JSON logs for those phases are untouched (Section F). One test (`Phase4BAbortBehaviorTest`) needed its adversarial stress parameters strengthened, since the new, stronger grip survives the old stress test; it now also passes explicit, deliberately-weak (Phase 3C's original 150/10) gripper gains alongside the same aggressive jerk to keep exercising the abort path itself. One boundary-case test (`test_failing_variant_never_accumulated_a_full_streak`) lost its original failing example (`y_plus_0.03` now passes, a genuine improvement) and was pointed at a pre-declared-unreachable excluded variant instead — a weaker substitute, flagged as such in the test's own comment.
 
-Full suite after this phase: see the commit's own verification run (reported to the user separately); no threshold was loosened anywhere, and Phase 4D's previously-failing-on-purpose test now passes for a genuine reason (the defect is fixed), not because it was weakened.
+Full suite after this phase: see the commit's own verification run (reported separately); no threshold was loosened anywhere, and Phase 4D's previously-failing-on-purpose test now passes for a genuine reason (the defect is fixed), not because it was weakened.
 
 ## Section H: time
 
@@ -132,4 +132,4 @@ Approximately 3 hours: evidence-gathering script + baseline diagnosis (~45 min),
 - **This remains a fixed-base, torso-constrained upper-body manipulation baseline.** No free-standing, mobile-base, or full-body capability is implied or claimed by anything in this report.
 - Per HANDOFF.md, no cameras, dataset collection, or Task 2 work was started in this phase.
 
-**Pending human visual review of `artifacts/phase4e_task1_corrected.mp4` and `artifacts/phase4e_task1_closeup.mp4`, and pending a future phase that closes the remaining ~2× slip gap, Task 1 is not restored and its success claim should not be reinstated.**
+**Pending my visual review of `artifacts/phase4e_task1_corrected.mp4` and `artifacts/phase4e_task1_closeup.mp4`, and pending a future phase that closes the remaining ~2× slip gap, Task 1 is not restored and its success claim should not be reinstated.**

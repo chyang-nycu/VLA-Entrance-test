@@ -71,8 +71,8 @@ genuine but bounded kinematic limitation (documented in Phase 4F: the
 position-priority waypoint IK's redundancy resolution does not fully
 eliminate wrist-orientation-driven contact-band drift at this specific
 grasp geometry) that produces measurable, but not task-defeating, slip.
-Direct human visual review of the resulting task execution — the standard
-this project has used throughout for "does this look physically honest and
+My direct visual review of the resulting task execution — the standard
+I have applied throughout for "does this look physically honest and
 functionally complete" — finds the executed task acceptable for prototype
 purposes.
 
@@ -84,9 +84,9 @@ This decision therefore separates two independent questions that Phase
   test or log has been changed to suggest otherwise.
 - **Entrance-test prototype task completion** (does the robot physically
   and honestly pick up the cube and place it in the target, without any
-  scripted assistance, in a way a human reviewer judges functionally and
+  scripted assistance, in a way I judge functionally and
   visually acceptable): **PASS, with a documented limitation.**
-- **Human visual review of the Phase 4F videos**: **PASS.**
+- **My visual review of the Phase 4F videos**: **PASS.**
 
 ## Limitations and future improvement
 

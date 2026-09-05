@@ -1,5 +1,10 @@
 # Phase 4D: Physics-Integrity Investigation (Diagnosis Only, No Fix)
 
+> **Evidence record — not reviewer reading.** Exhaustive per-phase audit
+> trail, kept so every number in the submission is traceable. The
+> reviewer-facing account is `README.md` and
+> `submission/entrance_test_report.md`.
+
 Date: 2026-09-02
 
 **This report supersedes no prior result numerically. It marks the *interpretation* of
