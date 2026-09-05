@@ -1,0 +1,193 @@
+{
+  "criteria": {
+    "handle_z": 0.9,
+    "ik_pos_tol_m": 0.008,
+    "min_radius_m": 0.06,
+    "min_theta_deg": 30.0,
+    "orient_tol_deg": 7.004726409076352,
+    "orient_tol_rad": 0.12225553903978155,
+    "sigma_min_floor": 0.0527,
+    "sigma_min_floor_source": "min singular value at x_minus_0.03, the best-conditioned cube position with a physically verified Task 1 grasp"
+  },
+  "gate_outcome": "GO_HINGE",
+  "locked": {
+    "chord_m": 0.1979898987322333,
+    "phi0_deg": 270.0,
+    "pivot_xy": [
+      0.16,
+      -0.06
+    ],
+    "radius_m": 0.14,
+    "theta_deg": 90.0,
+    "worst": {
+      "ik_residual_m": 0.007746701099468864,
+      "manipulability": 0.016163504714790482,
+      "min_singular_value": 0.12975029510631578,
+      "orientation_residual_deg": 6.547024286479541
+    }
+  },
+  "n_admissible_arcs": 2994,
+  "phase": "7A",
+  "top_candidates": [
+    {
+      "chord_m": 0.1979898987322333,
+      "phi0_deg": 270.0,
+      "pivot_xy": [
+        0.16,
+        -0.06
+      ],
+      "radius_m": 0.14,
+      "theta_deg": 90.0,
+      "worst": {
+        "ik_residual_m": 0.007746701099468864,
+        "manipulability": 0.016163504714790482,
+        "min_singular_value": 0.12975029510631578,
+        "orientation_residual_deg": 6.547024286479541
+      }
+    },
+    {
+      "chord_m": 0.1979898987322333,
+      "phi0_deg": 30.0,
+      "pivot_xy": [
+        0.18,
+        -0.3
+      ],
+      "radius_m": 0.14,
+      "theta_deg": 90.0,
+      "worst": {
+        "ik_residual_m": 0.007829162104864004,
+        "manipulability": 0.013579993022800234,
+        "min_singular_value": 0.13335328845340821,
+        "orientation_residual_deg": 6.779261680777824
+      }
+    },
+    {
+      "chord_m": 0.1979898987322333,
+      "phi0_deg": 30.0,
+      "pivot_xy": [
+        0.18,
+        -0.28
+      ],
+      "radius_m": 0.14,
+      "theta_deg": 90.0,
+      "worst": {
+        "ik_residual_m": 0.007934033025671323,
+        "manipulability": 0.01360446904584541,
+        "min_singular_value": 0.13495839672694995,
+        "orientation_residual_deg": 6.222033808066815
+      }
+    },
+    {
+      "chord_m": 0.1979898987322333,
+      "phi0_deg": 30.0,
+      "pivot_xy": [
+        0.18,
+        -0.26
+      ],
+      "radius_m": 0.14,
+      "theta_deg": 90.0,
+      "worst": {
+        "ik_residual_m": 0.007771953547689184,
+        "manipulability": 0.013473733714881073,
+        "min_singular_value": 0.13601982773015525,
+        "orientation_residual_deg": 6.807270115606972
+      }
+    },
+    {
+      "chord_m": 0.1979898987322333,
+      "phi0_deg": 270.0,
+      "pivot_xy": [
+        0.18,
+        -0.06
+      ],
+      "radius_m": 0.14,
+      "theta_deg": 90.0,
+      "worst": {
+        "ik_residual_m": 0.007539627779945652,
+        "manipulability": 0.017080764220903197,
+        "min_singular_value": 0.12447210958438602,
+        "orientation_residual_deg": 6.655538629545702
+      }
+    },
+    {
+      "chord_m": 0.1979898987322333,
+      "phi0_deg": 270.0,
+      "pivot_xy": [
+        0.18,
+        -0.04
+      ],
+      "radius_m": 0.14,
+      "theta_deg": 90.0,
+      "worst": {
+        "ik_residual_m": 0.007134264874983081,
+        "manipulability": 0.0169381862632857,
+        "min_singular_value": 0.11952922296881095,
+        "orientation_residual_deg": 6.4187257527188795
+      }
+    },
+    {
+      "chord_m": 0.1979898987322333,
+      "phi0_deg": 30.0,
+      "pivot_xy": [
+        0.2,
+        -0.3
+      ],
+      "radius_m": 0.14,
+      "theta_deg": 90.0,
+      "worst": {
+        "ik_residual_m": 0.007332079842345462,
+        "manipulability": 0.014513336364797931,
+        "min_singular_value": 0.12591161968568823,
+        "orientation_residual_deg": 6.786755596342434
+      }
+    },
+    {
+      "chord_m": 0.1979898987322333,
+      "phi0_deg": 30.0,
+      "pivot_xy": [
+        0.2,
+        -0.28
+      ],
+      "radius_m": 0.14,
+      "theta_deg": 90.0,
+      "worst": {
+        "ik_residual_m": 0.007678244764897053,
+        "manipulability": 0.014249854677663194,
+        "min_singular_value": 0.12755759525869703,
+        "orientation_residual_deg": 6.356299040763611
+      }
+    },
+    {
+      "chord_m": 0.1979898987322333,
+      "phi0_deg": 30.0,
+      "pivot_xy": [
+        0.2,
+        -0.26
+      ],
+      "radius_m": 0.14,
+      "theta_deg": 90.0,
+      "worst": {
+        "ik_residual_m": 0.007909301738690205,
+        "manipulability": 0.014352944608663432,
+        "min_singular_value": 0.12886006608872605,
+        "orientation_residual_deg": 6.949369975742077
+      }
+    },
+    {
+      "chord_m": 0.1979898987322333,
+      "phi0_deg": 300.0,
+      "pivot_xy": [
+        0.2,
+        -0.1
+      ],
+      "radius_m": 0.14,
+      "theta_deg": 90.0,
+      "worst": {
+        "ik_residual_m": 0.007145638753367683,
+        "manipulability": 0.02142662649486006,
+        "min_singular_value": 0.11696794158419731,
+        "orientation_residual_deg": 6.798437644004581
+      }
+    }
+  ]
+}

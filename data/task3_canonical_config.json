@@ -1,0 +1,75 @@
+{
+  "schema_version": "1.0.0",
+  "task_id": "task3_door_open",
+  "description": "Environment-integrity manifest for Task 3 (door-opening). Verifies the live scene/controller/geometry/hinge configuration against what Phase 7A-7C measured and locked -- this is NOT a data-collection authorization spec (unlike task1_canonical_config.json / task1_collection_spec.json). No demonstration dataset has been collected for this task.",
+  "task_instruction": "Open the cabinet door.",
+  "scene": {
+    "generator_function": "tasks.g1_pick_place.door_open.write_door_scene",
+    "base_generator_function": "tasks.g1_pick_place.camera_observation.write_grasp_scene_5a",
+    "scene_path": "tasks/g1_pick_place/g1_grasp_scene_door.xml"
+  },
+  "controller": {
+    "trial_function": "tasks.g1_pick_place.door_open.run_trial_door_open",
+    "use_oriented_ik": true,
+    "use_oriented_ik_note": "Unlike Task 1 (false throughout): Phase 7A/7B measured every arc waypoint meeting both the 8mm position and 7deg orientation tolerance simultaneously -- see reports/phase7a-workspace-map.md and reports/phase7c-door-motion.md.",
+    "arm_gains": {
+      "kp": 600.0,
+      "kv": 25.0
+    },
+    "arm_gains_note": "kp raised from Task 1's ARM_KP_4B=400 to clear an ~11mm steady-state settle droop at the PREGRASP_HANDLE posture; ARM_KP_4B itself is never modified. See reports/phase7c-door-motion.md attempt 1.",
+    "gripper_gains": {
+      "kp": 320.0,
+      "kd": 20.0
+    },
+    "gripper_gains_note": "Task 1's currently-verified GRIPPER_KP_4E/KD_4E, reused unchanged."
+  },
+  "geometry": {
+    "source": "logs/phase7b_selected_door_geometry.json",
+    "derivation": "tasks.g1_pick_place.door_open.select_door_geometry, a margin-scored re-search of tasks.g1_pick_place.workspace_map.search_largest_arc's admissible arcs -- NOT the single largest arc Phase 7A reported (see reports/phase7a-workspace-map.md's recommendation).",
+    "pivot_xy": [
+      0.38,
+      -0.16
+    ],
+    "radius_m": 0.08,
+    "phi0_deg": 120.0,
+    "theta_deg": 60.0,
+    "handle_z": 0.9,
+    "chord_m": 0.08,
+    "measured_margins": {
+      "orient_margin_deg": 4.014,
+      "sigma_margin": 0.0664,
+      "resid_margin_m": 0.00529,
+      "rest_clearance_m": 0.1522,
+      "rest_clearance_note": "Computed against the 7 wrist-chain link bodies only. A known, small, operationally-inert exception (door_panel vs left_finger, up to -9.6mm, idle-arm-only, never encountered under active control) is documented in logs/phase7b_selected_door_geometry.json and reports/phase7d-door-tests.md."
+    }
+  },
+  "hinge": {
+    "joint_name": "door_hinge",
+    "axis": "0 0 1",
+    "damping": 0.05,
+    "frictionloss": 0.08,
+    "handle_radius_m": 0.035,
+    "handle_radius_note": "== gripper_scene.CUBE_HALF, reused so the handle grip reproduces Task 1's verified squeeze-overtravel mechanics exactly."
+  },
+  "success_thresholds": {
+    "door_open_fraction": 0.75,
+    "door_open_fraction_note": "LIBERO-style: open means hinge_qpos >= 0.75 * authorized swing (33.75deg of 45deg), not the full swing.",
+    "door_dwell_s": 2.0,
+    "door_dwell_max_wait_s": 5.0,
+    "door_static_qvel_tol_rad_s": 0.1,
+    "handle_grasp_corridor_rad": 0.02,
+    "handle_slip_tol_m": 0.01,
+    "criteria_source": "tasks.g1_pick_place.door_open.run_trial_door_open._finalize"
+  },
+  "current_measured_result": {
+    "source": "logs/phase7c_door_trial_nominal.json",
+    "hinge_qpos_ge_open_threshold": true,
+    "max_hinge_deg": 45.31,
+    "bilateral_contact_retained_through_arc": false,
+    "max_handle_slip_m": 0.0223,
+    "note": "Door reaches/exceeds its target open angle; bilateral grip force touches exactly 0.0N at one instant during the pull, so the strict grip-retention and slip criteria fail -- disclosed, not hidden. See reports/phase7c-door-motion.md."
+  },
+  "hash": {
+    "value": "7c74485038417bad8aca3fe20c740d8d1270705e4f0b996a77480d74c25ef93b"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "pivot_xy": [0.38, -0.16],
+  "radius_m": 0.08,
+  "phi0_deg": 120.0,
+  "theta_deg": 60.0,
+  "chord_m": 0.07999999999999999,
+  "handle_z": 0.9,
+  "orient_margin_deg": 4.013671496586161,
+  "sigma_margin": 0.06635847679872309,
+  "resid_margin_m": 0.0052938561902787385,
+  "rest_clearance_m": 0.1521775392318248,
+  "rest_clearance_note": "Computed against the original 7-link-only RESTING_ARM_LINKS check (right_shoulder_pitch/roll/yaw, right_elbow, right_wrist_roll/pitch/yaw). After extending that check to also include the gripper's own left_finger/right_finger/palm bodies (Phase 7D), this specific locked geometry was found to have a small, real, but operationally-inert collision: door_panel vs left_finger, up to -9.6mm, present ONLY when the arm is frozen at its idle/rest configuration while the door hinge is swept independently -- a scenario that never occurs in an actual run_trial_door_open trial, where the arm is under active IK-driven control from the first physics step onward. Documented and accepted rather than re-searched, given every real trial with this geometry (Phases 2-4, dozens of runs) succeeded with clean, correct physics throughout. See reports/phase7d-door-tests.md.",
+  "sigma_min": 0.11905847679872308,
+  "worst": {
+    "ik_residual_m": 0.0027061438097212617,
+    "manipulability": 0.022651828012782736,
+    "min_singular_value": 0.11905847679872308,
+    "orientation_residual_deg": 2.9910549124901915
+  }
+}

@@ -1,0 +1,212 @@
+{
+  "APPROACH_HANDLE": {
+    "iterations": 1,
+    "orientation_residual_deg": 0.8640132530465422,
+    "orientation_residual_rad": 0.015079876046529089,
+    "orientation_within_tol": true,
+    "reachable_within_tol": true,
+    "residual_m": 0.0005925602658812487,
+    "target_pos": [
+      0.3359110991546882,
+      -0.1710582854123025,
+      0.9
+    ]
+  },
+  "ARC_00": {
+    "iterations": 0,
+    "orientation_residual_deg": 0.8640132530465422,
+    "orientation_residual_rad": 0.015079876046529089,
+    "orientation_within_tol": true,
+    "reachable_within_tol": true,
+    "residual_m": 0.0005925602658812487,
+    "target_pos": [
+      0.3359110991546882,
+      -0.1710582854123025,
+      0.9
+    ]
+  },
+  "ARC_01": {
+    "iterations": 0,
+    "orientation_residual_deg": 0.8640132530465422,
+    "orientation_residual_rad": 0.015079876046529089,
+    "orientation_within_tol": true,
+    "reachable_within_tol": true,
+    "residual_m": 0.0077881941226371374,
+    "target_pos": [
+      0.33769423364838763,
+      -0.16341083864193545,
+      0.9
+    ]
+  },
+  "ARC_02": {
+    "iterations": 1,
+    "orientation_residual_deg": 1.1350831006240512,
+    "orientation_residual_rad": 0.019810937389635797,
+    "orientation_within_tol": true,
+    "reachable_within_tol": true,
+    "residual_m": 0.0004890872621205723,
+    "target_pos": [
+      0.3389733833648573,
+      -0.15566314306640622,
+      0.9
+    ]
+  },
+  "ARC_03": {
+    "iterations": 0,
+    "orientation_residual_deg": 1.1350831006240512,
+    "orientation_residual_rad": 0.019810937389635797,
+    "orientation_within_tol": true,
+    "reachable_within_tol": true,
+    "residual_m": 0.007843769996780419,
+    "target_pos": [
+      0.3397430707886324,
+      -0.14784837550761715,
+      0.9
+    ]
+  },
+  "ARC_04": {
+    "iterations": 1,
+    "orientation_residual_deg": 1.4132686981506986,
+    "orientation_residual_rad": 0.024666191998103586,
+    "orientation_within_tol": true,
+    "reachable_within_tol": true,
+    "residual_m": 0.00045931536915995045,
+    "target_pos": [
+      0.33999999999999997,
+      -0.14000000000000004,
+      0.9
+    ]
+  },
+  "ARC_05": {
+    "iterations": 0,
+    "orientation_residual_deg": 1.4132686981506986,
+    "orientation_residual_rad": 0.024666191998103586,
+    "orientation_within_tol": true,
+    "reachable_within_tol": true,
+    "residual_m": 0.007853489714312304,
+    "target_pos": [
+      0.3397430707886324,
+      -0.13215162449238282,
+      0.9
+    ]
+  },
+  "ARC_06": {
+    "iterations": 1,
+    "orientation_residual_deg": 1.6272871754542073,
+    "orientation_residual_rad": 0.02840151908715457,
+    "orientation_within_tol": true,
+    "reachable_within_tol": true,
+    "residual_m": 0.00043177824467952383,
+    "target_pos": [
+      0.3389733833648573,
+      -0.12433685693359386,
+      0.9
+    ]
+  },
+  "ARC_07": {
+    "iterations": 0,
+    "orientation_residual_deg": 1.6272871754542073,
+    "orientation_residual_rad": 0.02840151908715457,
+    "orientation_within_tol": true,
+    "reachable_within_tol": true,
+    "residual_m": 0.00786233859751732,
+    "target_pos": [
+      0.33769423364838763,
+      -0.11658916135806463,
+      0.9
+    ]
+  },
+  "ARC_08": {
+    "iterations": 1,
+    "orientation_residual_deg": 1.8387925809357968,
+    "orientation_residual_rad": 0.03209298479857397,
+    "orientation_within_tol": true,
+    "reachable_within_tol": true,
+    "residual_m": 0.00040988582437986637,
+    "target_pos": [
+      0.3359110991546882,
+      -0.10894171458769758,
+      0.9
+    ]
+  },
+  "ARC_09": {
+    "iterations": 0,
+    "orientation_residual_deg": 1.8387925809357968,
+    "orientation_residual_rad": 0.03209298479857397,
+    "orientation_within_tol": true,
+    "reachable_within_tol": true,
+    "residual_m": 0.007879547861003325,
+    "target_pos": [
+      0.3336316155394127,
+      -0.10142726416362063,
+      0.9
+    ]
+  },
+  "ARC_10": {
+    "iterations": 1,
+    "orientation_residual_deg": 2.1033193183070615,
+    "orientation_residual_rad": 0.03670984732526087,
+    "orientation_within_tol": true,
+    "reachable_within_tol": true,
+    "residual_m": 0.000497460637409373,
+    "target_pos": [
+      0.3308655439013544,
+      -0.09407798811618923,
+      0.9
+    ]
+  },
+  "ARC_11": {
+    "iterations": 1,
+    "orientation_residual_deg": 1.8053267568287141,
+    "orientation_residual_rad": 0.031508895981012086,
+    "orientation_within_tol": true,
+    "reachable_within_tol": true,
+    "residual_m": 0.0001357152280699068,
+    "target_pos": [
+      0.3276247289839226,
+      -0.0869253571737199,
+      0.9
+    ]
+  },
+  "ARC_12": {
+    "iterations": 0,
+    "orientation_residual_deg": 1.8053267568287141,
+    "orientation_residual_rad": 0.031508895981012086,
+    "orientation_within_tol": true,
+    "reachable_within_tol": true,
+    "residual_m": 0.007863271563025919,
+    "target_pos": [
+      0.3239230484541326,
+      -0.08000000000000002,
+      0.9
+    ]
+  },
+  "PREGRASP_HANDLE": {
+    "iterations": 5,
+    "orientation_residual_deg": 1.9615832021589097,
+    "orientation_residual_rad": 0.034236085429486515,
+    "orientation_within_tol": true,
+    "reachable_within_tol": true,
+    "residual_m": 0.00034811569833070313,
+    "target_pos": [
+      0.3304605824142928,
+      -0.18688773541871287,
+      0.9
+    ]
+  },
+  "RETREAT": {
+    "iterations": 14,
+    "orientation_residual_deg": 6.027708436612694,
+    "orientation_residual_rad": 0.10520335856913143,
+    "orientation_within_tol": true,
+    "reachable_within_tol": true,
+    "residual_m": 0.002858182757433127,
+    "target_pos": [
+      0.2239230484541326,
+      -0.08000000000000002,
+      0.9
+    ]
+  },
+  "all_position_and_orientation_reachable": true,
+  "all_reachable": true
+}
