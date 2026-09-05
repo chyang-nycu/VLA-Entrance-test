@@ -13,6 +13,14 @@ grasping baseline to a VLA-oriented demonstration pipeline:
   language grounding is claimed. Every grasp is produced by physical
   contact and actuation: no teleport, weld, or scripted state overwrite.
 
+### **Written to be read** — the reviewer path:
+
+| Document | What it is |
+| --- | --- |
+| [`submission/entrance_test_report.md`](submission/entrance_test_report.md) | The full submission report. See **Contributions and Role** for the design decisions and defect catches behind each phase |
+| [`slide.pdf`](slide.pdf) | Research presentation — the story in slide form |
+| [`submission/DATASET_CARD.md`](submission/DATASET_CARD.md) | Dataset card: intended use, known biases, recommended quality masks (summarised in §5) |
+| [`submission/REPRODUCE.md`](submission/REPRODUCE.md) | Every command actually executed, with recorded timings |
 ## 2. Results at a Glance
 
 | Component | Result |
@@ -25,7 +33,7 @@ grasping baseline to a VLA-oriented demonstration pipeline:
 | Policy-action replay | 8.09mm canonical max TCP error |
 | Tests | 311, 0 unexpected failures |
 | Learned policy | Not attempted |
-| Isaac Lab | Not used (no macOS support) — MuJoCo implementation instead |
+| Isaac Lab | MuJoCo implementation instead |
 
 ## 3. Demo
 
@@ -34,8 +42,8 @@ grasping baseline to a VLA-oriented demonstration pipeline:
 ![Task 1, third-person view](submission/videos/task1_third_person.gif)
 
 Third-person, full episode (approach → grasp → lift → transport → lower →
-release → retreat), 12.0s — the video reviewed and accepted in the
-Phase 4F human acceptance decision above.
+release → retreat), 12.0s — the episode I reviewed and accepted as the
+Task 1 prototype result.
 
 ![Task 1, onboard camera](submission/videos/task1_onboard_rgb.gif)
 
@@ -105,7 +113,20 @@ validation + replay
 - Observations are recorded at 10Hz.
 - Actions are stored as H=5 sub-action chunks at an effective 50Hz.
 
-Full schema and per-episode detail: `submission/DATASET_CARD.md`.
+The dataset card
+([`submission/DATASET_CARD.md`](submission/DATASET_CARD.md)) answers four
+questions:
+
+| Question | Answer |
+| --- | --- |
+| What's in it? | 32 Task 1 episodes recorded at **two rates** — a 10Hz policy stream (RGB 160×120, proprioception, TCP pose) alongside a 500Hz execution trace of the literal applied control |
+| How is it designed? | Actions are TCP deltas chunked `[T, 5, 3]` at 50Hz — the representation that closed policy-replay error to 8.09mm. Privileged cube/target state sits in a separate group, and every action is derived from the expert's own commanded trajectory by forward kinematics, so privileged state cannot leak into training |
+| How good is it? | Replay fidelity is **measured per episode, not assumed**: exact-execution replay lands within 1mm on 29/29 episodes. Recommended quality masks ship alongside the data (`task_execution_through_release`, 24/24, is the default) |
+| What are its limits? | Scope is deliberately narrow and disclosed in full in the card — fixed target pad, fixed cube yaw, a 3cm×4.5cm cube-position envelope, and no model trained against it |
+
+The HDF5 itself is untracked (62MB); regenerate it deterministically with
+`python3 -m tasks.g1_pick_place.collect_dataset`. Field-level layout:
+[`data/schema_v3.md`](data/schema_v3.md).
 
 ## 6. Limitations
 
@@ -144,10 +165,11 @@ data/, logs/, artifacts/  datasets, raw evidence, and small evidence media
 
 ## 9. Detailed Documentation
 
-- Full submission report: `submission/entrance_test_report.md`
-  (see **Contributions and Role** for the design decisions and defect
-  catches that drove each phase)
-- Research slides: `slide.pdf`
-- Dataset card: `submission/DATASET_CARD.md`
-- Full chronological development history: `HANDOFF.md`
-- Per-phase evidence and attempt logs: `reports/`
+**Evidence and internal records** — exhaustive by design, not reviewer reading:
+
+| Document | What it is |
+| --- | --- |
+| [`reports/`](reports/) | 17 per-phase audit reports — the traceable source behind every number above |
+| [`data/schema_v3.md`](data/schema_v3.md) | HDF5 field-level layout, for tooling and dataset users |
+| [`HANDOFF.md`](HANDOFF.md) | Chronological engineering history and the per-phase authorization record |
+| [`docs/work_log.md`](docs/work_log.md) | Running work log |
