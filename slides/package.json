@@ -1,0 +1,20 @@
+{
+  "name": "g1-mujoco-slides",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "slidev --open",
+    "build": "slidev build",
+    "export": "slidev export",
+    "export:pdf": "node export-pdf.mjs"
+  },
+  "dependencies": {
+    "@slidev/cli": "^52.19.1",
+    "slidev-theme-academic": "^3.0.1",
+    "vue": "^3.5.42"
+  },
+  "devDependencies": {
+    "pdf-lib": "^1.17.1",
+    "puppeteer-core": "^25.10.0"
+  }
+}
