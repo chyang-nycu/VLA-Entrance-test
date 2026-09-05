@@ -1,0 +1,188 @@
+{
+  "H1_baseline_ow0.6": {
+    "door_pass": false,
+    "max_slip_mm": 22.302416878585145,
+    "slip_at_midpoint_mm": 17.768739310035603,
+    "final_hinge_deg": 45.31032047475179,
+    "contact_retention_frac": 0.8238383838383838,
+    "max_tcp_err_mm": 8.001063149595588,
+    "max_joint_err_deg": 1.2230161782735585,
+    "orient_weight": 0.6
+  },
+  "H1_tighter_ow2.0": {
+    "door_pass": false,
+    "max_slip_mm": 22.598920838839078,
+    "slip_at_midpoint_mm": 17.920767409161414,
+    "final_hinge_deg": 45.34248120018378,
+    "contact_retention_frac": 0.7894949494949495,
+    "max_tcp_err_mm": 8.016142279777315,
+    "max_joint_err_deg": 1.230080462702731,
+    "orient_weight": 2.0
+  },
+  "H1_tightest_ow5.0": {
+    "door_pass": false,
+    "max_slip_mm": 25.946558519864723,
+    "slip_at_midpoint_mm": 18.681567244674802,
+    "final_hinge_deg": 44.52354538861946,
+    "contact_retention_frac": 0.6456565656565657,
+    "max_tcp_err_mm": 8.022824058383843,
+    "max_joint_err_deg": 1.3313660661030287,
+    "orient_weight": 5.0
+  },
+  "H1_position_only": {
+    "door_pass": false,
+    "max_slip_mm": 22.378277020692554,
+    "slip_at_midpoint_mm": 18.029681261199805,
+    "final_hinge_deg": 45.283768872787476,
+    "contact_retention_frac": 0.7963636363636364,
+    "max_tcp_err_mm": 7.699005450437155,
+    "max_joint_err_deg": 1.2950255042089325,
+    "orient_weight": "position-only"
+  },
+  "H2_baseline_pad030": {
+    "door_pass": false,
+    "max_slip_mm": 22.302416878585145,
+    "slip_at_midpoint_mm": 17.768739310035603,
+    "final_hinge_deg": 45.31032047475179,
+    "contact_retention_frac": 0.8238383838383838,
+    "max_tcp_err_mm": 8.001063149595588,
+    "max_joint_err_deg": 1.2230161782735585,
+    "pad_half_z": 0.03
+  },
+  "H2_taller_pad045": {
+    "door_pass": false,
+    "max_slip_mm": 21.812671329275553,
+    "slip_at_midpoint_mm": 17.33799839022512,
+    "final_hinge_deg": 45.30022121293371,
+    "contact_retention_frac": 0.8404040404040404,
+    "max_tcp_err_mm": 8.059178149096942,
+    "max_joint_err_deg": 1.2200823643893803,
+    "pad_half_z": 0.045
+  },
+  "H2_tallest_pad060": {
+    "door_pass": false,
+    "max_slip_mm": 22.17447279750087,
+    "slip_at_midpoint_mm": 17.61071558365679,
+    "final_hinge_deg": 45.23783842425459,
+    "contact_retention_frac": 0.8092929292929293,
+    "max_tcp_err_mm": 8.061802115900946,
+    "max_joint_err_deg": 1.22047408690662,
+    "pad_half_z": 0.06
+  },
+  "H4_baseline_armkp600": {
+    "door_pass": false,
+    "max_slip_mm": 22.302416878585145,
+    "slip_at_midpoint_mm": 17.768739310035603,
+    "final_hinge_deg": 45.31032047475179,
+    "contact_retention_frac": 0.8238383838383838,
+    "max_tcp_err_mm": 8.001063149595588,
+    "max_joint_err_deg": 1.2230161782735585,
+    "arm_kp": 600.0
+  },
+  "H4_higher_armkp900": {
+    "door_pass": false,
+    "max_slip_mm": 20.84756018086755,
+    "slip_at_midpoint_mm": 15.56972803311031,
+    "final_hinge_deg": 45.81473602687104,
+    "contact_retention_frac": 0.8892929292929292,
+    "max_tcp_err_mm": 6.094486255847877,
+    "max_joint_err_deg": 1.0258740334735545,
+    "arm_kp": 900.0
+  },
+  "H4_highest_armkp1200": {
+    "door_pass": false,
+    "max_slip_mm": 20.701818421904516,
+    "slip_at_midpoint_mm": 14.722214210248412,
+    "final_hinge_deg": 46.17307347885062,
+    "contact_retention_frac": 0.9042424242424243,
+    "max_tcp_err_mm": 4.779444947074613,
+    "max_joint_err_deg": 0.7962510077718346,
+    "arm_kp": 1200.0
+  },
+  "H5_baseline_nsgain0.15": {
+    "door_pass": false,
+    "max_slip_mm": 22.302416878585145,
+    "slip_at_midpoint_mm": 17.768739310035603,
+    "final_hinge_deg": 45.31032047475179,
+    "contact_retention_frac": 0.8238383838383838,
+    "max_tcp_err_mm": 8.001063149595588,
+    "max_joint_err_deg": 1.2230161782735585,
+    "nullspace_posture_gain": 0.15,
+    "sigma_min_first": 0.1190709068273757,
+    "sigma_min_last": 0.13607020600854525,
+    "cond_first": 4.134624695099178,
+    "cond_last": 3.3973493385715323
+  },
+  "H5_low_nsgain0.05": {
+    "door_pass": false,
+    "max_slip_mm": 22.678377990044417,
+    "slip_at_midpoint_mm": 17.060225505264434,
+    "final_hinge_deg": 45.27204473386936,
+    "contact_retention_frac": 0.7923232323232323,
+    "max_tcp_err_mm": 7.522815258361623,
+    "max_joint_err_deg": 1.1826329145096075,
+    "nullspace_posture_gain": 0.05,
+    "sigma_min_first": 0.11909666706540878,
+    "sigma_min_last": 0.1364265637214631,
+    "cond_first": 4.133666584150726,
+    "cond_last": 3.3863055164027815
+  },
+  "H5_high_nsgain0.40": {
+    "door_pass": false,
+    "max_slip_mm": 22.305211432954977,
+    "slip_at_midpoint_mm": 17.45517494909575,
+    "final_hinge_deg": 45.885547841583175,
+    "contact_retention_frac": 0.821010101010101,
+    "max_tcp_err_mm": 7.952230067588892,
+    "max_joint_err_deg": 1.2792846347165385,
+    "nullspace_posture_gain": 0.4,
+    "sigma_min_first": 0.11902039536649847,
+    "sigma_min_last": 0.13608710706536542,
+    "cond_first": 4.136412596647132,
+    "cond_last": 3.395029746618668
+  },
+  "combined_arm1200_grip640": {
+    "door_pass": false,
+    "max_slip_mm": 13.24790813625335,
+    "slip_at_midpoint_mm": 11.197101467980756,
+    "final_hinge_deg": 49.43025516430615,
+    "contact_retention_frac": 1.0,
+    "max_tcp_err_mm": 5.1945516234948235,
+    "max_joint_err_deg": 0.8374323853747023,
+    "arm_kp": 1200.0,
+    "gripper_kp": 640.0
+  },
+  "combined_arm1500_grip800": {
+    "door_pass": false,
+    "max_slip_mm": 11.40406111934699,
+    "slip_at_midpoint_mm": 9.681166165875744,
+    "final_hinge_deg": 51.210609010648916,
+    "contact_retention_frac": 1.0,
+    "max_tcp_err_mm": 4.36996294132177,
+    "max_joint_err_deg": 0.683131757607211,
+    "arm_kp": 1500.0,
+    "gripper_kp": 800.0
+  },
+  "combined_arm1800_grip960": {
+    "door_pass": true,
+    "max_slip_mm": 9.854957360498002,
+    "slip_at_midpoint_mm": 8.348327607021751,
+    "final_hinge_deg": 51.73417276483589,
+    "contact_retention_frac": 1.0,
+    "max_tcp_err_mm": 3.531226789829345,
+    "max_joint_err_deg": 0.5618729240254623,
+    "arm_kp": 1800.0,
+    "gripper_kp": 960.0
+  },
+  "combined_arm2200_grip1200": {
+    "door_pass": true,
+    "max_slip_mm": 8.218523391797234,
+    "slip_at_midpoint_mm": 6.868904314657808,
+    "final_hinge_deg": 52.321508700269625,
+    "contact_retention_frac": 1.0,
+    "max_tcp_err_mm": 2.8794283145951134,
+    "max_joint_err_deg": 0.45024406696897545,
+    "arm_kp": 2200.0,
+    "gripper_kp": 1200.0
+  }
+}

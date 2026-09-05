@@ -1512,13 +1512,69 @@ by an earlier session's active-voice rewrite of that report ("pending
 human visual review" → "pending my visual review") — updated the
 assertion to match the corrected wording, not reverted.
 
-**What remains, not yet authorized**: (A) closing the slip/force gap
-further — the natural next step given Phase 7E's finding that a second,
-non-force contributor exists and appears before the force decline; the
-evidence-driven pattern would be to instrument wrist roll during the arc
-and test it directly, the same approach used for every prior
-grasp-stability phase. (B) Demonstration-dataset collection for Task 3,
-extending the existing two-rate HDF5 pipeline (Task 1's Phase 5B-5E
-precedent) — lower priority than (A), since collecting demonstrations of a
-task that mostly fails its strict criteria is low-value until the success
-rate improves. No push; not merged to `main` as of this entry.
+**What remains, not yet authorized (as of this entry, superseded below)**:
+(A) closing the slip/force gap further — the natural next step given
+Phase 7E's finding that a second, non-force contributor exists and
+appears before the force decline; the evidence-driven pattern would be to
+instrument wrist roll during the arc and test it directly, the same
+approach used for every prior grasp-stability phase. (B)
+Demonstration-dataset collection for Task 3, extending the existing
+two-rate HDF5 pipeline (Task 1's Phase 5B-5E precedent) — lower priority
+than (A), since collecting demonstrations of a task that mostly fails its
+strict criteria is low-value until the success rate improves. No push;
+not merged to `main` as of this entry.
+
+### Addendum: Phase 8 — slip-onset diagnosis, expert now passes (2026-09-05)
+
+Directly answers (A) above. Full account: `reports/phase8-slip-diagnosis.md`
+(instrumentation, event timeline, 5 controlled hypothesis tests, combined
+ablation, video, and expert-readiness table).
+
+**The second, non-force contributor identified: arm servo tracking
+error**, present from the very first instant of the pull (t≈0.34s) — a
+full 1.2s before contact force even begins to decline (t≈1.81s) — and
+slip already crosses the 10mm target at t≈1.55s, while force is still on
+its healthy plateau. Confirmed causal, not just correlational, by a
+single-factor dose-response ablation: raising `ARM_KP_DOOR` alone
+(600→900→1200, gripper gain untouched) cut max slip 22.3→20.8→20.7mm and
+raised contact retention 82.4%→90.4%, all monotonically. Two other
+candidate mechanisms were tested and **rejected** by direct intervention:
+tightening orientation control (H1) makes slip *worse*, not better;
+varying finger-pad contact height 2x (H2) has no effect. Workspace
+conditioning (H5) was left honestly **inconclusive** — the only available
+lever (`NULLSPACE_POSTURE_GAIN`, swept 0.05-0.40) failed to move σ_min/
+condition number at all in this workspace region, so the manipulation
+failed rather than the hypothesis being tested.
+
+**Shipped defaults changed**: `ARM_KP_DOOR` 600→**2200**, `GRIPPER_KP_DOOR`
+320→**1200** (`tasks/g1_pick_place/door_open.py`; `data/task3_canonical_config.json`
+hash re-stamped). Both mechanisms had to be fixed together — raising
+either alone does not reach `door_pass=True` (max observed 20.70mm arm-only,
+16.3mm gripper-only from Phase 7E). Combined result: **`door_pass=True`**,
+all 11 criteria pass, max slip **8.22mm** (was 22.3mm), 100% bilateral
+contact retention throughout the pull (was 82.4%), deterministic across
+3 reruns, peak arm actuator force only 63% of the physical per-joint
+torque limit (a real margin, not saturation-edge tuning). Task 1/2 scene
+hashes confirmed unchanged. `tests/test_door_open.py`'s
+`TestKnownLimitation` class (which asserted the known-False `door_pass`
+as a documented limitation) is now `TestExpertReliability` asserting the
+new passing state; full suite re-run at 347/347, 0 unexpected failures.
+
+Video re-recorded against the new config
+(`artifacts/phase8_task3_third_person.mp4`, `_closeup.mp4`) with a
+burned-in label derived from the trial's own live `door_pass` result at
+record time (not asserted ahead of time) — now reads "SUCCESSFUL EXPERT
+DEMONSTRATION". The prior failing-config recording is preserved as
+`_prefail.mp4` rather than deleted.
+
+**What remains, now that the strict target is met**: setup-variation /
+generalization has **not** been tested — only the single fixed nominal
+handle geometry from Phase 7A/7B was verified against the new gains; a
+different handle position or door geometry would require rerunning
+Phase 0-1's geometry search, out of scope here. Per
+`reports/phase8-slip-diagnosis.md`'s own recommendation: demonstration
+collection may now proceed (readiness gate is met for this one fixed
+setup), but should either scope its own metadata to this single geometry
+explicitly, or be preceded by a small generalization check across a few
+`select_door_geometry` variants before committing to full-scale HDF5
+collection. Not yet authorized to begin; not yet started.

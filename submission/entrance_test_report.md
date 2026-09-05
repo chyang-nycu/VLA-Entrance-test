@@ -34,13 +34,16 @@ than brief grasp-and-carry of a free body. Its geometry (hinge pivot,
 handle radius, swing) was derived from a measured TCP workspace/
 conditioning map, not chosen by hand — the same map retroactively explains
 two earlier, previously-unresolved Task 1 findings (§8). The arm
-reaches/exceeds the door's target open angle, but bilateral grip force
-touches exactly 0.0N at one instant during the pull, so the stricter
-grip-retention and slip criteria fail — disclosed, not hidden, the same
-treatment Task 1's own Phase 4E gave an analogous finding. No demonstration
-data was collected for this task.
+reaches/exceeds the door's target open angle and, after a Phase 8
+diagnosis identified and fixed two independent grasp-slip mechanisms (arm
+servo tracking error and grip-force decline), now meets the stricter
+grip-retention and slip criteria as well: `door_pass=True`, max slip
+8.22mm against the 10mm target. No demonstration data was collected for
+this task yet — setup variation across different handle geometries
+remains untested (§8).
 
-**Tests**: 345 (311 pre-Task-3 + 34 new), 0 unexpected failures.
+**Tests**: 347 (311 pre-Task-3 + 36, after Phase 8 added 2 covering the
+new passing state), 0 unexpected failures.
 
 Model training and model inference were never attempted; Task 2's own
 scaled dataset collection and policy integration remain not started; Task 3
@@ -88,8 +91,8 @@ with a second, physically-identical green cube (§7).
 actuator, no equality, moved only by real contact through the gripper —
 whose geometry (pivot, handle radius, swing) is derived from a measured
 workspace/conditioning map rather than chosen by hand. The arm reaches its
-target open angle; a disclosed grip-force limitation during the pull
-remains open (§8).
+target open angle and meets the strict grip-retention/slip criteria after
+a Phase 8 diagnosis fixed two independent slip mechanisms (§8).
 
 Model training or inference was never implemented or attempted in any
 phase.
@@ -270,7 +273,9 @@ material defects and required no corrective commit.
 ## 8. Task 3 — Articulated Door-Opening
 
 Full evidence: `reports/phase7a-workspace-map.md` through
-`reports/phase7d-door-tests.md`.
+`reports/phase7d-door-tests.md`, plus the follow-on causality/diagnosis
+work in `reports/phase7e-slip-causality.md` and
+`reports/phase8-slip-diagnosis.md`.
 
 This is a new manipulation class for the project: sustained contact with
 an **articulated** object under a kinematic constraint, rather than brief
@@ -300,14 +305,27 @@ unlike Task 1) works with zero position-residual cost, confirming that
 Task 1's own orientation-IK conflict was a height artifact, not an
 architectural limitation.
 
-**Result**: the arm reaches/exceeds the door's target open angle (45.3° of
-a 45° threshold, deterministic across repeats). The disclosed limitation:
-bilateral grip force touches exactly 0.0N at one instant during the pull,
-so the stricter grip-retention (`bilateral_contact_retained_through_arc`)
-and slip (`max_handle_slip_le_10mm`, measured 22.3mm) criteria fail —
-`door_pass` is honestly `False`. This is the same physical phenomenon Task
-1's Phase 4E disclosed rather than hid (a real, momentary zero-force
-contact instant underneath a still-registering boolean contact check).
+**Result**: the arm reaches/exceeds the door's target open angle (52.3° of
+a 45° threshold, deterministic across repeats). The initial shipped
+configuration failed the stricter grip-retention and slip criteria
+(bilateral grip force touched exactly 0.0N at one instant during the
+pull, max slip 22.3mm against a 10mm target) — disclosed rather than
+hidden, the same treatment Task 1's Phase 4E gave an analogous finding.
+A dedicated Phase 8 diagnosis (instrumented time-series, an 8-event
+timeline, and 5 independently-tested hypotheses) found the slip had
+**two distinct, additive causes**: arm servo tracking error, present
+from the very start of the pull and confirmed by a monotonic
+dose-response ablation (raising `ARM_KP_DOOR` alone cut slip
+22.3→20.7mm), and bilateral grip-force decline partway through the pull
+(raising `GRIPPER_KP_DOOR` alone cut slip 22.3→16.3mm, Phase 7E).
+Neither fix alone reaches the target; raising both together
+(`ARM_KP_DOOR`=2200, `GRIPPER_KP_DOOR`=1200, now the shipped default)
+does: **`door_pass=True`**, max slip **8.22mm**, 100% bilateral contact
+retention, deterministic across reruns, peak actuator force only 63% of
+its physical torque limit. Two competing hypotheses (tighter orientation
+control; taller finger-pad contact) were tested directly and rejected —
+tightening orientation made slip worse, and pad height had no measurable
+effect.
 
 **Engineering findings along the way**, each caught by directly running
 physics rather than trusting a plan: a units bug (the scene's rotation was
@@ -330,12 +348,14 @@ function, since they are module-level here rather than nested closures)
 and to forbid `qfrc_applied` on the hinge's own dof — a cheat surface a
 1-DOF joint has that a free body's 6 dof don't reduce to as simply.
 
-**Tests**: 34 new (`tests/test_door_open.py`), including two diagnostic
-tests that pass by asserting the known grip-force limitation explicitly,
-the same regression-diagnostic pattern already used for Task 1's
-historical failures. Full suite: 345 tests, 0 unexpected failures. No
-demonstration dataset was collected for this task; the data pipeline
-(§6) is untouched.
+**Tests**: 36 (`tests/test_door_open.py`) — the original 34 from Phase
+7D, with Phase 8 replacing the two tests that asserted the known
+grip-force limitation (now superseded) with tests asserting the new
+verified-passing state (`door_pass=True`, max slip <=10mm, deterministic
+reruns), plus 2 net new tests. Full suite: 347 tests, 0 unexpected
+failures. No demonstration dataset was collected for this task yet — the
+data pipeline (§6) is untouched, and setup variation across different
+handle geometries remains untested (`reports/phase8-slip-diagnosis.md`).
 
 ## 9. Failures and Debugging Process
 
@@ -408,12 +428,13 @@ Per-attempt evidence for every item is in the matching `reports/phase*.md`.
 - **7 of 29 scaled policy-action replays exceed the 10mm target**, all
   first diverging at the post-release RETREAT phase.
 - **Model training and inference were never attempted.**
-- **Task 3's grip-retention and slip criteria are not met** (bilateral
-  contact force touches 0.0N at one instant during the pull, 22.3mm
-  measured slip against a 10mm target) — the door still reaches its target
-  open angle, but `door_pass` is honestly `False` (§8). No demonstration
-  data was collected for Task 3, and Task 2's own scaled dataset
-  collection and policy integration were also never started (§7).
+- **Task 3's setup variation/generalization is untested** — the strict
+  grip-retention and slip criteria are now met (`door_pass=True`, 8.22mm
+  slip) after Phase 8's dual-mechanism fix, but only against the single
+  fixed handle geometry from Phase 7A/7B; different handle positions or
+  door geometries have not been verified (§8). No demonstration data was
+  collected for Task 3 yet, and Task 2's own scaled dataset collection
+  and policy integration were also never started (§7).
 - The 5-variant sweep uses a single shared, untuned configuration by
   design — the envelope is a property of that configuration, not the best
   achievable per position.
@@ -483,7 +504,9 @@ history and the per-phase authorization record).
   tuning budgets.
 - Scaled dataset collection and policy integration for Task 2.
 - Model training and inference against the dataset.
-- Close Task 3's grip-retention/slip gap (§8) — likely needs a
-  trajectory/waypoint redesign, following the same evidence-driven pattern
-  as Task 1's Phase 4E/4F, rather than another gain adjustment.
-- Demonstration-dataset collection and policy integration for Task 3.
+- Task 3 setup-variation/generalization check across different handle
+  positions and door geometries (§8) — the strict slip/grip-retention gap
+  itself is now closed, but only one fixed geometry has been verified.
+- Demonstration-dataset collection and policy integration for Task 3,
+  scoped to the verified geometry (or preceded by the generalization
+  check above).

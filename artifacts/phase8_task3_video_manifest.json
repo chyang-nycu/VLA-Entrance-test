@@ -1,0 +1,9 @@
+{
+  "door_pass": true,
+  "max_hinge_deg": 52.36424109008133,
+  "max_handle_slip_m": 0.008218524462664193,
+  "label": "SUCCESSFUL EXPERT DEMONSTRATION (all strict criteria met)",
+  "n_frames": 360,
+  "third_person_path": "/Users/yangjudx/Documents/Robotics/artifacts/phase8_task3_third_person.mp4",
+  "closeup_path": "/Users/yangjudx/Documents/Robotics/artifacts/phase8_task3_closeup.mp4"
+}

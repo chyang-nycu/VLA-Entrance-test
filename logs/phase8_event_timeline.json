@@ -1,0 +1,12 @@
+{
+  "slip > 5mm": 0.2839999999999687,
+  "slip > 10mm": 1.5539999999998293,
+  "first major contact-force decline (<90% plateau, sustained)": 1.8119999999998009,
+  "first exact-zero force": 2.6519999999997084,
+  "first large wrist yaw deviation (>5deg from t0)": 3.045999999999665,
+  "first large orientation deviation (>5deg absolute)": null,
+  "first large TCP tracking error (>2x early baseline)": 0.335999999999963,
+  "peak slip time": 3.4579999999996196,
+  "peak slip value mm": 22.302416878585145,
+  "friction margin first goes negative (N_required>available)": 2.6139999999997126
+}

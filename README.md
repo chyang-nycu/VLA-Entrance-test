@@ -9,8 +9,11 @@ grasping baseline to a VLA-oriented demonstration pipeline:
 - **Task 2** — object-conditioned two-object selection on the same scene.
 - **Task 3** — articulated door-opening: a hinged cabinet door, geometry
   derived from a measured workspace/conditioning map rather than chosen by
-  hand. Reaches its target open angle; a disclosed grip-force limitation
-  during the pull remains open (§6).
+  hand. Reaches/exceeds its target open angle and meets the strict
+  <=10mm grasp-slip engineering target (8.22mm), after a Phase 8
+  diagnosis found and fixed two independent slip mechanisms (§6).
+  Setup-variation/generalization across different handle geometries has
+  not yet been tested (`reports/phase8-slip-diagnosis.md`).
 - **VLA pipeline** — RGB + proprioception observations, recorded expert
   actions, HDF5 demonstrations, replay validation (Task 1 only so far).
 - All tasks use a **scripted classical expert** — no learned policy or
@@ -31,12 +34,12 @@ grasping baseline to a VLA-oriented demonstration pipeline:
 | --- | --- |
 | Task 1 | Pick-and-place completed in the supported reachable envelope |
 | Task 2 | 4 configs x 3 deterministic repeats, 12/12 pass |
-| Task 3 (door-opening) | Reaches/exceeds the 45deg open target; grip force touches 0.0N at one instant during the pull (disclosed, not hidden) |
+| Task 3 (door-opening) | Reaches/exceeds the 45deg open target; strict <=10mm grasp-slip target met (8.22mm, `door_pass=True`) after Phase 8's dual-mechanism fix |
 | Wrong-object placements | 0 |
 | Distractor displacement | <=1.73mm |
 | Demonstration pipeline | RGB + proprioception + actions + replay |
 | Policy-action replay | 8.09mm canonical max TCP error |
-| Tests | 345, 0 unexpected failures |
+| Tests | 347, 0 unexpected failures |
 | Learned policy | Not attempted |
 | Isaac Lab | MuJoCo implementation instead |
 
@@ -152,11 +155,13 @@ The HDF5 itself is untracked (62MB); regenerate it deterministically with
   (measured ~25.9mm); task-level pick-and-place otherwise works.
 - Task 2 uses privileged object selection (`selected_object_id` supplied
   directly), not natural-language parsing or visual-language grounding.
-- Task 3 (door-opening) reaches its target open angle, but bilateral grip
-  force touches exactly 0.0N at one instant during the pull, so the
-  stricter grip-retention and slip criteria fail — disclosed, not hidden
-  (`reports/phase7c-door-motion.md`). No demonstration data collected for
-  this task.
+- Task 3 (door-opening) reaches its target open angle and meets its
+  strict <=10mm grasp-slip target (8.22mm, `door_pass=True`) after Phase
+  8 diagnosed and fixed two independent slip mechanisms (arm-tracking
+  error and grip-force decline — `reports/phase8-slip-diagnosis.md`).
+  Setup variation (different handle positions/door geometries) has not
+  been tested — only the single fixed geometry from Phase 7A/7B. No
+  demonstration data collected for this task yet.
 
 ## 7. Reproduce
 
@@ -189,7 +194,7 @@ data/, logs/, artifacts/  datasets, raw evidence, and small evidence media
 
 | Document | What it is |
 | --- | --- |
-| [`reports/`](reports/) | 21 per-phase audit reports — the traceable source behind every number above, including Task 3's workspace map, scene, motion, and test phases (`phase7a`-`phase7d`) |
+| [`reports/`](reports/) | 24 per-phase audit reports — the traceable source behind every number above, including Task 3's workspace map, scene, motion, test, causality, and slip-diagnosis phases (`phase7a`-`phase8`) |
 | [`data/schema_v3.md`](data/schema_v3.md) | HDF5 field-level layout, for tooling and dataset users |
 | [`HANDOFF.md`](HANDOFF.md) | Chronological engineering history and the per-phase authorization record |
 | [`docs/work_log.md`](docs/work_log.md) | Running work log |
