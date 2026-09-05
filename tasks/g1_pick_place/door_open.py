@@ -87,7 +87,6 @@ from tasks.g1_pick_place.run_pick_place import (
     ARM_KP_4B,
     ARM_KV_4B,
     GRIPPER_KD_4E,
-    GRIPPER_KP_4E,
     _solve_waypoint,
     relative_slip_m,
     tcp_local_cube_offset,
@@ -105,20 +104,28 @@ LOG_DIR = ROOT / "logs"
 CANONICAL_CONFIG_PATH = ROOT / "data" / "task3_canonical_config.json"
 
 TIMESTEP = 0.002
-GRIPPER_KP_DOOR = GRIPPER_KP_4E  # reuse Task 1's currently-verified gripper gains as-is
-GRIPPER_KD_DOOR = GRIPPER_KD_4E
-# Arm position-servo gain for this task -- attempt 1 of a 3-attempt
-# calibration budget. Task 1's ARM_KP_4B=400 leaves a steady-state
-# position-servo droop of ~11mm of TCP error at the PREGRASP_HANDLE
-# posture (measured directly: qvel settles to ~0 while tcp_err plateaus
-# above SETTLE_TCP_POS_TOL=10mm) -- a static tracking bias at that specific
-# joint configuration, not a convergence or oscillation problem. Raising
-# the arm's own gain (not touching ARM_KP_4B, GRIPPER_KP_4E, or any Task 1
-# constant) to 600 measured 9.83mm at the same posture, clearing the bound
-# with ~1.7mm of margin; qvel was confirmed to still settle to ~0 (no
-# oscillation introduced). See reports/phase7c-door-motion.md.
-ARM_KP_DOOR = 600.0
+# Gains as of Phase 8 (reports/phase8-slip-diagnosis.md). Phase 7C's
+# original ARM_KP_DOOR=600 / GRIPPER_KP_DOOR=GRIPPER_KP_4E(320) fixed the
+# PREGRASP settle droop but left door_pass=False: max slip 22.3mm against
+# a 10mm target. Phase 8 traced this to TWO INDEPENDENT, ADDITIVE
+# mechanisms -- (1) arm tracking error, present from the first PULL_ARC
+# waypoint, demonstrated causal by a monotonic dose-response (arm_kp
+# 600->900->1200 cut slip 22.3->20.8->20.7mm and raised contact retention
+# 82%->90%); (2) bilateral grip-force decline partway through the pull
+# (Phase 7E's finding, gripper_kp 320->480->640 cut slip 22.3->18.7->16.3mm
+# and raised retention to 100%) -- and found that COMBINING both closes
+# the gap: at arm_kp=2200/gripper_kp=1200, max slip is 8.22mm,
+# door_pass=True (all 11 criteria), bit-identical across reruns, and
+# actuator force peaks at 63% of the physical torque limit (real margin,
+# not pushing past what the arm can actually deliver). Neither lever
+# alone reaches this; five weaker hypotheses (wrist-orientation
+# constraint, finger-pad contact height, and a conditioning-only
+# manipulation via null-space posture gain) were tested and found NOT to
+# explain the effect -- tightening orientation control made slip WORSE.
+ARM_KP_DOOR = 2200.0
 ARM_KV_DOOR = ARM_KV_4B
+GRIPPER_KP_DOOR = 1200.0
+GRIPPER_KD_DOOR = GRIPPER_KD_4E
 PREGRASP_STANDOFF_DEG = 8.0  # in-plane tangential standoff, see diagnose_door_reachability
 DRIVE_S_DOOR = {
     # CLOSE is 1.5s, not Task 1's 0.8s: measured directly (bilateral
@@ -418,12 +425,36 @@ def _override_finger_closing_range(root: ET.Element, extra_closing_m: float) -> 
 FINGER_EXTRA_CLOSING_M = 0.005
 
 
+def _override_finger_pad_height(root: ET.Element, pad_half_z: float) -> None:
+    """H2 ablation knob: finger pad Z half-extent, task-local to this
+    scene copy only (gripper_scene.py's FINGER_PAD_HALF/LEGACY_FINGER_PAD_HALF
+    are never redefined). Mirrors Task 1's own Phase 4E attempt 1 (taller
+    pads to keep the grasped object's center inside the pads' vertical
+    span despite wrist-roll drift) -- reused here as a direct, motivated
+    test of the same "grasp contact geometry" hypothesis for the door
+    handle, one factor at a time.
+    """
+    patched = 0
+    for el in root.iter("geom"):
+        name = el.get("name")
+        if name in ("left_finger_pad", "right_finger_pad"):
+            size = el.get("size", "").split()
+            if len(size) != 3:
+                raise RuntimeError(f"unexpected {name} size attribute: {el.get('size')!r}")
+            size[2] = f"{pad_half_z:.6f}"
+            el.set("size", " ".join(size))
+            patched += 1
+    if patched != 2:
+        raise RuntimeError(f"expected to patch 2 finger pad geoms, patched {patched}")
+
+
 def write_door_scene(
     geometry: dict,
     arm_kp: float = ARM_KP_DOOR,
     arm_kv: float = ARM_KV_DOOR,
     hinge_damping: float = HINGE_DAMPING,
     hinge_frictionloss: float = HINGE_FRICTIONLOSS,
+    finger_pad_half_z: float | None = None,
     scene_name: str = "g1_grasp_scene_door.xml",
 ) -> Path:
     """Task 3 scene: write_grasp_scene_5a()'s own output, plus a passive
@@ -448,6 +479,8 @@ def write_door_scene(
     if (arm_kp, arm_kv) != (ARM_KP_4B, ARM_KV_4B):
         _override_right_arm_gains(root, arm_kp, arm_kv)
     _override_finger_closing_range(root, FINGER_EXTRA_CLOSING_M)
+    if finger_pad_half_z is not None:
+        _override_finger_pad_height(root, finger_pad_half_z)
 
     pivot_x, pivot_y = geometry["pivot_xy"]
     radius = geometry["radius_m"]

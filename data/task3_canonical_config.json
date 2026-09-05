@@ -13,15 +13,15 @@
     "use_oriented_ik": true,
     "use_oriented_ik_note": "Unlike Task 1 (false throughout): Phase 7A/7B measured every arc waypoint meeting both the 8mm position and 7deg orientation tolerance simultaneously -- see reports/phase7a-workspace-map.md and reports/phase7c-door-motion.md.",
     "arm_gains": {
-      "kp": 600.0,
+      "kp": 2200.0,
       "kv": 25.0
     },
-    "arm_gains_note": "kp raised from Task 1's ARM_KP_4B=400 to clear an ~11mm steady-state settle droop at the PREGRASP_HANDLE posture; ARM_KP_4B itself is never modified. See reports/phase7c-door-motion.md attempt 1.",
+    "arm_gains_note": "kp raised to 2200 (from Phase 7C attempt-1 value of 600) as part of Phase 8: combined with the gripper-gain increase below, this closes the slip/force gap entirely. See reports/phase8-slip-diagnosis.md.",
     "gripper_gains": {
-      "kp": 320.0,
+      "kp": 1200.0,
       "kd": 20.0
     },
-    "gripper_gains_note": "Task 1's currently-verified GRIPPER_KP_4E/KD_4E, reused unchanged."
+    "gripper_gains_note": "kp raised to 1200 (from Task 1 GRIPPER_KP_4E=320) as part of Phase 8, combined with the arm-gain increase above. Neither alone reaches door_pass=True; both together do (max slip 8.22mm, all 11 criteria pass, actuator force peaks at 63% of the physical torque limit). See reports/phase8-slip-diagnosis.md."
   },
   "geometry": {
     "source": "logs/phase7b_selected_door_geometry.json",
@@ -62,14 +62,15 @@
     "criteria_source": "tasks.g1_pick_place.door_open.run_trial_door_open._finalize"
   },
   "current_measured_result": {
-    "source": "logs/phase7c_door_trial_nominal.json",
-    "hinge_qpos_ge_open_threshold": true,
-    "max_hinge_deg": 45.31,
-    "bilateral_contact_retained_through_arc": false,
-    "max_handle_slip_m": 0.0223,
-    "note": "Door reaches/exceeds its target open angle; bilateral grip force touches exactly 0.0N at one instant during the pull, so the strict grip-retention and slip criteria fail -- disclosed, not hidden. See reports/phase7c-door-motion.md."
+    "source": "logs/phase8_ablation_results.json (combined_arm2200_grip1200)",
+    "door_pass": true,
+    "max_hinge_deg": 52.36,
+    "max_handle_slip_m": 0.00822,
+    "min_bilateral_normal_force_n": 7.52,
+    "bilateral_contact_retained_through_arc": true,
+    "note": "Phase 8 closed the gap Phase 7C/7E left open: combining an arm-gain increase (fixes early tracking-driven slip) with a gripper-gain increase (fixes later force-driven slip) passes all 11 criteria in criteria_door, deterministic across reruns, on the nominal (genuinely-closed-start) configuration. See reports/phase8-slip-diagnosis.md for the full causal investigation, including which hypotheses were tested and rejected (wrist orientation, finger-pad height)."
   },
   "hash": {
-    "value": "7c74485038417bad8aca3fe20c740d8d1270705e4f0b996a77480d74c25ef93b"
+    "value": "7712e1beb907ec1e78f4b7914748e0280d3131f040f2478e4800b992609f0238"
   }
 }

@@ -382,24 +382,41 @@ class TestMinimumEvaluation(unittest.TestCase):
             self.assertNotIn(forbidden, src)
 
 
-class TestKnownLimitation(unittest.TestCase):
-    """Diagnostic tests that PASS by asserting the currently-measured,
-    disclosed limitation -- the same regression-diagnostic pattern already
-    used for Task 1's historical failures (tests/test_phase3_grasp.py,
-    tests/test_phase4f_orientation_grasp.py). If a future phase closes this
-    gap, these tests should be updated to lock the new result, not deleted
-    silently.
+class TestExpertReliability(unittest.TestCase):
+    """Phase 7C shipped arm_kp=600/gripper_kp=320, which passed 8 of 11
+    door criteria (door_pass=False, max slip 22.3mm, force touched exactly
+    0.0N mid-pull) -- disclosed as a limitation, not hidden, at the time.
+    Phase 8 traced this to two independent, additive mechanisms (early
+    arm-tracking-driven slip; later grip-force-driven slip) and found that
+    combining an arm-gain and a gripper-gain increase (now the shipped
+    defaults) closes the gap entirely. These tests lock the NEW verified
+    result, replacing the phase7c-era tests that asserted the old failure
+    -- the same "update tests to match newly-verified numbers" precedent
+    Task 1's Phase 4E already established, not a silent deletion. Full
+    causal investigation: reports/phase8-slip-diagnosis.md.
     """
 
-    def test_door_pass_is_honestly_false_at_nominal(self) -> None:
+    def test_door_pass_is_true_at_nominal(self) -> None:
         r = run_trial_door_open(_DOOR_SCENE, _GEOMETRY)
-        self.assertFalse(r["door_pass"])
-        self.assertTrue(r["criteria_door"]["hinge_qpos_ge_open_threshold"])
-        self.assertFalse(r["criteria_door"]["bilateral_contact_retained_through_arc"])
+        self.assertTrue(r["door_pass"])
+        for key, value in r["criteria_door"].items():
+            with self.subTest(criterion=key):
+                self.assertTrue(value)
 
-    def test_bilateral_normal_force_touches_zero_during_the_pull(self) -> None:
+    def test_bilateral_contact_force_never_touches_zero_during_the_pull(self) -> None:
         r = run_trial_door_open(_DOOR_SCENE, _GEOMETRY)
-        self.assertEqual(r["telemetry"]["min_bilateral_normal_force_n"], 0.0)
+        self.assertGreater(r["telemetry"]["min_bilateral_normal_force_n"], 0.0)
+
+    def test_max_slip_under_10mm_target(self) -> None:
+        r = run_trial_door_open(_DOOR_SCENE, _GEOMETRY)
+        self.assertLessEqual(r["telemetry"]["max_handle_slip_m"], 0.010)
+
+    def test_result_is_deterministic_across_reruns(self) -> None:
+        slips = {
+            run_trial_door_open(_DOOR_SCENE, _GEOMETRY)["telemetry"]["max_handle_slip_m"]
+            for _ in range(3)
+        }
+        self.assertEqual(len(slips), 1, "repeats must be bit-identical (no RNG anywhere)")
 
 
 if __name__ == "__main__":
