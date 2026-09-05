@@ -1410,3 +1410,115 @@ unrelated `vendor/unitree_mujoco` local-state drift and
 per every prior phase's practice. `submission/` was then updated to
 include Task 2 (videos, report Section 14, `results_summary.json`,
 `video_manifest.json`) in a separate local commit. No push.
+
+## Task 3 — articulated door-opening (2026-09-05/06)
+
+New manipulation class: sustained contact with an articulated object under
+a kinematic constraint (a hinged cabinet door), rather than brief
+grasp-and-carry of a free body — LIBERO's "open the microwave"/"open the
+top drawer" is the reference, and its joint-position success predicate is
+what `criteria_door` mirrors. Scope: task + success criteria + tests +
+report — explicitly **not** demonstration-dataset collection or policy
+integration. Full account: `reports/phase7-summary.md` and
+`reports/phase7a-workspace-map.md` through `reports/phase7e-slip-causality.md`.
+
+**Geometry is measured, not chosen.** `tasks/g1_pick_place/workspace_map.py`
+sweeps a 1,120-point physics-free TCP grid, characterising each solved
+configuration's Jacobian conditioning (manipulability, σ_min, condition
+number) and orientation reachability. Gate: **GO_HINGE** (2,994 admissible
+arcs before margin-selection). The locked geometry — pivot `[0.38,-0.16]`,
+0.08m radius, 60° swing, handle at `z=0.9` — reuses Task 1's exact
+verified squeeze-grip radius (`CUBE_HALF`) and was chosen by margin, not by
+the single largest admissible arc (the largest hugs the 7° orientation
+wall by construction). `tasks/g1_pick_place/door_open.py` builds the scene
+by re-parsing `write_grasp_scene_5a()`'s own output, never editing it or
+`gripper_scene.py` — confirmed by unchanged SHA-256 on
+`g1_grasp_scene_4b.xml`/`_5a.xml`/`_task2.xml` throughout every phase.
+
+**Three retroactive findings, project-wide relevant, not Task-3-local.**
+(1) The quoted `cube_dx ∈ [-0.035,-0.005]` reachable envelope
+(`reports/phase5e-scaled-data-collection.md`) is a sampling artifact, not
+a reach limit — single-waypoint TCP reach extends to `x=0.10` at table
+height, ~22cm toward the robot. (2) Phase 4A's accepted/rejected boundary
+is explained quantitatively: it sits at Jacobian σ_min ≈ 0.010 (accepted
+∈ [0.0121,0.0527], rejected ∈ [0.0063,0.0084], n=5, clean non-overlapping
+gap); Task 1's own nominal grasp point (manipulability 0.00384) sits at
+the **0.2th percentile** of 976 reachable workspace points. (3) Phase 4F's
+orientation-IK conflict is height-dependent, not architectural: no point
+at table height meets a 7° orientation tolerance anywhere in the measured
+workspace (min 31.1°); 10cm higher, 67 sampled points do (min 0.9°). Task
+3 uses `use_oriented_ik=True` throughout with zero position-residual cost,
+confirming this directly.
+
+**Seven real bugs found and fixed, every one by running physics or
+writing a test, never by inspection.** Scene: a units bug (rotation
+written in degrees against a `radian`-compiled model — the measured handle
+position gave it away exactly), a 55mm idle-arm/panel collision (the
+resting-arm clearance check didn't originally cover the 7 wrist-chain link
+bodies at all), and later a smaller 4.66-9.6mm idle-arm/finger collision
+(the same check didn't cover the gripper's own finger/palm bodies either —
+found by the test suite, kept as a documented exception rather than
+re-searched, since every real trial has the arm under active control, not
+idle). Motion: a wrong gripper-gain constant (Phase 3C's superseded
+150/20 instead of the currently-verified 320/20), a ~11mm steady-state
+servo droop at the pregrasp posture (fixed with a task-local, disclosed
+arm-gain increase to 600 — `ARM_KP_4B` itself untouched), and an
+IK-redundancy sensitivity where warm-starting the approach solve from the
+arm's post-standoff state (rather than a fixed reference) left one finger
+pad short of the handle by under a millimetre. Tests: waypoints were
+targeting the geometry's nominal angle regardless of the door's actual
+live hinge state (unlike Task 1/2, which always read live object pose),
+and the anti-cheat "was it closed" check compared against absolute zero
+instead of the trial's own declared starting angle — both surfaced only
+once the 4-configuration evaluation matrix (with "already ajar" probes)
+was built.
+
+**Result**: reaches/exceeds the target open angle (45.31° of 45°,
+deterministic). `door_pass` is honestly `False` — bilateral grip force
+touches exactly 0.0N for 438 of 2,475 steps during the pull (Phase 7E
+instrumentation, `logs/phase7e_pull_diagnostics.json`), and max slip is
+22.3mm against a 10mm target. **Causal isolation, not just correlation**:
+re-running the identical arc at 1.5x/2x gripper gain held Jacobian
+conditioning fixed to 4 significant figures while cutting max slip to
+16.3mm and eliminating all contact-loss episodes — force insufficiency is
+a demonstrated partial cause. It does not close the gap alone (`door_pass`
+still `False` at 2x force; slip already exceeds 10mm at t=1.55s, before
+the force decline is even visible at t=1.82s) — a second contributor,
+plausibly the same TCP-frame-rotation mechanism Task 1's Phase 4C/4E
+identified, remains open. Kinematic conditioning's own raw correlation
+with slip (r≈0.90) is real but confounded with monotonic arc progress —
+detrending against time made it *stronger*, the signature of a confound a
+single trial cannot separate — and was not supported as causal by the one
+experiment actually run.
+
+**Integrity**: door is structurally passive (no actuator/equality/tendon
+on any door body — confirmed by scene inspection, not just by omitting a
+control signal). `HingeInitGuard` mirrors `CubeInitGuard`'s contract
+(1-qpos/1-dof slice instead of 7-wide freejoint). The import-time source
+self-audit scans all six step/drive/settle functions (module-level here,
+not nested closures like Task 1's, so a single-function scan would have
+missed bugs in the others) and forbids `qfrc_applied` on the hinge's own
+dof — a cheat surface a 1-DOF joint has that a free body's 6 dof don't
+reduce to as simply.
+
+**Tests**: 34 new (`tests/test_door_open.py`, 9 classes mirroring Task 2's
+template), including two diagnostic tests that pass by asserting the known
+grip-force limitation explicitly — the same regression-diagnostic pattern
+already used for Task 1's historical failures. Full suite: 345 tests, 0
+unexpected failures. One unrelated fix made during this phase's full-suite
+run: `tests/test_phase4e_gripper_integrity.py` asserted the literal string
+"pending human" in `reports/phase4e-gripper-integrity-repair.md`, broken
+by an earlier session's active-voice rewrite of that report ("pending
+human visual review" → "pending my visual review") — updated the
+assertion to match the corrected wording, not reverted.
+
+**What remains, not yet authorized**: (A) closing the slip/force gap
+further — the natural next step given Phase 7E's finding that a second,
+non-force contributor exists and appears before the force decline; the
+evidence-driven pattern would be to instrument wrist roll during the arc
+and test it directly, the same approach used for every prior
+grasp-stability phase. (B) Demonstration-dataset collection for Task 3,
+extending the existing two-rate HDF5 pipeline (Task 1's Phase 5B-5E
+precedent) — lower priority than (A), since collecting demonstrations of a
+task that mostly fails its strict criteria is low-value until the success
+rate improves. No push; not merged to `main` as of this entry.

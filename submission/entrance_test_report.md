@@ -28,10 +28,23 @@ policy-action decoder meets a 10mm replay-fidelity target on 18 of the 24
 behaviour-cloning-pool episodes (22 of 29 dataset-wide), with every
 excess-error case isolated to the post-release RETREAT phase.
 
-**Tests**: 311 (288 pre-Task-2 + 23 new), 0 unexpected failures.
+**Task 3** ("open the cabinet door") is a new manipulation class: sustained
+contact with an articulated object under a kinematic constraint, rather
+than brief grasp-and-carry of a free body. Its geometry (hinge pivot,
+handle radius, swing) was derived from a measured TCP workspace/
+conditioning map, not chosen by hand — the same map retroactively explains
+two earlier, previously-unresolved Task 1 findings (§8). The arm
+reaches/exceeds the door's target open angle, but bilateral grip force
+touches exactly 0.0N at one instant during the pull, so the stricter
+grip-retention and slip criteria fail — disclosed, not hidden, the same
+treatment Task 1's own Phase 4E gave an analogous finding. No demonstration
+data was collected for this task.
 
-Task 3, model training, and model inference were never attempted; Task 2's
-own scaled dataset collection and policy integration remain not started.
+**Tests**: 345 (311 pre-Task-3 + 34 new), 0 unexpected failures.
+
+Model training and model inference were never attempted; Task 2's own
+scaled dataset collection and policy integration remain not started; Task 3
+has no demonstration-collection or policy-integration work either.
 
 ## 2. Contributions and Role
 
@@ -71,8 +84,15 @@ under small arm torques, which is why the fixed-base MVP was chosen.
 **Task 2**: language-conditioned two-object selection on the same scene
 with a second, physically-identical green cube (§7).
 
-**Task 3** and any form of model training or inference were never
-implemented or attempted in any phase.
+**Task 3**: *"Open the cabinet door."* A passive hinged door — no
+actuator, no equality, moved only by real contact through the gripper —
+whose geometry (pivot, handle radius, swing) is derived from a measured
+workspace/conditioning map rather than chosen by hand. The arm reaches its
+target open angle; a disclosed grip-force limitation during the pull
+remains open (§8).
+
+Model training or inference was never implemented or attempted in any
+phase.
 
 ## 4. System Design
 
@@ -90,7 +110,7 @@ distinguishably-coloured pads.
 **Controller** (Phase 3C onward, entirely classical):
 
 - **Bounded MuJoCo `<position>` servos** per right-arm joint, retaining the
-  real force limits — replacing the earlier torque-PD architecture (§8).
+  real force limits — replacing the earlier torque-PD architecture (§9).
 - **Waypoint-based, position-priority damped-least-squares IK**
   (`controller_3c.py::solve_ik_waypoint`), solved once per motion segment,
   with null-space joint-limit avoidance and a nominal-posture objective.
@@ -247,7 +267,77 @@ exact prior values, and Task 1's measured nominal result is unchanged
 `5f119ce`: 311 tests, 0 unexpected failures. The independent audit found no
 material defects and required no corrective commit.
 
-## 8. Failures and Debugging Process
+## 8. Task 3 — Articulated Door-Opening
+
+Full evidence: `reports/phase7a-workspace-map.md` through
+`reports/phase7d-door-tests.md`.
+
+This is a new manipulation class for the project: sustained contact with
+an **articulated** object under a kinematic constraint, rather than brief
+grasp-and-carry of a free body. The gripper must maintain grip while the
+hand's path is dictated by a hinge, not by the planner — directly stressing
+Task 1's largest documented weakness (grasp slip under load).
+
+**Geometry is derived, not chosen.** A physics-free TCP workspace and
+Jacobian-conditioning sweep (1,120 points) measured where this fixed-base
+arm's reach is well conditioned and orientation-achievable, then a
+deterministic search inscribed the largest well-margined circular arc
+inside that region. The resulting door — pivot, 8cm handle radius, 60°
+swing — passed the pre-registered go/no-go gate (`GO_HINGE`) with 2,994
+admissible candidates before margin-selection; the handle itself reuses
+Task 1's exact verified squeeze-grip geometry (radius = `CUBE_HALF`).
+
+**The map retroactively explains two earlier, previously-unresolved
+findings.** Phase 4A's grasp-envelope boundary (§5) is explained
+quantitatively: the accepted/rejected cut sits at a Jacobian smallest
+singular value of ≈0.010, and Task 1's own nominal grasp point sits at the
+1st percentile of manipulability across the measured workspace — the task
+has been operating at one of the worst-conditioned reachable points on the
+table the entire time. Separately, no point anywhere at Task 1's grasp
+height meets a 7° wrist-orientation tolerance; 10cm higher, dozens of
+points do — meaning the door's orientation-constrained IK (used throughout,
+unlike Task 1) works with zero position-residual cost, confirming that
+Task 1's own orientation-IK conflict was a height artifact, not an
+architectural limitation.
+
+**Result**: the arm reaches/exceeds the door's target open angle (45.3° of
+a 45° threshold, deterministic across repeats). The disclosed limitation:
+bilateral grip force touches exactly 0.0N at one instant during the pull,
+so the stricter grip-retention (`bilateral_contact_retained_through_arc`)
+and slip (`max_handle_slip_le_10mm`, measured 22.3mm) criteria fail —
+`door_pass` is honestly `False`. This is the same physical phenomenon Task
+1's Phase 4E disclosed rather than hid (a real, momentary zero-force
+contact instant underneath a still-registering boolean contact check).
+
+**Engineering findings along the way**, each caught by directly running
+physics rather than trusting a plan: a units bug (the scene's rotation was
+written in degrees against a `radian`-compiled model, caught because the
+measured handle position didn't match); a wrong gripper-gain constant
+(imported Phase 3C's superseded gains instead of the currently-verified
+ones); a redundancy-resolution sensitivity (warm-starting the approach
+solve from the arm's post-standoff state, rather than a fixed reference,
+left one finger pad short of the handle by under a millimetre); and a
+resting-arm clearance check that initially covered the wrist-chain links
+but not the gripper's own fingers, which extend further from the wrist
+than those links do.
+
+**Integrity**: the door is structurally passive — no actuator, equality,
+or tendon on any door body, so opening it requires real contact force,
+not an omitted control signal. `HingeInitGuard` mirrors `CubeInitGuard`'s
+contract; the import-time source self-audit is extended to scan all six
+of the task's step/drive/settle functions (not just the outer trial
+function, since they are module-level here rather than nested closures)
+and to forbid `qfrc_applied` on the hinge's own dof — a cheat surface a
+1-DOF joint has that a free body's 6 dof don't reduce to as simply.
+
+**Tests**: 34 new (`tests/test_door_open.py`), including two diagnostic
+tests that pass by asserting the known grip-force limitation explicitly,
+the same regression-diagnostic pattern already used for Task 1's
+historical failures. Full suite: 345 tests, 0 unexpected failures. No
+demonstration dataset was collected for this task; the data pipeline
+(§6) is untouched.
+
+## 9. Failures and Debugging Process
 
 Two controller architectures were tried before one succeeded; a visual
 defect was caught by my own review after the pipeline had already passed
@@ -300,7 +390,7 @@ In chronological order:
 
 Per-attempt evidence for every item is in the matching `reports/phase*.md`.
 
-## 9. Limitations
+## 10. Limitations
 
 - Strict max-3D-grasp-slip ≤10mm bar: **not met** (25.92mm). The
   pad-vertical-overlap and physical-release criteria under Phase 4F's
@@ -318,8 +408,12 @@ Per-attempt evidence for every item is in the matching `reports/phase*.md`.
 - **7 of 29 scaled policy-action replays exceed the 10mm target**, all
   first diverging at the post-release RETREAT phase.
 - **Model training and inference were never attempted.**
-- **Task 3 was never implemented.** Task 2's own scaled dataset collection
-  and policy integration were also never started (§7).
+- **Task 3's grip-retention and slip criteria are not met** (bilateral
+  contact force touches 0.0N at one instant during the pull, 22.3mm
+  measured slip against a 10mm target) — the door still reaches its target
+  open angle, but `door_pass` is honestly `False` (§8). No demonstration
+  data was collected for Task 3, and Task 2's own scaled dataset
+  collection and policy integration were also never started (§7).
 - The 5-variant sweep uses a single shared, untuned configuration by
   design — the envelope is a property of that configuration, not the best
   achievable per position.
@@ -327,7 +421,7 @@ Per-attempt evidence for every item is in the matching `reports/phase*.md`.
   phase agreement during replay is reported from recorded metadata, not
   independently re-derived.
 
-## 10. Time Spent
+## 11. Time Spent
 
 No phase tracked hands-on time while in progress. The figures below are
 derived from the commit history: elapsed wall-clock time between each
@@ -366,7 +460,7 @@ time across 3 rest gaps. Where a phase separately logged a hands-on
 estimate, it is in that phase's own report (Phase 3C: a "~4 hour" budget,
 1 of 4 attempts consumed; Phase 5E: ~3 hours).
 
-## 11. Reproduction, Documentation, and Future Work
+## 12. Reproduction, Documentation, and Future Work
 
 **Reproduce**: see [`REPRODUCE.md`](REPRODUCE.md) — every command listed
 there was actually executed in this environment, with real observed
@@ -374,13 +468,13 @@ runtimes recorded.
 
 **Where the detail lives**: [`DATASET_CARD.md`](DATASET_CARD.md) (dataset
 usage terms and biases), [`../data/schema_v3.md`](../data/schema_v3.md)
-(HDF5 layout), `reports/` (17 per-phase audit reports — the traceable
+(HDF5 layout), `reports/` (21 per-phase audit reports — the traceable
 source behind every number here), `HANDOFF.md` (chronological engineering
 history and the per-phase authorization record).
 
 **Future work:**
 
-- Close the RETREAT-phase policy-replay gap (§8, item 13) — a larger H, or
+- Close the RETREAT-phase policy-replay gap (§9, item 13) — a larger H, or
   a position-dependent correction for large single-transition jumps.
 - A v2 collection spec enabling genuine target-position variation, which
   requires an authorized Task 1 scene-geometry change.
@@ -389,4 +483,7 @@ history and the per-phase authorization record).
   tuning budgets.
 - Scaled dataset collection and policy integration for Task 2.
 - Model training and inference against the dataset.
-- A Task 3 environment.
+- Close Task 3's grip-retention/slip gap (§8) — likely needs a
+  trajectory/waypoint redesign, following the same evidence-driven pattern
+  as Task 1's Phase 4E/4F, rather than another gain adjustment.
+- Demonstration-dataset collection and policy integration for Task 3.

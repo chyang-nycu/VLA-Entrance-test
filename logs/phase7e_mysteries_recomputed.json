@@ -1,0 +1,51 @@
+{
+  "variants": [
+    {
+      "name": "nominal",
+      "residual_mm": 7.832132452080569,
+      "sigma_min": 0.014029237895518956,
+      "condition_number": 40.63621108921047,
+      "manipulability": 0.0038369490578762004,
+      "reachable": true
+    },
+    {
+      "name": "x_minus_0.03",
+      "residual_mm": 5.059389467570519,
+      "sigma_min": 0.05274428521480665,
+      "condition_number": 10.510768509428475,
+      "manipulability": 0.013575892267077967,
+      "reachable": true
+    },
+    {
+      "name": "x_plus_0.03",
+      "residual_mm": 26.950088858649007,
+      "sigma_min": 0.006325030390092973,
+      "condition_number": 90.18760897506147,
+      "manipulability": 0.0017418757714661973,
+      "reachable": false
+    },
+    {
+      "name": "y_plus_0.03",
+      "residual_mm": 7.633655687185055,
+      "sigma_min": 0.012071560864041214,
+      "condition_number": 46.86512831936414,
+      "manipulability": 0.0032756173223658543,
+      "reachable": true
+    },
+    {
+      "name": "y_minus_0.03",
+      "residual_mm": 8.788081410535256,
+      "sigma_min": 0.008366870162787109,
+      "condition_number": 68.67824924066741,
+      "manipulability": 0.0023105137100715907,
+      "reachable": false
+    }
+  ],
+  "workspace_manipulability": {
+    "min": 0.0036336787608489975,
+    "median": 0.01971466390067885,
+    "max": 0.024151610110503065,
+    "n": 976
+  },
+  "nominal_percentile": 0.20491803278688525
+}

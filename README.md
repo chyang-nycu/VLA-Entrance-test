@@ -7,9 +7,13 @@ grasping baseline to a VLA-oriented demonstration pipeline:
 
 - **Task 1** — single-object pick-and-place (fixed-base, torso-constrained upper body).
 - **Task 2** — object-conditioned two-object selection on the same scene.
+- **Task 3** — articulated door-opening: a hinged cabinet door, geometry
+  derived from a measured workspace/conditioning map rather than chosen by
+  hand. Reaches its target open angle; a disclosed grip-force limitation
+  during the pull remains open (§6).
 - **VLA pipeline** — RGB + proprioception observations, recorded expert
-  actions, HDF5 demonstrations, replay validation.
-- Both tasks use a **scripted classical expert** — no learned policy or
+  actions, HDF5 demonstrations, replay validation (Task 1 only so far).
+- All tasks use a **scripted classical expert** — no learned policy or
   language grounding is claimed. Every grasp is produced by physical
   contact and actuation: no teleport, weld, or scripted state overwrite.
 
@@ -27,11 +31,12 @@ grasping baseline to a VLA-oriented demonstration pipeline:
 | --- | --- |
 | Task 1 | Pick-and-place completed in the supported reachable envelope |
 | Task 2 | 4 configs x 3 deterministic repeats, 12/12 pass |
+| Task 3 (door-opening) | Reaches/exceeds the 45deg open target; grip force touches 0.0N at one instant during the pull (disclosed, not hidden) |
 | Wrong-object placements | 0 |
 | Distractor displacement | <=1.73mm |
 | Demonstration pipeline | RGB + proprioception + actions + replay |
 | Policy-action replay | 8.09mm canonical max TCP error |
-| Tests | 311, 0 unexpected failures |
+| Tests | 345, 0 unexpected failures |
 | Learned policy | Not attempted |
 | Isaac Lab | MuJoCo implementation instead |
 
@@ -88,6 +93,16 @@ could not reproduce the expert's 500Hz control trace on replay (up to
 ~98mm error). Chunking actions into H=5 sub-deltas at an effective 50Hz
 reduced canonical replay error to 8.09mm.
 
+- **Workspace conditioning explains two earlier mysteries at once.**
+  Mapping the arm's reachability/conditioning directly (a gap Task 1 had
+  flagged but never closed) found the quoted "3cm x 4.5cm envelope" was a
+  sampling artifact — the real reach toward the body is ~22cm — and that
+  Task 1's grasp point sits at the 1st percentile of manipulability across
+  the whole workspace. It also found orientation reachability is sharply
+  height-dependent: at table height nothing meets a 7deg wrist-alignment
+  tolerance anywhere; 10cm higher, dozens of points do. That gap is what
+  Task 3's door task exploits.
+
 ## 5. VLA Demonstration Pipeline
 
 ```text
@@ -137,6 +152,11 @@ The HDF5 itself is untracked (62MB); regenerate it deterministically with
   (measured ~25.9mm); task-level pick-and-place otherwise works.
 - Task 2 uses privileged object selection (`selected_object_id` supplied
   directly), not natural-language parsing or visual-language grounding.
+- Task 3 (door-opening) reaches its target open angle, but bilateral grip
+  force touches exactly 0.0N at one instant during the pull, so the
+  stricter grip-retention and slip criteria fail — disclosed, not hidden
+  (`reports/phase7c-door-motion.md`). No demonstration data collected for
+  this task.
 
 ## 7. Reproduce
 
@@ -169,7 +189,7 @@ data/, logs/, artifacts/  datasets, raw evidence, and small evidence media
 
 | Document | What it is |
 | --- | --- |
-| [`reports/`](reports/) | 17 per-phase audit reports — the traceable source behind every number above |
+| [`reports/`](reports/) | 21 per-phase audit reports — the traceable source behind every number above, including Task 3's workspace map, scene, motion, and test phases (`phase7a`-`phase7d`) |
 | [`data/schema_v3.md`](data/schema_v3.md) | HDF5 field-level layout, for tooling and dataset users |
 | [`HANDOFF.md`](HANDOFF.md) | Chronological engineering history and the per-phase authorization record |
 | [`docs/work_log.md`](docs/work_log.md) | Running work log |
